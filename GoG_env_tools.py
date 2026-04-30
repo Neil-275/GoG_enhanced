@@ -244,11 +244,11 @@ class FreeBaseEnv:
             # Use KGInterface to get 1-hop triples
             if self.kg:
                 try:
-                    triples_df = self.kg.get_1hop_triples_incomplete(entity_id)
+                    triples_df = self.kg.get_1hop_triples(entity_id)
                     # Convert DataFrame to list format: [head, relation, tail]
                     triples = triples_df.values.tolist() if len(triples_df) > 0 else []
                     relations = list(set([triple[1] for triple in triples]))
-                    # logger.debug(f"Relations after get_1hop_triples_incomplete: {relations}")
+                    # logger.debug(f"Relations after get_1hop_triples: {relations}")
                 except Exception as e:
                     logger.error(f"Failed to get 1-hop triples for {entity_id}: {e}")
                     triples = []
