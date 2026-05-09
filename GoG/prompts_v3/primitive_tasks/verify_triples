@@ -1,0 +1,6 @@
+Analyze the following question and the relational paths of the potential candidates.
+Determine which candidate's path logically simplifies to the relationship requested in the question.
+Consider the directionality of the relations (e.g., parent_of vs. child_of) to ensure the logic flows correctly from the question's subject to the candidate.
+Think step-by-step through the whole property logic for each path provided.
+Select only the single most appropriate candidate ID. Return None if no candidate logically satisfies the relationship.
+Only output the appropriate ID of the candidates or None. Provide no further explanation

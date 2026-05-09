@@ -7,3 +7,5 @@ results/
 *.sample
 .env
 NBFNet_PyG/experiments/*
+*.pyc
+__pycache__/
