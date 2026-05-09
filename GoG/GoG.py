@@ -81,12 +81,16 @@ def write_results(data, env: KGEnv, prediction, args):
                 "question": data["question"],
                 "prediction": prediction,
                 "ground_truth": data["answer"] + data['hard_answer'],
+                "generate_call_count": env.generate_call_count,
                 "records": env.records,
             }
             if env.llm_output:
                 res["llm_output"] = env.llm_output
 
             f.write(json.dumps(res) + "\n")
+        logger.info(
+            f"Finished query {data['id']}: generate_call_count={env.generate_call_count}"
+        )
 
 
 def find_answer(process_idx, idxes_to_process, args, datas, env):

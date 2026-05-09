@@ -73,6 +73,7 @@ class KGEnv:
         self.n_related_triples = self.args.n_related_triples
         # only used in answer without kg
         self.llm_output = None
+        self.generate_call_count = 0
         self.topic_entities = None
         self.question = None
 
@@ -102,6 +103,7 @@ class KGEnv:
         self.n_related_triples = self.args.n_related_triples
         # only used in answer without kg
         self.llm_output = None
+        self.generate_call_count = 0
 
 
     def convert_records_to_str(self):
@@ -142,6 +144,7 @@ class KGEnv:
             else:
                 return self.search(parameter)
         elif action == "generate":
+            self.generate_call_count += 1
             return self.generate(parameter)
 
     def generate(self, thought):
