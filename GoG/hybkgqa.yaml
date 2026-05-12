@@ -29,3 +29,5 @@ dependencies:
       - easydict
       - pyyaml
       - torch-geometric
+      - pandas
+      - loguru
