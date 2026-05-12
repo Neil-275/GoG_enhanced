@@ -251,7 +251,7 @@ class KGEnv:
         # else:
         #     result = convert_triples_to_str(generated_triples)
 
-        return result
+        return "\n".join(result)
 
     def verify(self, thought, relation_paths):
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/verify_triples")

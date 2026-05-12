@@ -22,16 +22,16 @@ embed_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 class FB15k_237_Config:
     """Configuration for FB15k-237 dataset"""
-    incomplete_path = "brink_dataset/fb15k_237/private_id/knowledge_graph_complete.tsv"
-    complete_path = "brink_dataset/fb15k_237/private_id/knowledge_graph_incomplete.tsv"
+    incomplete_path = "brink_dataset/fb15k_237/private_id/knowledge_graph_incomplete.tsv"
+    complete_path = "brink_dataset/fb15k_237/private_id/knowledge_graph_complete.tsv"
     rel2id_path = "brink_dataset/fb15k_237/rel2id.pkl" # For translation from BRINK ID to GNN ID
     ent2id_path = "brink_dataset/fb15k_237/ent2id.pkl"
 
 
 class FamilyConfig:
     """Configuration for Family dataset"""
-    incomplete_path = "brink_dataset/family/knowledge_graph_complete.tsv"
-    complete_path = "brink_dataset/family/knowledge_graph_incomplete.tsv"
+    incomplete_path = "brink_dataset/family/knowledge_graph_incomplete.tsv"
+    complete_path = "brink_dataset/family/knowledge_graph_complete.tsv"
     rel2id_path =  "brink_dataset/family/rel2id.pkl"
     ent2id_path =  "brink_dataset/family/ent2id.pkl"
 
