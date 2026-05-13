@@ -1,0 +1,3 @@
+- Sử dụng sparse matrix cho tính PPR khi sử dụng GPU (khác với code gốc là
+sparse matrix sẽ không có cạnh lặp)
+- Thêm eval train 

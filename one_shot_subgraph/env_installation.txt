@@ -1,0 +1,3 @@
+pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cu126
+pip install torch-scatter -f https://data.pyg.org/whl/torch-2.1.0+cu126.html
+pip install networkx scikit-learn scipy tqdm pickle-mixin
