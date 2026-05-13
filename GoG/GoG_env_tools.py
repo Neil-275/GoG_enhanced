@@ -37,8 +37,8 @@ import pickle as pkl
 class KGEnv:
     def __init__(self, args) -> None:
         self.args = args
-        with open("sample_args_family.pkl", "wb") as f:
-            pkl.dump(self.args, f)
+        # with open("sample_args_family.pkl", "wb") as f:
+        #     pkl.dump(self.args, f)
         self.dataset_name = args.dataset.split("/")[1]
 
         # Initialize KGInterface
@@ -301,7 +301,7 @@ class KGEnv:
         return filtered_triples, relations
 
     def search(self, entity_names):
-        print(f"Search entity names: {entity_names}", type(entity_names))
+        # print(f"Search entity names: {entity_names}", type(entity_names))
         entity_names = parse_llm_output_to_list(entity_names)
 
         all_related_triples = []

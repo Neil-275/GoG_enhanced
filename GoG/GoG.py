@@ -329,8 +329,9 @@ if __name__ == "__main__":
         for k in data.keys():
             if type(data[k]) == str and data[k].startswith("[") and data[k].endswith("]"):
                 data[k] = literal_eval(data[k])
+        # print(data)
                 
-
+    # exit()
     # print(datas[0])
     postfix = '_no-kb' if args.no_kg else ""
     dataset_name = args.dataset.split("/")[1]
@@ -364,7 +365,7 @@ if __name__ == "__main__":
 
     
     #REMOVE LATER
-    datas = datas[12:22]
+    datas = datas[136:137]
 
     
     idxes_to_process = range(len(datas))

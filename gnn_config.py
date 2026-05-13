@@ -17,6 +17,7 @@ one_shot_subgraph_config: dict = {
     "family":{
         "args": {
             "device": "cuda:0",
+            "gpu": "0",
             "topk": 0.1,
             "topm": -1,
             # "n_ent": 
@@ -31,14 +32,15 @@ one_shot_subgraph_config: dict = {
             "concatHidden": False,
             "shortcut": False,
             "readout": "linear",
-            "cache_dir": "cache/family",
+            "cache_dir": "data_for_LP/id_processed/family/",
             "add_inverse_edges": True,
-            "add_idd_edges": False,
+            "add_idd_edges": True,
         },
     },
     "fb15k_237": {
         "args": {
             "device": "cuda:0",
+            "gpu": "0",
             "topk": 0.1,
             "topm": -1,
             "add_manual_edges": False,
@@ -52,9 +54,9 @@ one_shot_subgraph_config: dict = {
             "concatHidden": False,
             "shortcut": False,
             "readout": "linear",
-            "cache_dir": "cache/family",
+            "cache_dir": "data_for_LP/id_processed/fb15k_237/",
             "add_inverse_edges": True,
-            "add_idd_edges": False,
+            "add_idd_edges": True,
         },
     },
     "wikidata5m": {

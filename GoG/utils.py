@@ -421,4 +421,4 @@ def convert_jsonl_to_json(jsonl_filepath):
     return str(json_filepath)
 
 if __name__ == "__main__":
-    print(parse_llm_output_to_list("[Cody Linley, Joe Jonas, Nicholas Braun, Abli"))
+    print(parse_llm_output_to_list("[Cody Linley/ Joe Jonas/ Nicholas Braun/ Abli"))

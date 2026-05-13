@@ -1,6 +1,6 @@
 from GoG.kg_interface import KGInterface
-from NBFNet_PyG.nbfnet.inference import *
-from NBFNet_PyG.nbfnet import util as gnn_util
+# from NBFNet_PyG.nbfnet.inference import *
+# from NBFNet_PyG.nbfnet import util as gnn_util
 from one_shot_subgraph.model import GNN_auto
 from one_shot_subgraph.PPR_sampler import pprSampler
 import os
