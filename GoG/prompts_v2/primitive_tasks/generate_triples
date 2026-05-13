@@ -11,7 +11,7 @@ Known Triples:
 125	educational_institution.campuses	2666
 125	educational_institution.school_type	15
 Output:
- 125: location.located_in
+125: location.located_in
 
 
 Thought: what is the timezone of 5612
@@ -19,7 +19,7 @@ Known Triples:
 5612	located_in	412
 412	timezone	27
 Output:
- 5612: timezone	
+5612: timezone	
 
 Here is the question.
 

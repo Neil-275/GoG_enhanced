@@ -24,16 +24,16 @@ class FB15k_237_Config:
     """Configuration for FB15k-237 dataset"""
     incomplete_path = "brink_dataset/fb15k_237/private_id/knowledge_graph_incomplete.tsv"
     complete_path = "brink_dataset/fb15k_237/private_id/knowledge_graph_complete.tsv"
-    rel2id_path = "brink_dataset/fb15k_237/rel2id.pkl" # For translation from BRINK ID to GNN ID
-    ent2id_path = "brink_dataset/fb15k_237/ent2id.pkl"
+    rel_path = "brink_dataset/fb15k_237/private_id/relations.txt" # For translation from BRINK ID to GNN ID
+    ent_path = "brink_dataset/fb15k_237/private_id/entities.txt"
 
 
 class FamilyConfig:
     """Configuration for Family dataset"""
     incomplete_path = "brink_dataset/family/knowledge_graph_incomplete.tsv"
     complete_path = "brink_dataset/family/knowledge_graph_complete.tsv"
-    rel2id_path =  "brink_dataset/family/rel2id.pkl"
-    ent2id_path =  "brink_dataset/family/ent2id.pkl"
+    rel_path = "brink_dataset/family/relations.txt"
+    ent_path = "brink_dataset/family/entities.txt"
 
 
 class Wikidata5mConfig:
@@ -60,30 +60,9 @@ DATASET_CONFIG_MAP = {
 # ============================================================================
 
 class KGInterface:
-    """
-    Interface for interacting with Knowledge Graphs stored as Pandas DataFrames.
-    
-    The KG is represented as a DataFrame with columns: [head, relation, tail]
-    Supports both 'complete' and 'incomplete' graphs via kg_type parameter (defaults to 'incomplete').
-    """
     
     def __init__(self, dataset_name: str, base_path: Optional[str] = None):
-        """
-        Initialize the KG interface for a given dataset.
-        
-        Args:
-            dataset_name: Name of the dataset (e.g., 'fb15k_237', 'family', 'wikidata5m')
-            base_path: Optional base path to prepend to config file paths
-            
-        Raises:
-            ValueError: If dataset_name is not in DATASET_CONFIG_MAP
-        """
-        if dataset_name.lower() not in DATASET_CONFIG_MAP:
-            raise ValueError(
-                f"Unknown dataset: {dataset_name}. "
-                f"Available datasets: {list(DATASET_CONFIG_MAP.keys())}"
-            )
-        
+
         self.dataset_name = dataset_name.lower()
         self.config = DATASET_CONFIG_MAP[self.dataset_name]
         self.base_path = Path(base_path) if base_path else Path(".")
@@ -103,23 +82,6 @@ class KGInterface:
         logger.info(f"Entities: {len(self.entities)} (optional)")
         logger.info(f"NetworkX Complete Graph - Nodes: {self.complete_graph_nx.number_of_nodes()}, Edges: {self.complete_graph_nx.number_of_edges()}")
         logger.info(f"NetworkX Incomplete Graph - Nodes: {self.incomplete_graph_nx.number_of_nodes()}, Edges: {self.incomplete_graph_nx.number_of_edges()}")
-
-    def _build_entity_mapping(self) -> None:
-        """Build a consecutive entity id mapping from the loaded KGs.
-
-        This intentionally does NOT depend on any precomputed `ent2id.pkl`.
-        The mapping is stable across runs by sorting entity labels.
-        """
-        all_entities = set(pd.concat([
-            self.complete_kg["head"].astype(str),
-            self.complete_kg["tail"].astype(str),
-            self.incomplete_kg["head"].astype(str),
-            self.incomplete_kg["tail"].astype(str),
-        ]).unique())
-
-        entities_sorted = sorted(all_entities)
-        self.entity2id = {ent: idx for idx, ent in enumerate(entities_sorted)}
-        self.id2entity = {idx: ent for ent, idx in self.entity2id.items()}
 
     def _build_pyg_data(self, kg_type: str = "incomplete", add_inverse: bool = True) -> Data:
         """Build a `torch_geometric.data.Data` representation of the KG.
@@ -219,23 +181,22 @@ class KGInterface:
         self.incomplete_kg = pd.read_csv(incomplete_path, sep='\t' if incomplete_path.suffix == '.tsv' else ',')
         self.incomplete_kg.columns = ['head', 'relation', 'tail']
         self.incomplete_kg = self.incomplete_kg.astype(str)
+        self.list_edges = list(zip(self.incomplete_kg['head'], self.incomplete_kg['relation'], self.incomplete_kg['tail']))
         
-        self.rel2id = pkl.load(open(self.base_path / self.config.rel2id_path, 'rb'))
+        with open(self.base_path / self.config.rel_path, 'r') as f:
+            self.relations = [line.strip() for line in f]
         if self.dataset_name == "family":
             # Handle Family dataset's relation label inconsistency.
-            self.rel2id = {k + "_of": v for k, v in self.rel2id.items()}
-        # We intentionally do not use any precomputed entity mapping.
-        # Load relations and entities (optional)
-        self.relations = list(self.complete_kg['relation'].unique())
+            self.relations = [rel + "_of" for rel in self.relations]
+        self.n_rel = len(self.relations)
+        self.rel2id = {v: k for k, v in enumerate(self.relations)}
         self.create_rel_emb()
 
-        self.entities = set(pd.concat([
-            self.complete_kg['head'].astype(str), 
-            self.complete_kg['tail'].astype(str)
-        ]).unique())
-
+        with open(self.base_path / self.config.ent_path, 'r') as f:
+            self.entities = [line.strip() for line in f]
+        self.entity2id = {v: k for k, v in enumerate(self.entities)}
+        self.n_ent = len(self.entities)
         # Build a stable consecutive mapping for entities.
-        self._build_entity_mapping()
         
     def create_rel_emb(self):
         m_rel = []
@@ -315,6 +276,15 @@ class KGInterface:
             (kg['relation'] == relation)
         ]
         return triples['tail'].tolist()
+    
+    def get_head_entities(self, tail: str, relation: str, kg_type: str = 'incomplete') -> List[str]:
+        """Get all head entities for a given (relation, tail) pair."""
+        kg = self._get_kg(kg_type)
+        triples = kg[
+            (kg['tail'] == tail) & 
+            (kg['relation'] == relation)
+        ]
+        return triples['head'].tolist()
     
     # ========================================================================
     # NetworkX-based Graph Methods

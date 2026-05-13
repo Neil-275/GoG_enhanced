@@ -18,7 +18,7 @@ from GoG.utils import (
     parse_generated_relations
 )
 from GoG.GoG_llms import run_llm
-from GoG.gnn_interface import GNNInterface
+from GoG.gnn_interface import OneShotInterface
 import pandas as pd
 import pickle as pkl
 # from rank_bm25 import BM25Okapi
@@ -43,9 +43,13 @@ class KGEnv:
 
         # Initialize KGInterface
 
-        self.kg:KGInterface = KGInterface(self.dataset_name)
-        self.gnn:GNNInterface = GNNInterface(self.dataset_name)
-        self.gnn.assign_graph(self.kg.pyg_data)
+        self.kg: KGInterface = KGInterface(self.dataset_name)
+        ## NBFNet ##
+        # self.gnn: GNNInterface = GNNInterface(self.dataset_name)
+        # self.gnn.assign_graph(self.kg.pyg_data)
+        ## One-shot subgraph 
+        self.gnn: OneShotInterface = OneShotInterface(self.dataset_name, self.kg.n_ent, self.kg.n_rel)
+        self.gnn.assign_graph(self.kg)
         print(f"Dataset Name: {self.dataset_name}")
         logger.info(f"Initialized KGInterface with dataset: {self.dataset_name}")
 
@@ -193,23 +197,23 @@ class KGEnv:
         # print("Parsed generated relations:")
         parsed_relations = parse_generated_relations(responses)
 
-        # print(parsed_relations)
+        print(parsed_relations)
         result = []
         for start_entity, relation in parsed_relations.items():
-            relation = relation[0]
+            relation = relation[0] # LLM đề xuất 1 relation cho mỗi entity
             
-            relation, _ = self.kg.get_best_relation_match(relation, 0.0)
+            relation, _ = self.kg.get_best_relation_match(relation)
             # print(f"Relation: {relation}")
-            relation_id = self.kg.rel2id.get(relation)
+            # relation_id = self.kg.rel2id.get(relation)
             
-            candidates = self.gnn.predict_topk(start_entity, relation_id, k=10)
+            candidates = self.gnn.predict_topk(start_entity, relation, k=10)
             relation_paths = {}
-            for candidate in candidates[0].tolist():
+            for candidate in candidates:
                 relation_path = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
                 if relation_path == None or len(relation_path["relations"]) > 6:
                     continue
-                # print("candidate:", candidate, end="\t")
-                # print("relation_path:", relation_path)
+                print("candidate:", candidate, end="\t")
+                print("relation_path:", relation_path)
                 # relation_path is a dict with key path and relation_path
                 relation_path_str = f"{start_entity}-"
                 for i, ent, rel in zip(range(len(relation_path["relations"])), relation_path["path"][1:], relation_path["relations"]):
@@ -266,7 +270,7 @@ class KGEnv:
             f"Answer: "
         )
         # print("Verify prompt:", prompt)
-        verified_triples = []
+        # verified_triples = []
         response = run_llm(
             prompt,
             self.args.temperature,
