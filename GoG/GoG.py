@@ -33,6 +33,7 @@ from GoG.utils import (
 )
 from loguru import logger
 import traceback
+import sys
 
 
 multiprocessing.set_start_method('spawn', force=True)
@@ -119,6 +120,8 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
             t1 = t2
 
         try:
+            logger.info("-----------")
+            logger.info(f"Process query {idx} ...")
             data = datas[idx]
             if "question" not in data:
                 data["question"] = data["ProcessedQuestion"]
@@ -131,7 +134,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 + f'Question: {data["question"]}\nTopic Entity: {topic_entity_names_str}\n'
             )
 
-            logger.debug(data["question"])
+            logger.info(f"Question: {data['question']}")
 
             env.assign_query(data["q_entity"], data['question'])
             # env.mid_crucial_triples = data["mid_crucial_triples"]
@@ -233,6 +236,9 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
 
                 env.records.append({"i": i, "thought": thought, "action": action})
                 if done:
+                    logger.info(
+                        f"Finish query {idx} with KG, prediction: {prediction}"
+                    )
                     write_results(data, env, prediction, args)
                     break
 
@@ -247,10 +253,13 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 logger.debug(records_str)
 
             if not done:
+                logger.warning(
+                    f"Finish query {idx} without KG, prediction: {prediction}"
+                )
                 prediction = answer_question_without_kg(env, base_prompt, args)
                 write_results(data, env, prediction, args)
 
-            logger.debug(f"ground truth: {data['answer']}")
+            logger.info(f"ground truth: {data['answer']}")
         except Exception as e:
             # logger.error(f"{traceback.print_exc()}, trying get answer without kg")
             # prediction = answer_question_without_kg(env, base_prompt, args)
@@ -318,10 +327,25 @@ if __name__ == "__main__":
     parser.add_argument("--prompt_dir", default='GoG/prompts_v2', type=str)
     parser.add_argument("--sc_num", type=int, default=1,
                         help="choose the number of self-consistency check.")
+    parser.add_argument("--debug", action="store_true")
     
     # parser.add_argument("start_idx", type=int, default=0, help="the start index of the dataset to process.")
 
     args = parser.parse_args()
+
+    LOG_LEVEL = "DEBUG" if args.debug else "INFO"
+    os.environ["LOG_LEVEL"] = LOG_LEVEL
+    logger.remove()
+    logger.add(
+        sys.stdout,
+        level=LOG_LEVEL,
+        format=(
+            "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+            "<level>{level: <8}</level> | "
+            "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
+            "<level>{message}</level>"
+        )
+    )
     logger.debug(f"{args}")
 
     datas = pd.read_csv(args.dataset, sep="\t").to_dict(orient="records")

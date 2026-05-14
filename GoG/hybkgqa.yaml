@@ -31,3 +31,5 @@ dependencies:
       - torch-geometric
       - pandas
       - loguru
+      - datasets
+      - tiktoken

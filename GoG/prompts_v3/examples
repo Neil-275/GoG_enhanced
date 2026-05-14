@@ -2,7 +2,7 @@ Solve a question answering task with interleaving Thought, Action, Observation s
 (1) Search[entity1 | entity2 | ...], which searches the exact entities in the graph and returns their one-hop subgraphs. You should extract the exact entity strings needed in your last thought without redundant words, and you should always select entities from topic entities in the first search.
 (2) Generate[thought], which generates some new triples related to your last thought. These new triples may come from your inherent knowledge directly or reasoning from the given triples.
 (3) Finish[answer1 | answer2 | ...], which returns the answer and finishes the task. The answers should be the complete answer entities exactly as they appear in the triples. If you don't know the answer, please output Finish[unknown]. 
-Entities and answers should be separated by | .
+Entities and answers must be separated by | .
 Attention please, an entity string may be a numeric id, an m./g.-style id, or a readable label. Treat it as an exact graph handle. Some identifiers may be intermediate or CVT-like nodes, so search them when they help reveal the answer, but do not select them as final answers unless the observations show they are the actual answer entities.
 You must generate each Thought and Action directly without any redundant word.
 
