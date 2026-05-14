@@ -81,7 +81,9 @@ def write_results(data, env: KGEnv, prediction, args):
                 "index": data["id"],
                 "question": data["question"],
                 "prediction": prediction,
-                "ground_truth": data["answer"] + data['hard_answer'],
+                "answers": data["answer"],
+                "hard_answer": data['hard_answer'],
+                # "ground_truth": list(set(data["answer"] + data['hard_answer'])),
                 "generate_call_count": env.generate_call_count,
                 "records": env.records,
             }
