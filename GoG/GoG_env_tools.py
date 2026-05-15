@@ -21,6 +21,8 @@ from GoG.GoG_llms import run_llm
 from GoG.gnn_interface import OneShotInterface
 import pandas as pd
 import pickle as pkl
+import os
+import sys
 # from rank_bm25 import BM25Okapi
 
 # Note: Some legacy methods are not available in the new KGInterface
@@ -32,6 +34,19 @@ import pickle as pkl
 #     def retrieve_id2types_by_name(entity_name):
 #         logger.warning(f"retrieve_id2types_by_name not available for {entity_name}")
 #         return {}
+
+
+logger.remove()
+logger.add(
+    sys.stdout,
+    level=os.environ.get("LOG_LEVEL", "INFO"),
+    format=(
+        "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+        "<level>{level: <8}</level> | "
+        "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
+        "<level>{message}</level>"
+    )
+)
 
 
 class KGEnv:
@@ -138,6 +153,8 @@ class KGEnv:
         logger.debug(f'Result: {result}')
         action = result.group(1).lower()
         parameter = result.group(2)
+
+        logger.info(f"Action: {action}, Parameter: {parameter}")
 
         if action == "search":
             if parameter == "[ALL]":
