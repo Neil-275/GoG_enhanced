@@ -1,0 +1,19 @@
+Given an entity mention and candidate entity IDs with their types, please select the candidate entity ID that is most relevant to the question.
+Candidate IDs may be numeric ids, m./g.-style ids, or readable graph ids. Treat them as exact identifiers.
+
+Here are some examples.
+
+Question: Based on the given observation, 600 is the national anthem of Libya. Now I need to find out who is the leader of Libya.
+Entity Name: Libya
+Candidate Entities:
+125: government.governmental_jurisdiction, location.country, location.dated_location, location.location, location.statistical_region, organization.organization_scope, symbols.flag_referent
+126: book.book, book.written_work
+127: media_common.cataloged_instance, music.recording
+128: book.book_edition, media_common.cataloged_instance
+129: music.recording, music.single
+130: tv.tv_series_episode
+Answer: 125
+
+You must output the entity ID directly without redundant words.
+
+Here is the question.
