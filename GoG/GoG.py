@@ -270,7 +270,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
             # stack_trace = traceback.format_exc()
             # print(stack_trace)
             write_results(data, env, None, args, error=str(e))
-            logger.error(f"Error processing query {idx} and leave it missing: {e}")
+            logger.exception(f"Error processing query {idx} and leave it missing: {e}")
 
     logger.info(f"{process_idx} finished")
 
