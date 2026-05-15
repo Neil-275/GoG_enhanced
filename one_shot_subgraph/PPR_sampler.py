@@ -144,7 +144,7 @@ class pprSampler():
     def generatePPRScoresForOneEntity(self, h, method=None):
         if method is None:
             method = 'matrix' if self.use_gpu_ppr else 'nx'
-            
+            # print("ahahahaha")
         if method == 'nx':
             '''
             nx. pagerank(G, alpha=0.85, personalization=None, max_iter=100, tol=1e-06, nstart=None, weight='weight', dangling=None)
