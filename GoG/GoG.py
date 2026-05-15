@@ -74,7 +74,7 @@ def answer_question_without_kg(env: KGEnv, prompt, args):
     return answers
 
 
-def write_results(data, env: KGEnv, prediction, args):
+def write_results(data, env: KGEnv, prediction, args, error: str = None):
     with lock:
         with open(args.output_file, "a") as f:
             res = {
@@ -86,6 +86,7 @@ def write_results(data, env: KGEnv, prediction, args):
                 # "ground_truth": list(set(data["answer"] + data['hard_answer'])),
                 "generate_call_count": env.generate_call_count,
                 "records": env.records,
+                "error": error,
             }
             if env.llm_output:
                 res["llm_output"] = env.llm_output
@@ -266,8 +267,10 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
             # logger.error(f"{traceback.print_exc()}, trying get answer without kg")
             # prediction = answer_question_without_kg(env, base_prompt, args)
             # write_results(data, env, prediction, args)
-            stack_trace = traceback.format_exc()
-            print(stack_trace)
+            # stack_trace = traceback.format_exc()
+            # print(stack_trace)
+            write_results(data, env, None, args, error=str(e))
+            logger.error(f"Error processing query {idx} and leave it missing: {e}")
 
     logger.info(f"{process_idx} finished")
 
