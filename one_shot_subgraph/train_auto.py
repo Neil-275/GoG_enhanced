@@ -165,13 +165,14 @@ if __name__ == '__main__':
     elif dataset == 'YAGO':
         # [VALID] MRR:0.6117 H@1:0.5477 H@10:0.7273        [TEST] MRR:0.6064 H@1:0.5403 H@10:0.7218 
         params = {'lr': 0.001, 'hidden_dim': 64, 'attn_dim': 2, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9429713470775948, 'lamb': 0.000946516892415447, 'dropout': 0.19456805575101324}
-    elif dataset == 'FB15k_237':
+    elif dataset == 'fb15k_237':
         # [VALID] MRR:0.6117 H@1:0.5477 H@10:0.7273        [TEST] MRR:0.6064 H@1:0.5403 H@10:0.7218 
         params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9429713470775948, 'lamb': 0.000946516892415447, 'dropout': 0.19456805575101324}
         # params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 6, 'act': 'relu', 'initializer': 'relation', 'concatHidden': False, 'shortcut': True, 'readout': 'linear', 'decay_rate': 0.9429713470775948, 'lamb': 0.000946516892415447, 'dropout': 0.19456805575101324}
     elif dataset == 'family':
         params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9429713470775948, 'lamb': 0.000946516892415447, 'dropout': 0.19456805575101324}
-        
+    elif dataset == "wikidata5m":
+        params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9, 'lamb': 0.001, 'dropout': 0.2}
     else:
         exit()    
     run_model(params)

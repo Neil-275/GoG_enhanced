@@ -1,5 +1,4 @@
 Please select 3 relations that are most relevant to the question and rank them.
-The entity may be a numeric id, an m./g.-style id, or a readable label. Treat it as an exact graph handle and choose only from the provided relations.
 You should answer these relations in list format directly without redundant words.
 If there is no relevant relation, please output [].
 

@@ -1,10 +1,25 @@
 Solve a question answering task with interleaving Thought, Action, Observation steps. You should always generate Thought decomposing the question before Action. Action can be three types: 
-(1) Search[entity1 | entity2 | ...], which searches the exact entities in the graph and returns their one-hop subgraphs. You should extract the exact entity strings needed in your last thought without redundant words, and you should always select entities from topic entities in the first search.
-(2) Generate[thought], which generates some new triples related to your last thought. These new triples may come from your inherent knowledge directly or reasoning from the given triples.
-(3) Finish[answer1 | answer2 | ...], which returns the answer and finishes the task. The answers should be the complete answer entities exactly as they appear in the triples. If you don't know the answer, please output Finish[unknown]. 
-Entities and answers must be separated by | .
-Attention please, an entity string may be a numeric id, an m./g.-style id, or a readable label. Treat it as an exact graph handle. Some identifiers may be intermediate or CVT-like nodes, so search them when they help reveal the answer, but do not select them as final answers unless the observations show they are the actual answer entities.
+(1) Search[entity1 | entity2 | ...], which searches the exact entities on the knowledge graph and returns their one-hop subgraphs. You should extract  all the concrete entities appeared in your last thought without redundant words, and you should always select entities from topic entities in the first search.
+(2) Generate[thought], which generate some new triples related to your last thought. Your thought should reflect your inference on what relation should exist on the already discovered entities
+(3) Finish[answer1 | answer2 | ...], which returns the answer and finishes the task. The answers should be complete entity label appeared in the triples. If you don't know the answer, please output Finish[unknown]. 
+Entities and answers should be separated by | .
 You must generate each Thought and Action directly without any redundant word.
+
+Important context:
+- Real-world knowledge graphs are always incomplete. 
+Do NOT expect to always find a direct triple that answers the question.
+- Instead, you must rely on indirect evidence, combining multiple facts and relation paths. 
+If no direct edge exists, reason over intermediate nodes and multi-hop chains to imply the answer.
+- Avoid finalizing prematurely if only partial evidence is present; keep exploring relation paths to assemble a reasoning chain.
+
+Key principles:
+- Focus on RELATION PATHS as reasoning patterns, not individual triples
+- Multi-hop reasoning is essential - explore 1-hop, 2-hop, and 3-hop patterns
+- Select paths strategically based on semantic relevance to the question
+- Ground selected paths to get concrete evidence chains
+- A reasoning path can connect topic entity and answer entity through intermediate entities
+- Look for both direct relations and inverse relations
+- Use path grounding results as structured evidence for your final answer
 
 Here are some examples.
 

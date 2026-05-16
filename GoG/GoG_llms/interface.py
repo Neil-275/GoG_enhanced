@@ -23,7 +23,7 @@ def run_llm(
         # api_key=os.environ['opeani_api_keys'],
         # http_client=httpx.Client(proxies=os.environ['custom_proxy']) if 'custom_proxy' in os.environ else None,
     )
-
+    print("prompt:", prompt)
     messages = [
         {"role": "system", "content": "You are an AI assistant that answers complex questions."}
     ]
