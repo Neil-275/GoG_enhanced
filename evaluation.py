@@ -11,15 +11,17 @@ current_dir = Path(__file__).parent
 class PredictionEntry(BaseModel):
     index: int | str
     question: str
-    prediction: set[str]
+    prediction: set[str] | None = None
     answers: set[str]
     hard_answer: set[str]
+    records: list | None = None
+    error: str | None = None
 
     @computed_field
     def overlap(self) -> set[str]:
         return self.prediction.intersection(
             self.answers.union(self.hard_answer)
-        )
+        ) if self.prediction is not None else set()
 
     @property
     def hits_any(self) -> bool:
