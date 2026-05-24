@@ -227,7 +227,7 @@ class KGInterface:
     # Query Methods
     # ========================================================================
     
-    def get_1hop_triples(self, entity: str, kg_type: str = 'incomplete') -> pd.DataFrame:
+    def get_1hop_triples(self, entity: str, kg_type: str = 'incomplete', merge: bool = True) -> pd.DataFrame:
         """
         Get all 1-hop triples from an entity.
         
@@ -241,7 +241,9 @@ class KGInterface:
         kg = self._get_kg(kg_type)
         head_triples = kg[kg['head'] == entity]
         tail_triples = kg[kg['tail'] == entity]
-        return pd.concat([head_triples, tail_triples], ignore_index=True)
+        if merge:
+            return pd.concat([head_triples, tail_triples]).reset_index(drop=True)
+        return head_triples, tail_triples
     
     def get_relations_for_entity(self, entity: str, direction: str = 'both', kg_type: str = 'incomplete') -> Set[str]:
         """

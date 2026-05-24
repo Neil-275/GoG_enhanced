@@ -1,8 +1,10 @@
 from collections import defaultdict
 from copy import deepcopy
+from logging import Formatter
 import random
 import re
 # import spacy
+from string import Formatter
 import traceback
 import asyncio
 from loguru import logger
@@ -214,31 +216,33 @@ class KGEnv:
         # print("Parsed generated relations:")
         parsed_relations = parse_generated_relations(responses)
 
-        print(parsed_relations)
+        # print(parsed_relations)
         result = []
         for start_entity, relation in parsed_relations.items():
             relation = relation[0] # LLM đề xuất 1 relation cho mỗi entity
             
-            relation, _ = self.kg.get_best_relation_match(relation)
-            # print(f"Relation: {relation}")
+            relation, _ = self.kg.get_best_relation_match(relation, 0.0)
+            # print(f"{start_entity}: {relation}")
             # relation_id = self.kg.rel2id.get(relation)
             
-            candidates = self.gnn.predict_topk(start_entity, relation, k=10)
+            candidates = self.gnn.predict_topk(start_entity, relation, k=3, known=False)
             relation_paths = {}
             for candidate in candidates:
                 relation_path = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
-                if relation_path == None or len(relation_path["relations"]) > 6:
+                if relation_path == None:
                     continue
-                print("candidate:", candidate, end="\t")
-                print("relation_path:", relation_path)
+                # if  len(relation_path["relations"]) > 6:
+                #     continue
+                # print("candidate:", candidate, end="\t")
+                # print("relation_path:", relation_path)
                 # relation_path is a dict with key path and relation_path
                 relation_path_str = f"{start_entity}-"
                 for i, ent, rel in zip(range(len(relation_path["relations"])), relation_path["path"][1:], relation_path["relations"]):
                     relation_path_str += f"[{rel}]-> "
-
+                relation_path_str = f"{candidate}: {relation_path_str}{candidate}"
                 # print("relation_path_str:", relation_path_str)
-                relation_paths[candidate] = relation_path_str + str(candidate)
-            verified_candidates = self.verify(thought, relation_paths)
+                relation_paths[candidate] = relation_path_str
+            verified_candidates = self.verify(start_entity, relation, relation_paths)
             for candidate in verified_candidates:
                 triple = [str(start_entity), str(relation), str(candidate)]
                 triple_str = convert_triples_to_str([triple])
@@ -271,27 +275,31 @@ class KGEnv:
         #     result = convert_triples_to_str(verified_triples)
         # else:
         #     result = convert_triples_to_str(generated_triples)
-
+        if len(result) == 0:
+            return "No valid triples generated."
         return "\n".join(result)
 
-    def verify(self, thought, relation_paths):
+    def get_template_variables(self, template_string):
+    # Field names can be None for raw text chunks, so filter those out
+        return [field_name for _, field_name, _, _ in Formatter().parse(template_string) if field_name is not None]
+
+    def verify(self, start_entity, relation, relation_paths):
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/verify_triples")
         prompt = format_prompt(prompt_path)
-
+        # print("type of prompt:", type(prompt))
+        # print("Format str:", self.get_template_variables(prompt))
+        prompt = prompt.format(subject=start_entity, relation=relation)
         relation_path_str = [f"{relation_path}" for candidate, relation_path in relation_paths.items()]
         relation_path_str = "\n".join(relation_path_str)
         
-        prompt = (
-            prompt + f"Question: {thought}\n"
-            f"Proposed Candidates: {relation_path_str}\n"
-            f"Answer: "
-        )
+        prompt = prompt + relation_path_str + "\nDeduction space: "
         # print("Verify prompt:", prompt)
         # verified_triples = []
         response = run_llm(
             prompt,
             self.args.temperature,
-            self.args.max_length,
+            # self.args.max_length,
+            1024,
             self.args.opeani_api_keys,
             self.args.LLM_type,
             stop=None,
@@ -328,6 +336,14 @@ class KGEnv:
             # Use KGInterface to get 1-hop triples
             if self.kg:
                 try:
+                    # outgoing, incoming = self.kg.get_1hop_triples(entity_id)
+                    # # Convert DataFrames to list format: [head, relation, tail]
+                    # incoming_triples = incoming.values.tolist() if len(incoming) > 0 else []
+                    # outgoing_triples = outgoing.values.tolist() if len(outgoing) > 0 else []
+                    # incoming_triples = [(1, triple) for triple in incoming_triples]  # Mark incoming triples with 1
+                    # outgoing_triples = [(0, triple) for triple in outgoing_triples]  # Mark outgoing triples with 0
+                    # triples = incoming_triples + outgoing_triples
+                    # relations = list(set([triple[1][1] for triple in triples]))
                     triples_df = self.kg.get_1hop_triples(entity_id)
                     # Convert DataFrame to list format: [head, relation, tail]
                     triples = triples_df.values.tolist() if len(triples_df) > 0 else []
@@ -341,8 +357,6 @@ class KGEnv:
                 triples = []
                 relations = []
             
-            if self.mid_crucial_triples:
-                triples, relations = self.filter_crucial_triples(triples)
             # logger.debug(f"Relations after filter_crucial_triples: {relations}")
 
             for i in range(len(relations)):
@@ -352,9 +366,14 @@ class KGEnv:
                 relations[i] = abbr_rel
 
             for i in range(len(triples)):
-                abbr_rel = shorten_relation(triples[i][1])
-                self.abbr_rel_to_rel[abbr_rel] = triples[i][1]
-                triples[i][1] = abbr_rel
+                if len(triples[i]) == 2:
+                    abbr_rel = shorten_relation(triples[i][1][1])
+                    self.abbr_rel_to_rel[abbr_rel] = triples[i][1][1]
+                    triples[i][1][1] = abbr_rel
+                elif len(triples[i]) == 3:
+                    abbr_rel = shorten_relation(triples[i][1])
+                    self.abbr_rel_to_rel[abbr_rel] = triples[i][1]
+                    triples[i][1] = abbr_rel
 
             relations = sorted(relations)
             # logger.debug(f"Relations after abbreviation and sorting: {relations}")
@@ -365,17 +384,14 @@ class KGEnv:
             related_triples = self.sample_triples_by_relation(triples, filtered_relations)
             
             # Extract relations from sampled triples
-            sampled_relations = sorted(list(set([triple[1] for triple in related_triples])))
-            # logger.debug(f"Relations in sampled triples: {sampled_relations}")
-
-            # Note: convert_id_to_name_in_triples not available in new interface
-            # IDs are already in the triples from the KGInterface
-            # Skipping conversion step - triples should already have readable names
-            # self.update_id_to_name(id_to_label)  # Passing this step
+            # sampled_relations = sorted(list(set([triple[1] for triple in related_triples])))
 
             all_related_triples.extend(related_triples)
 
         all_related_triples = sorted(all_related_triples)
+        # print("All related triples:")
+        # for triple in all_related_triples:
+        #     print(f"  {triple}")
 
         self.triples.extend(deepcopy(all_related_triples))
 
@@ -385,10 +401,16 @@ class KGEnv:
 
         new_entities = set()
         for triple in all_related_triples:
-            if triple[0].lower() in self.name_to_id:
-                new_entities.add(triple[0])
-            if triple[2].lower() in self.name_to_id:
-                new_entities.add(triple[2])
+            if len(triple) == 2:
+                if triple[1][0].lower() in self.name_to_id:
+                    new_entities.add(triple[1][0])
+                if triple[1][2].lower() in self.name_to_id:
+                    new_entities.add(triple[1][2])
+            elif len(triple) == 3:
+                if triple[0].lower() in self.name_to_id:
+                    new_entities.add(triple[0])
+                if triple[2].lower() in self.name_to_id:
+                    new_entities.add(triple[2])
         new_entities -= self.explored_entities
         self.records[-1]["new_entities"] = list(new_entities)
 
@@ -470,9 +492,14 @@ class KGEnv:
         # only remain related triples
         relation_to_triples = defaultdict(list)
         for triple in triples:
-            relation = triple[1]
-            if relation in filtered_relations:
-                relation_to_triples[relation].append(triple)
+            if len(triple) == 2:
+                relation = triple[1][1]
+                if relation in filtered_relations:
+                    relation_to_triples[relation].append(triple)
+            elif len(triple) == 3:
+                relation = triple[1]
+                if relation in filtered_relations:
+                    relation_to_triples[relation].append(triple)
 
         related_triples = []
         for rel, triples in relation_to_triples.items():

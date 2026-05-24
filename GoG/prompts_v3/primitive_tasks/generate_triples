@@ -1,7 +1,14 @@
-Given the existing triples, please generate some new relations based on your current thought regarding what are missing for the mentioned entity that serve further exploration.
-You must output only the entity ID and the missing relation following the schema of the provided triples in the format: `EntityID: relation_name` without further exploration
 
-Here are some examples.
+[Task]
+Based on the Current Reasoning Thought and the Existing triplets, identify missing crucial relations that prevent path resolution. Propose the missing relations that should originate from the entity.
+
+[Output Format]
+You must output ONLY the entity ID and the predicted missing relation name, matching the exact format schema follow the provided triples. Do not provide any conversational text, explanations, or further exploration.
+
+Format:
+EntityID: relation_name
+
+[Examples]
 
 Thought: which state is 125 in
 Known Triples: 
@@ -23,3 +30,6 @@ Output:
 
 Here is the question.
 
+[Context]
+- Thought: {thought}
+- Existing Triples: {existing_triples}

@@ -34,6 +34,7 @@ from GoG.utils import (
 from loguru import logger
 import traceback
 import sys
+import subprocess
 
 
 multiprocessing.set_start_method('spawn', force=True)
@@ -115,8 +116,8 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
 
     t1 = time.time()
     for n, idx in enumerate(idxes_to_process):
-        if n > 9: 
-            break
+        # if n > 9: 
+        #     break
         if (n + 1) % 10 == 0:
             t2 = time.time()
             logger.debug(f"{process_idx}: {n / len(idxes_to_process)}, {t2 - t1}")
@@ -193,18 +194,6 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                         else:
                             logger.debug(f"ohh... {thought_action}")
                             continue
-                        # n_badcalls += 1
-                        # n_calls += 1
-                        # thought = thought_action.strip().split("\n")[0]
-                        # logger.debug(f"thought...{thought}")
-                        # action = run_llm(
-                        #     prompt + f"Thought {i}: {thought}\nAction {i}:",
-                        #     args.temperature,
-                        #     args.max_length,
-                        #     args.opeani_api_keys,
-                        #     args.LLM_type,
-                        #     'Observation'
-                        # ).strip()
 
                 logger.debug(f"Thought {i}: {thought}")
                 logger.debug(f"Action {i}: {action}")
@@ -214,28 +203,27 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                     logger.debug("Match  ", match)
                     prediction = match.group(1)
                     prediction = parse_llm_output_to_list(prediction)
-                    if prediction[0][:2] in ["m.", "g."]:
-                        # Finish["m.0h3d7qb"]
-                        action = "Search" + action[6:]
-                    elif prediction[0].lower() == "unknown":
-                        # Finish["unkown"]
-                        # not enough information even after generation
-                        # expand to 2-hop sub-graph
-                        logger.debug("roll back and expand")
-                        while "generate" in env.last_action.lower():
-                            env.records.pop()
-                        assert "search" in env.last_action.lower()
+                    # print("prediction: ", prediction)
+                    done = True
+                    # if prediction[0].lower() == "unknown":
+                    #     # Finish["unkown"]
+                    #     # not enough information even after generation
+                    #     # expand to 2-hop sub-graph
+                    #     logger.debug("roll back and expand")
+                    #     while "generate" in env.last_action.lower():
+                    #         env.records.pop()
+                    #     assert "search" in env.last_action.lower()
 
-                        i = len(env.records) + 1
+                    #     i = len(env.records) + 1
 
-                        action = "Search[ALL]"
-                        n_expand += 1
-                        if n_expand >= args.max_n_expand:
-                            logger.debug("max n_expand, break")
-                            prediction = answer_question_without_kg(env, base_prompt, args)
-                            done = True
-                    else:
-                        done = True
+                    #     action = "Search[ALL]"
+                    #     n_expand += 1
+                    #     if n_expand >= args.max_n_expand:
+                    #         logger.debug("max n_expand, break")
+                    #         prediction = answer_question_without_kg(env, base_prompt, args)
+                    #         done = True
+                    # else:
+                        # done = True
 
                 env.records.append({"i": i, "thought": thought, "action": action})
                 if done:
@@ -280,7 +268,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dataset",
         type=str,
-        default="brink_dataset/family/test.tsv",
+        default="brink_dataset/family/test_passed.tsv",
         help="choose the dataset.",
     )
     parser.add_argument(
@@ -333,6 +321,8 @@ if __name__ == "__main__":
     parser.add_argument("--sc_num", type=int, default=1,
                         help="choose the number of self-consistency check.")
     parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--test", action="store_true",
+                        help="save results to test_predictions.jsonl (overwrites on each run).")
     
     # parser.add_argument("start_idx", type=int, default=0, help="the start index of the dataset to process.")
 
@@ -364,10 +354,14 @@ if __name__ == "__main__":
     # print(datas[0])
     postfix = '_no-kb' if args.no_kg else ""
     dataset_name = args.dataset.split("/")[1]
-    output_file = (
-        Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
-        / f"{args.sc_num}_{args.n_related_triples}_{args.max_n_expand}_{args.temperature}_{Path(args.dataset).stem + postfix}_predictions.jsonl"
-    )
+    
+    if args.test:
+        output_file = Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}/test_predictions.jsonl")
+    else:
+        output_file = (
+            Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
+            / f"{args.sc_num}_{args.n_related_triples}_{args.max_n_expand}_{args.temperature}_{Path(args.dataset).stem + postfix}_predictions.jsonl"
+        )
 
     args.output_file = output_file
 
@@ -380,7 +374,11 @@ if __name__ == "__main__":
 
     # print(output_file)
 
-    if os.path.exists(output_file) and not args.force:
+    if args.test:
+        # In test mode, always overwrite the file
+        with open(output_file, "w") as f:
+            pass
+    elif os.path.exists(output_file) and not args.force:
         with open(output_file, "r") as f:
             output_datas = [json.loads(line) for line in f.readlines()]
         processed_idxes = set([data["id"] for data in output_datas])
@@ -394,9 +392,17 @@ if __name__ == "__main__":
 
     
     #REMOVE LATER
-    # datas = datas[136:137]
-
-    
+    # failed_cases = []
+    # k = 0
+    # f = json.load(open("failed_cases.json", "r"))
+    # for q in f:
+    #     failed_cases.append(q["index"])
+    #     # k += 1
+    #     # if k >= 10:  # Limit to first 10 failed cases
+    #     #     break
+    # datas = [data for data in datas if data['id'] in failed_cases]
+    print(f"Number of datas to process: {len(datas)}")
+    datas = datas[13:43]
     idxes_to_process = range(len(datas))
 
 
@@ -409,6 +415,10 @@ if __name__ == "__main__":
 
     # args.model = SentenceTransformer("BAAI/bge-large-en-v1.5")
     # args.reranker = FlagReranker("BAAI/bge-reranker-large", use_fp16=True)
+    ## Produce a sample_args file
+    import pickle as pkl
+    # with open("sample_args_family.pkl", "wb") as f:
+    #     pkl.dump(args, f)
 
     env = KGEnv(args)
 
@@ -431,3 +441,71 @@ if __name__ == "__main__":
 
     json_filepath = convert_jsonl_to_json(output_file)
     # eval_results(json_filepath)
+    
+    # Automatically extract failed cases from the predictions
+    logger.info(f"Extracting failed cases from {json_filepath}")
+    
+    if os.path.exists(json_filepath):
+        try:
+            # Get the absolute path to extract_fail_cases.py
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            parent_dir = os.path.dirname(script_dir)
+            extract_script = os.path.join(parent_dir, "extract_fail_cases.py")
+            
+            result = subprocess.run(
+                [sys.executable, extract_script, "--prediction_path", str(json_filepath)],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            
+            if result.stdout:
+                logger.info(f"Extract output: {result.stdout}")
+            
+            if result.returncode != 0:
+                logger.error(f"Failed to extract failed cases. Return code: {result.returncode}")
+                if result.stderr:
+                    logger.error(f"Error: {result.stderr}")
+            else:
+                logger.info("Successfully extracted failed cases")
+        except Exception as e:
+            logger.error(f"Error extracting failed cases: {e}")
+    else:
+        logger.warning(f"Predictions file not found: {json_filepath}")
+    
+    # Automatically run evaluation on the predictions
+    logger.info(f"Running evaluation on {json_filepath}")
+    
+    if os.path.exists(json_filepath):
+        try:
+            # Generate evaluation output filename based on predictions filename
+            json_path = Path(json_filepath)
+            eval_filename = json_path.stem.replace("_predictions", "_evaluation") + ".json"
+            eval_output_path = json_path.parent / eval_filename
+            
+            # Get the absolute path to evaluation.py
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            parent_dir = os.path.dirname(script_dir)
+            eval_script = os.path.join(parent_dir, "evaluation.py")
+            
+            result = subprocess.run(
+                [sys.executable, eval_script, "--prediction_file", str(json_filepath), 
+                 "--output_file", str(eval_output_path)],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            
+            if result.stdout:
+                logger.info(f"Evaluation output: {result.stdout}")
+            
+            if result.returncode != 0:
+                logger.error(f"Failed to run evaluation. Return code: {result.returncode}")
+                if result.stderr:
+                    logger.error(f"Error: {result.stderr}")
+            else:
+                logger.info(f"Successfully completed evaluation. Results saved to {eval_output_path}")
+        except Exception as e:
+            logger.error(f"Error running evaluation: {e}")
+    else:
+        logger.warning(f"Predictions file not found: {json_filepath}")

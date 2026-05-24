@@ -50,6 +50,26 @@ def add_ns(entity_id):
 
 
 def convert_triples_to_str(triples, sep=", "):
+    if len(triples) == 0:
+        return "  No triples found."
+    if len(triples[0]) == 2:
+        triples = sorted(triples, key=lambda x: x[0]) # sort by incoming/outgoing
+        incoming_str = ""
+        for i, triple in enumerate(triples):
+            if triple[0] == 1:
+                incoming_str += f"  {triple[1]}\n"
+        if incoming_str == "":
+            incoming_str = "  No incoming triples.\n"
+        else:  incoming_str = "  Incoming triples:\n" + incoming_str
+        outgoing_str = ""
+        for i, triple in enumerate(triples):
+            if triple[0] == 0:
+                outgoing_str += f"  {triple[1]}\n"
+        if outgoing_str == "":
+            outgoing_str = "  No outgoing triples.\n"
+        else:  outgoing_str = "  Outgoing triples:\n" + outgoing_str
+        return incoming_str + "\n" + outgoing_str
+
     for i, triple in enumerate(triples):
         triple = [remove_ns(item) for item in triple]
         triples[i] = sep.join(triple)

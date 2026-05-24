@@ -6,7 +6,8 @@ Entities and answers must be separated by | .
 Attention please, an entity string may be a numeric id, an m./g.-style id, or a readable label. Treat it as an exact graph handle. Some identifiers may be intermediate or CVT-like nodes, so search them when they help reveal the answer, but do not select them as final answers unless the observations show they are the actual answer entities.
 You must generate each Thought and Action directly without any redundant word.
 
-Here are some examples.
+
+<!-- Here are some examples.
 
 Question: What state is the education institution that has sports team 561 in?
 Topic Entity: [561]
@@ -69,4 +70,4 @@ Action 2: Finish[700]
 
 Here is the question.
 
-You must generate observation yourself.
+You must generate observation yourself. -->

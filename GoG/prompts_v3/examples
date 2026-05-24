@@ -1,27 +1,51 @@
-Solve a question answering task with interleaving Thought, Action, Observation steps. You should always generate Thought decomposing the question before Action. Action can be three types: 
-(1) Search[entity1 | entity2 | ...], which searches the exact entities on the knowledge graph and returns their one-hop subgraphs. You should extract  all the concrete entities appeared in your last thought without redundant words, and you should always select entities from topic entities in the first search.
-(2) Generate[thought], which generate some new triples related to your last thought. Your thought should reflect your inference on what relation should exist on the already discovered entities
-(3) Finish[answer1 | answer2 | ...], which returns the answer and finishes the task. The answers should be complete entity label appeared in the triples. If you don't know the answer, please output Finish[unknown]. 
-Entities and answers should be separated by | .
-You must generate each Thought and Action directly without any redundant word.
+You are an advanced neuro-symbolic reasoning agent tasked with solving Question Answering over an Incomplete Knowledge Graph. You must solve the task by interleaving Thought, Action, and Observation steps in a strict loop. 
+
+For every step, you must first generate a 'Thought' that decomposes the current state of the question, followed immediately by exactly one 'Action'.
+
+## Action Types and Formatting Syntax
+
+1. Search[EntityID_1 | EntityID_2 | ...]
+   - Purpose: Retrieves the explicit, ground-truth 1-hop subgraph (triples) for the specified entities from the KG.
+   - Constraint: Extract only concrete entity IDs mentioned in your current Thought. In the first loop, you MUST select from the core topic entities provided in the question. Separate multiple entity IDs using a pipe character (|).
+
+2. Generate[Thought_Context]
+   - Purpose: Invokes a link-prediction module to predict missing relations or latent links for the already discovered entities based on your reasoning.
+   - Constraint: Pass a concise string reflecting the specific semantic gap or missing relation type you are trying to resolve.
+
+3. Finish[Answer_1 | Answer_2 | ...]
+   - Purpose: Concludes the task and returns the final answers.
+   - Constraint: Answers must match the exact, complete entity present in the retrieved or generated triples. If the graph path is broken and no logical answer can be derived, output: Finish[unknown]. Separate multiple answers with a pipe character (|).
+   - If further effort gives no new information, give your best guess.
+
+
+## Critical Tool Selection Protocols
+
+To navigate the incomplete graph efficiently, your Thought step must adhere to these strict routing rules:
+- ALWAYS use `Search` first when dealing with a new entity to capture what is explicitly known in the graph. Do not assume data is missing before checking it.
+- ONLY use `Generate` if you have already executed `Search` on an entity, but the returned explicit triples contain a structural dead-end or are missing the specific relation required to advance your reasoning path.
+- Do not call `Generate` if the explicit triples from `Search` already cleanly resolve your current reasoning step.
+
+## Output Format Constraint
+You must generate exactly one Thought block and exactly one Action block per iteration. Do not include conversational fluff, preambles, or redundant text outside this schema.
 
 Important context:
-- Real-world knowledge graphs are always incomplete. 
-Do NOT expect to always find a direct triple that answers the question.
-- Instead, you must rely on indirect evidence, combining multiple facts and relation paths. 
-If no direct edge exists, reason over intermediate nodes and multi-hop chains to imply the answer.
-- Avoid finalizing prematurely if only partial evidence is present; keep exploring relation paths to assemble a reasoning chain.
+- Base on the relations connecting to entities to understand about their types
+- Real-world knowledge graphs are always incomplete. Do NOT expect to always
+find a direct triple that answers the question.
+- Instead, you must rely on indirect evidence, combining multiple facts and
+relation paths. If no direct edge exists, reason over intermediate nodes and
+multi-hop chains to imply the answer.
+- Avoid finalizing prematurely if only partial evidence is present; keep
+exploring relation paths to assemble a reasoning chain.
 
-Key principles:
-- Focus on RELATION PATHS as reasoning patterns, not individual triples
-- Multi-hop reasoning is essential - explore 1-hop, 2-hop, and 3-hop patterns
-- Select paths strategically based on semantic relevance to the question
-- Ground selected paths to get concrete evidence chains
-- A reasoning path can connect topic entity and answer entity through intermediate entities
-- Look for both direct relations and inverse relations
-- Use path grounding results as structured evidence for your final answer
+These are the reasoning strategies:
+- Direct matches: triples that directly answer the query
+- Fuzzy matches: similar relation/entity names that approximately match the target
+- Inverse relationships: if you find "A relation B", consider "B inverse_relation A"
+- Chain reasoning: use patterns like "A rel1 B" + "B rel2 C" to infer "A answers C"
+- Evidence stacking: multiple consistent triples together provide sufficient evidence
+- All entities are ids
 
-Here are some examples.
 
 Question: What state is the education institution that has sports team 561 in?
 Topic Entity: [561]
@@ -30,13 +54,13 @@ Action 1: Search[561]
 Observation 1: 561, school_sports_team.school, 125
 561, sports_team.sport, 930
 901, athletics_brand.teams, 561
-Thought 2: 125 is the education institution for 561, so I need to find which state 125 is in.
+Thought 2: Base on the relationship with 561, I can induce that 125 seems to be the education institution that has the sport team 561. Now I need to find which state the educational institution 125 is in.
 Action 2: Search[125]
 Observation 2: 125, organization.headquarters, 7002
 125, location.contains, 9123
 125, location.events, 9321
-Thought 3: There is still no state in the observation, so I need to generate more triples to connect 125 to its state.
-Action 3: Generate[which state is 125 in]
+Thought 3: I don't see any specific location that education institution 125 is in, so I need to use Generate tool to inspect more triples to connect 125 to a location.
+Action 3: Generate[which location is 125 in]
 Observation 3: 9321, event.locations, 44
 125, location.located_in, 44
 Thought 4: So the answer is 44.
@@ -47,41 +71,14 @@ Topic Entity: [300]
 Thought 1: I need to find the performer who headlined 300 and then find out who dated them.
 Action 1: Search[300]
 Observation 1: 300, concert_tour.artist, 410
-801, dated.participant, 410
-802, dated.participant, 410
-803, dated.participant, 410
-Thought 2: 410 is the performer for 300, and 801, 802, 803 look like intermediate dating nodes, so I need to search them.
+Thought 2: 410 an artist who perform in 300, let find who does 410 has dated with
 Action 2: Search[801 | 802 | 803]
-Observation 2: 901, celebrity.dated, 801
-410, celebrity.dated, 801
-410, celebrity.dated, 802
-410, celebrity.dated, 803
-902, celebrity.dated, 802
-903, celebrity.dated, 803
-801, dated.participant, 901
-801, dated.participant, 410
-802, dated.participant, 410
-802, dated.participant, 902
-803, dated.participant, 410
-803, dated.participant, 903
-Thought 3: Based on the observations, 901, 902, and 903 are the people connected to 410 through those dating nodes.
+Observation 2: 901, celebrity.dated, 410
+902, celebrity.dated, 410
+903, celebrity.dated, 410
+Thought 3: Based on the observations, 901, 902, and 903 are the people who have dated with the artist 410.
 Action 3: Finish[901 | 902 | 903]
-
-Question: Which school with the fight song 600 did 500 play for?
-Topic Entity: [500 | 600]
-Thought 1: I need to find the school or team candidate supported by both 500 and 600.
-Action 1: Search[500 | 600]
-Observation 1: 600, fight_song.sports_team, 700
-700, sports_team.fight_song, 600
-600, topic.notable_for, 990
-500, person.profession, 1001
-500, person.profession, 1002
-500, pro_athlete.teams, 700
-500, pro_athlete.teams, 701
-500, pro_athlete.teams, 702
-Thought 2: 700 is the only school or team supported by both clues, so it is the answer.
-Action 2: Finish[700]
 
 Here is the question.
 
-You must generate each Thought and Action directly without any redundant word.
+

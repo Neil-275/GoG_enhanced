@@ -84,12 +84,15 @@ class OneShotInterface:
         self.model = GNN_auto(
             self.args,
         ).to(self.args.device)
-
-        weight_path = one_shot_subgraph_config[dataset_name].get("checkpoint")
+        # print("HAHAHAHAHAAHAHAH")
+        weight_path = self.args.checkpoint
+        # print("weight_path:", weight_path)
         if weight_path is not None:
+
             checkpoint = torch.load(weight_path, map_location=self.args.device)
             state = checkpoint['model_state_dict'] if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint else checkpoint
             self.model.load_state_dict(state)
+            print(f"Loaded model weights from {weight_path}")
         self.model.eval()
 
         # print(self.args.device)
@@ -163,7 +166,7 @@ class OneShotInterface:
             (scores, tail_ids): both are 1D CPU tensors of shape [topk].
         """
         assert hasattr(self, "kg")
-        
+        # print("Predicting....")
         # print("entity:", head)
         # print("relation:", relation)
         hid = _to_id(head, self.entity2id, 'entity')

@@ -2,20 +2,23 @@ from argparse import ArgumentParser
 from pathlib import Path
 import json
 from json import JSONDecodeError
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, computed_field, Field
 
 
 current_dir = Path(__file__).parent
 
 
 class PredictionEntry(BaseModel):
-    index: int | str
+    index: int | str = Field(alias="id")
     question: str
     prediction: set[str] | None = None
-    answers: set[str]
-    hard_answer: set[str]
+    answers: set[str] = Field(alias="ground_truth")
+    hard_answer: set[str] = Field(alias="ground_truth_entities")
     records: list | None = None
     error: str | None = None
+    
+    class Config:
+        populate_by_name = True  # Allow both alias and field name
 
     @computed_field
     def overlap(self) -> set[str]:
