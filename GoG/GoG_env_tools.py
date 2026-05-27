@@ -236,10 +236,10 @@ class KGEnv:
                 # print("candidate:", candidate, end="\t")
                 # print("relation_path:", relation_path)
                 # relation_path is a dict with key path and relation_path
-                relation_path_str = f"{start_entity}-"
+                relation_path_str = f"{start_entity} -"
                 for i, ent, rel in zip(range(len(relation_path["relations"])), relation_path["path"][1:], relation_path["relations"]):
-                    relation_path_str += f"[{rel}]-> "
-                relation_path_str = f"{candidate}: {relation_path_str}{candidate}"
+                    relation_path_str += f"[{rel}]-"
+                relation_path_str = f"{candidate}: {relation_path_str}> {candidate}"
                 # print("relation_path_str:", relation_path_str)
                 relation_paths[candidate] = relation_path_str
             verified_candidates = self.verify(start_entity, relation, relation_paths)
@@ -249,32 +249,7 @@ class KGEnv:
                 # print("Generated triple:", triple_str)
                 self.records[-1]["generated_triples"] = triple_str
                 result.append(triple_str)
-
-        
-
-
-        # if n == 1:
-        #     responses = [responses]
-        # self.records[-1]["generated_triples"] = {}
-        # for i, response in enumerate(responses):
-        #     generated_triples = []
-        #     logger.debug(responses)
-        #     for line in response.split("\n"):
-        #         try:
-        #             h, r, t = [item.strip() for item in line.split(sep)]
-        #             generated_triples.append([h, r, t])
-        #         except Exception as e:
-        #             logger.error(traceback.format_exc())
-        #             logger.error(line)
-
-        #     generated_triples = sorted(generated_triples)
-        #     self.records[-1]["generated_triples"][i + 1] = generated_triples
-
-        # if n > 1:
-        #     verified_triples = self.verify(thought)
-        #     result = convert_triples_to_str(verified_triples)
-        # else:
-        #     result = convert_triples_to_str(generated_triples)
+                
         if len(result) == 0:
             return "No valid triples generated."
         return "\n".join(result)
@@ -292,20 +267,21 @@ class KGEnv:
         relation_path_str = [f"{relation_path}" for candidate, relation_path in relation_paths.items()]
         relation_path_str = "\n".join(relation_path_str)
         
-        prompt = prompt + relation_path_str + "\nDeduction space: "
+        prompt = prompt + "Candidates:\n" + relation_path_str + "\nDeduction space: "
+        # print(123)
         # print("Verify prompt:", prompt)
         # verified_triples = []
         response = run_llm(
             prompt,
             self.args.temperature,
             # self.args.max_length,
-            1024,
+            768,
             self.args.opeani_api_keys,
             self.args.LLM_type,
             stop=None,
         )
         # print("Verify response:", response)
-        candidate = extract_numbers_from_string(response)
+        candidate = extract_numbers_from_string(response, last_line=True)
         self.records[-1]['verified_candidates'] = candidate
         return candidate
                 # for line in response.split("\n"):

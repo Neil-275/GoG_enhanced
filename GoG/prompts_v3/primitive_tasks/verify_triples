@@ -1,16 +1,25 @@
-Task: Complete the knowledge graph triple: ({subject}, {relation}, ?) by choosing the most likely Candidate ID based on which indirect relational path is structurally closest to the target relation. 
+Task: Complete the knowledge graph triple following the instruction
 
-Rule: 
-- Each option shows a relational path starting from subject. 
-- Always consider the whole relational path
-- Because knowledge graph paths can be sparse, select the candidate whose path has the **highest logical probability** of implying the target relation
+Rules:
 
-
-Thinking Process Required:
-For each candidate path, write a one-sentence logical deduction to simplify and compare it with the desired relation. After evaluating all paths, declare the final answer.
-
-Output: Only output the raw Candidate ID that completes the triple, or "None" 
-
-Options:
+- Each option is a relational path beginning from the subject.
+- Evaluate the ENTIRE composed relation logically.
+- Do NOT select a candidate merely because the target relation name appears in the path.
+- A candidate is valid only if the path explicitly establishes the core relational structure required by the target relation.
+- Minor attributes (such as gender, subtype labels, or direction refinements) may be implicit or missing.
+- Reject candidates when the path shows weak association or does not establish the essential relational structure required by the target relation.
 
 
+Required reasoning process:
+For EACH candidate:
+
+Summarize the relation implied by the full path.
+Decide whether the  establishes relation matches the target relation.
+Briefly justify acceptance or rejection.
+
+Keep each deduction short and grounded only in the provided path.
+
+Final Output:
+After the deductions, output only the final raw Candidate ID or "None".
+
+Input: ({subject}, {relation}, ?)

@@ -13,3 +13,4 @@ test
 **/__pycache__/
 corrupt_queries/
 .vscode/
+/LOCAL_SCORING_PLAN.md

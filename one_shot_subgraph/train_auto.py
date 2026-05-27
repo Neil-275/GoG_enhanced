@@ -25,6 +25,8 @@ parser.add_argument('--add_manual_edges', action='store_true')
 parser.add_argument('--remove_1hop_edges', default=True)
 parser.add_argument('--only_eval', action='store_true')
 parser.add_argument('--not_shuffle_train', default=True)
+parser.add_argument('--ppr_k', type=int, default=2, help='k for k-hop localized PPR')
+parser.add_argument('--drop_graph', action='store_true', help='Drop NetworkX graph after building samplers')
 args = parser.parse_args()
 
 class Options(object):
@@ -42,7 +44,7 @@ if __name__ == '__main__':
         dataset = dataset[-1]
     else:
         dataset = dataset[-2]
-    
+    args.dataset = dataset
     results_dir = 'results'
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)

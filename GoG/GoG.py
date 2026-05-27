@@ -247,7 +247,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 logger.warning(
                     f"Finish query {idx} without KG, prediction: {prediction}"
                 )
-                prediction = answer_question_without_kg(env, base_prompt, args)
+                prediction = answer_question_without_kg(env, prompt, args)
                 write_results(data, env, prediction, args)
 
             logger.info(f"ground truth: {data['answer']}")
@@ -402,7 +402,7 @@ if __name__ == "__main__":
     #     #     break
     # datas = [data for data in datas if data['id'] in failed_cases]
     print(f"Number of datas to process: {len(datas)}")
-    datas = datas[13:43]
+    # datas = datas[1:4]
     idxes_to_process = range(len(datas))
 
 

@@ -91,7 +91,9 @@ class OneShotInterface:
 
             checkpoint = torch.load(weight_path, map_location=self.args.device)
             state = checkpoint['model_state_dict'] if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint else checkpoint
-            self.model.load_state_dict(state)
+            incompatible = self.model.load_state_dict(state, strict=False)
+            if incompatible.missing_keys or incompatible.unexpected_keys:
+                print(f"⚠ load_state_dict non-strict: missing={incompatible.missing_keys}, unexpected={incompatible.unexpected_keys}")
             print(f"Loaded model weights from {weight_path}")
         self.model.eval()
 
@@ -178,23 +180,44 @@ class OneShotInterface:
         subgraph = self.sampler.getOneSubgraph(int(hid))
         subgraph_data = self.sampler.getBatchSubgraph([subgraph])
 
-        values = self.model.inference(q_sub, q_rel, subgraph_data)
-        # print("shape of values:", values.shape)
-        maxx = values.max().item()
-        # known_tails = set(neighbors[:, 1])
-        #extract edges that have head as head or tail and relation as rid use edge_index
+        scoring_mode = getattr(self.args, 'scoring_mode', 'global')
+        if scoring_mode != 'local':
+            values = self.model.inference(q_sub, q_rel, subgraph_data)
+            maxx = values.max().item()
+            neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == rid)]
+            neighbors = np.concatenate([neighbors, self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == rid)]], axis=0)
+            ent_neighbors = set(neighbors[:, 2]).union(set(neighbors[:, 0])).difference({hid})
+            if known and ent_neighbors:
+                values[0, list(ent_neighbors)] = maxx + 1.0
+
+            values, indices = torch.topk(values[0], k=k)
+            tail_ids = [self.id2entity[int(idx)] for idx in indices.detach().cpu().numpy()]
+            return tail_ids
+
+        # Local scoring: use candidate-only scores from inference.
+        out = self.model.inference(q_sub, q_rel, subgraph_data, topk=None)
+        node_scores = out['node_scores']
+        abs_idxs = out['abs_idxs']
+        node_ptr = out['node_ptr']
+        start = int(node_ptr[0].item())
+        end = int(node_ptr[1].item())
+        cand_scores = node_scores[start:end].clone()
+        cand_abs = abs_idxs[start:end]
+
         neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == rid)]
-        # print("neighbors:", neighbors)
         neighbors = np.concatenate([neighbors, self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == rid)]], axis=0)
         ent_neighbors = set(neighbors[:, 2]).union(set(neighbors[:, 0])).difference({hid})
-        # print("known neighbors:", ent_neighbors)
         if known and ent_neighbors:
-            values[0, list(ent_neighbors)] = maxx + 1.0  # Promote known tails to the top
+            ent_neighbors = torch.tensor(list(ent_neighbors), device=cand_abs.device, dtype=cand_abs.dtype)
+            mask = torch.isin(cand_abs, ent_neighbors)
+            if mask.any():
+                maxx = cand_scores.max().item()
+                cand_scores[mask] = maxx + 1.0
 
-        # sort 
-        values, indices = torch.topk(values[0], k=k)
-        # print(len(indices), indices)
-        ## Map back to original entity ids
-        tail_ids = [self.id2entity[int(idx)] for idx in indices.detach().cpu().numpy()]
-
-        return  tail_ids
+        kk = min(int(k), int(cand_scores.numel()))
+        if kk == 0:
+            return []
+        values, idx = torch.topk(cand_scores, k=kk)
+        indices = cand_abs[idx]
+        tail_ids = [self.id2entity[int(x)] for x in indices.detach().cpu().numpy()]
+        return tail_ids

@@ -37,6 +37,10 @@ class pprSampler():
         
         # Use matrix method for GPU acceleration if specified
         self.use_gpu_ppr = getattr(args, 'use_gpu_ppr', True)
+        # K-hop parameter for truncated PPR
+        self.ppr_k = getattr(args, 'ppr_k', 2)
+        # Use localized k-hop PPR when a positive k is provided.
+        self.ppr_method = 'khop' if self.ppr_k and self.ppr_k > 0 else ('matrix' if self.use_gpu_ppr else 'nx')
         
         if self.use_gpu_ppr:
             print('==> Using GPU-accelerated PPR computation')
@@ -46,10 +50,11 @@ class pprSampler():
         else:
             print('==> Using CPU-based NetworkX PPR computation')
             self.homoTrainGraph = self.triplesToNxGraph(self. homoEdges)
+
         
         self.ppr_savePath = os.path.join(self.data_folder, f'ppr_scores/{split}/')
         checkPath(self.ppr_savePath)
-        print('==> checking ppr scores for each entity...')
+        print(f'==> checking ppr scores for each entity using {self.ppr_method}...')
         
         for h in tqdm(range(self.n_ent), ncols=50, leave=False):
             ent_ppr_savePath = os.path.join(self.ppr_savePath, f'{int(h)}.pkl')
@@ -57,7 +62,7 @@ class pprSampler():
                 pass
             else:
                 # with default setting to generate ppr scores
-                h_ppr_scores = self.generatePPRScoresForOneEntity(h)
+                h_ppr_scores = self.generatePPRScoresForOneEntity(h, method=self.ppr_method)
                 pkl.dump(h_ppr_scores, open(ent_ppr_savePath, 'wb'))
         print('finished.')
         
@@ -69,10 +74,13 @@ class pprSampler():
         # change data type and move to GPU
         self.edge_index = torch.LongTensor(self.edge_index). to(self.device)
 
-        # clean cache
+        # clean cache: drop `homoEdges` but keep `homoTrainGraph` in memory
+        # (required for k-hop localized PPR). To force dropping the graph
+        # set `args.drop_graph = True` when creating the sampler.
         del self.homoEdges
-        if hasattr(self, 'homoTrainGraph'):
-            del self.homoTrainGraph
+        if getattr(self.args, 'drop_graph', False):
+            if hasattr(self, 'homoTrainGraph'):
+                del self.homoTrainGraph
         
         print('==> finish sampler initilization.')
     
@@ -145,6 +153,24 @@ class pprSampler():
         if method is None:
             method = 'matrix' if self.use_gpu_ppr else 'nx'
             # print("ahahahaha")
+        # support k-hop localized PPR
+        if method == 'khop':
+            k = getattr(self, 'ppr_k', 2)
+            # get nodes within k hops from h
+            nodes_dict = nx.single_source_shortest_path_length(self.homoTrainGraph, h, cutoff=k)
+            nodes = list(nodes_dict.keys())
+            # if neighborhood is entire graph, fallback to full PPR
+            if len(nodes) >= self.n_ent:
+                return self.generatePPRScoresForOneEntity(h, method='matrix' if self.use_gpu_ppr else 'nx')
+
+            subg = self.homoTrainGraph.subgraph(nodes)
+            # run personalized PageRank on induced subgraph
+            scores_sub = nx.pagerank(subg, personalization={h: 1})
+            # convert to full-length vector (zeros outside neighborhood)
+            scores = np.zeros(self.n_ent, dtype=float)
+            for n, v in scores_sub.items():
+                scores[int(n)] = float(v)
+            return scores
         if method == 'nx':
             '''
             nx. pagerank(G, alpha=0.85, personalization=None, max_iter=100, tol=1e-06, nstart=None, weight='weight', dangling=None)

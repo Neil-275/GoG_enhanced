@@ -10,12 +10,20 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from collections import defaultdict
 import torch.nn.functional as F
+from torch_scatter import scatter
 import copy
+from torch.utils.data import Subset
 
 class BaseModel(object):
     def __init__(self, args, loaders, samplers):
         self.args = args
         loader, val_loader, test_loader = loaders
+        # scoring_mode controls global vs local/candidate-only scoring
+        self.scoring_mode = getattr(args, 'scoring_mode', 'global')
+        self.dataset = getattr(args, 'dataset', '')
+        self.args = args
+        self.args.scoring_mode = self.scoring_mode
+
         self.loader = loader
         self.model = GNN_auto(args)
         self.model.cuda()
@@ -145,21 +153,59 @@ class BaseModel(object):
         reach_tails_list = []
         t_time = time.time()
         self.model.train()
-        
         for batch_data in tqdm(self.trainLoader, ncols=50, leave=False):                      
-            # prepare data    
             subs, rels, objs, subgraph_data = self.prepareData(batch_data)
             
             # forward
             self.model.zero_grad()
-            scores = self.model(subs, rels, subgraph_data)
-            
-            # loss calculation
-            pos_scores = scores[[torch.arange(len(scores)).cuda(), objs.flatten()]]
-            max_n = torch.max(scores, 1, keepdim=True)[0]
-            loss = torch.sum(- pos_scores + max_n + torch.log(torch.sum(torch.exp(scores - max_n),1))) 
 
-            # loss backward
+            if self.scoring_mode != 'local':
+                scores = self.model(subs, rels, subgraph_data)
+                # global softmax loss (numerically stable)
+                pos_scores = scores[[torch.arange(len(scores)).cuda(), objs.flatten()]]
+                max_n = torch.max(scores, 1, keepdim=True)[0]
+                loss = torch.sum(- pos_scores + max_n + torch.log(torch.sum(torch.exp(scores - max_n),1)))
+                # cover tail entity or not
+                reach_tails = (pos_scores == 0).detach().int().reshape(-1).cpu().tolist()
+                reach_tails_list += reach_tails
+            else:
+                # Local scoring: candidate-only logits + OTHER logit per query
+                node_scores, other_logit = self.model(subs, rels, subgraph_data)
+                batch_idxs, abs_idxs, _, _, _, node_ptr = subgraph_data
+                if node_ptr is None:
+                    counts = torch.bincount(batch_idxs, minlength=len(subs))
+                    node_ptr = torch.cat([counts.new_zeros(1), counts.cumsum(0)], dim=0)
+
+                tails = objs.flatten().long()
+                per_q_losses = []
+                for i in range(int(len(subs))):
+                    start = int(node_ptr[i].item())
+                    end = int(node_ptr[i + 1].item())
+                    cand_logits = node_scores[start:end]
+                    cand_abs = abs_idxs[start:end]
+                    K = int(cand_logits.numel())
+                    if K == 0:
+                        # No candidates sampled: force OTHER
+                        logits_i = other_logit[i].view(1, 1)
+                        target_i = torch.zeros(1, dtype=torch.long, device=logits_i.device)
+                        per_q_losses.append(F.cross_entropy(logits_i, target_i))
+                        continue
+
+                    match = (cand_abs == tails[i]).nonzero(as_tuple=False)
+                    if match.numel() > 0:
+                        target_idx = int(match[0, 0].item())
+                        reach_tails_list.append(0)
+                    else:
+                        target_idx = K  # OTHER
+                        reach_tails_list.append(1)
+
+                    logits_i = torch.cat([cand_logits, other_logit[i:i+1]], dim=0).view(1, K + 1)
+                    target_i = torch.tensor([target_idx], dtype=torch.long, device=logits_i.device)
+                    per_q_losses.append(F.cross_entropy(logits_i, target_i))
+
+                loss = torch.stack(per_q_losses).sum()
+
+            # backward
             loss.backward()
             self.optimizer.step()
 

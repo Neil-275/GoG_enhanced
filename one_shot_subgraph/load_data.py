@@ -164,9 +164,13 @@ class DataLoader(Dataset):
         
         if self.args.remove_1hop_edges:
             # print('==> removing 1-hop links...')
-            tmp_index = np.ones((self.n_ent, self.n_ent))
-            tmp_index[self.train_data[:, 0], self.train_data[:, 2]] = 0
-            save_facts = tmp_index[self.fact_data[:, 0], self.fact_data[:, 2]].astype(bool)
+            # Avoid allocating an O(n_ent^2) dense matrix here. We only need to
+            # know whether a (head, tail) pair appears in the training split.
+            train_pairs = set(zip(self.train_data[:, 0].tolist(), self.train_data[:, 2].tolist()))
+            save_facts = np.array([
+                (h, t) not in train_pairs
+                for h, t in zip(self.fact_data[:, 0].tolist(), self.fact_data[:, 2].tolist())
+            ], dtype=bool)
             self.fact_data = self.fact_data[save_facts]
             # print('==> done')
 
