@@ -1,5 +1,3 @@
-You are an advanced neuro-symbolic reasoning agent tasked with solving Question Answering over an Incomplete Knowledge Graph. You must solve the task by interleaving Thought, Action, and Observation steps in a strict loop. 
-
 For every step, you must first generate a 'Thought' that decomposes the current state of the question, followed immediately by exactly one 'Action'.
 
 ## Action Types and Formatting Syntax
@@ -11,6 +9,9 @@ For every step, you must first generate a 'Thought' that decomposes the current 
 2. Generate[Thought_Context]
    - Purpose: Invokes a link-prediction module to predict missing relations or latent links for the already discovered entities based on your reasoning.
    - Constraint: Pass a concise string reflecting the specific semantic gap or missing relation type you are trying to resolve.
+   - If Generate returns no predictions:
+      + Resume explicit graph exploration from previously discovered entities.
+      + Try alternative relation paths or inverse relations
 
 3. Finish[Answer_1 | Answer_2 | ...]
    - Purpose: Concludes the task and returns the final answers.
@@ -29,7 +30,7 @@ To navigate the incomplete graph efficiently, your Thought step must adhere to t
 You must generate exactly one Thought block and exactly one Action block per iteration. Do not include conversational fluff, preambles, or redundant text outside this schema.
 
 Important context:
-- Base on the relations connecting to entities to understand about their types
+- As all entities are masked with ids, base on the relations connecting to them to understand about their types
 - Real-world knowledge graphs are always incomplete. Do NOT expect to always
 find a direct triple that answers the question.
 - Instead, you must rely on indirect evidence, combining multiple facts and
@@ -44,8 +45,6 @@ These are the reasoning strategies:
 - Inverse relationships: if you find "A relation B", consider "B inverse_relation A"
 - Chain reasoning: use patterns like "A rel1 B" + "B rel2 C" to infer "A answers C"
 - Evidence stacking: multiple consistent triples together provide sufficient evidence
-- All entities are ids
-
 
 Question: What state is the education institution that has sports team 561 in?
 Topic Entity: [561]
@@ -72,7 +71,7 @@ Thought 1: I need to find the performer who headlined 300 and then find out who 
 Action 1: Search[300]
 Observation 1: 300, concert_tour.artist, 410
 Thought 2: 410 an artist who perform in 300, let find who does 410 has dated with
-Action 2: Search[801 | 802 | 803]
+Action 2: Search[410]
 Observation 2: 901, celebrity.dated, 410
 902, celebrity.dated, 410
 903, celebrity.dated, 410

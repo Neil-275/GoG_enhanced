@@ -254,7 +254,7 @@ def parse_generated_relations(text):
     return result
 
 
-def extract_numbers_from_string(text, return_type="int"):
+def extract_numbers_from_string(text, return_type="int", last_line = False):
     """
     Extract all numbers from a string and return them as a list.
     
@@ -278,6 +278,10 @@ def extract_numbers_from_string(text, return_type="int"):
         >>> extract_numbers_from_string("Entity 125 with relation 3")
         [125, 3]
     """
+    if last_line:
+        # Only parse numbers from the final line when requested.
+        text = text.splitlines()[-1] if text.splitlines() else ""
+
     if return_type == "int":
         # Extract integers (including negative)
         pattern = r"-?\d+"
