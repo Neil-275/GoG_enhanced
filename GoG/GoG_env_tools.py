@@ -17,7 +17,7 @@ from GoG.utils import (
     shorten_relation,
     convert_triples_to_str,
     extract_numbers_from_string,
-    parse_generated_relations
+    parse_generated_relation_directions
 )
 from GoG.GoG_llms import run_llm
 from GoG.gnn_interface import OneShotInterface
@@ -138,6 +138,49 @@ class KGEnv:
             )
         return string
 
+    def synthesize_answer(self, prompt):
+        prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/answer_synthesis")
+        synthesis_prompt = format_prompt(prompt_path)
+
+        records_str = self.convert_records_to_str()
+        prompt = (
+            synthesis_prompt
+            + "\n"
+            + records_str
+            + "\nAnswer"
+        )
+        # print("Synthesis prompt:", prompt)
+        output = run_llm(
+            prompt,
+            self.args.temperature,
+            512,
+            self.args.opeani_api_keys,
+            self.args.LLM_type,
+            stop=None,
+        )
+        # print("LLM output:", output)
+        self.llm_output = output
+
+        if not output:
+            return ["unknown"]
+
+        match = re.search(r"Answers(\[.*\])", output)
+        if match:
+            answers = parse_llm_output_to_list(match.group(1))
+        elif "[" in output:
+            answers = parse_llm_output_to_list(output[output.index("["):])
+        else:
+            answers = None
+
+        if not answers:
+            return ["unknown"]
+
+        answers = [answer for answer in answers if answer]
+        if not answers:
+            return ["unknown"]
+
+        return answers
+
     @property
     def last_thought(self):
         return self.records[-1]["thought"]
@@ -179,27 +222,25 @@ class KGEnv:
         related_triples_df = [self.kg.get_1hop_triples(str(entity_id)) 
                            for entity_id in entities if str(entity_id) in self.kg.entities]
         related_triples = [triple for df in related_triples_df for triple in df.values.tolist()]
-        # triples = triples_df.values.tolist() if len(triples_df) > 0 else []
         related_triples = random.sample(related_triples, k=min(len(related_triples), 3))
-        # print("Related triples for generation:")
-        # for triple in related_triples:
-        #     print(triple)
-        # print("length of related_triples:", len(related_triples))
         related_triple_str = convert_triples_to_str(related_triples)
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/generate_triples")
-        # prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/generate_triples_wo_ctx")
         prompt = format_prompt(prompt_path)
+
+        candidate_relations = self.kg.get_best_relation_match(thought, k=5) if self.kg.rels else []
+        candidate_relations_str = "\n".join(candidate_relations)
     
         n = self.args.sc_num
-        # neighbors = self.kg.get_1hop_triples(self.name_to_id[self.topic_entities[0].lower()])
-        sep = "\t"
         prompt = (
-            prompt + f"Thought: {thought}\n"
-            f"Known Triples: {related_triple_str}\n"
-            f"Missing relations: "
+            prompt.format(
+                thought=thought,
+                # existing_triples=related_triple_str,
+                candidate_relations=candidate_relations_str,
+            )
+            + "\nAnswer: "
         )
 
-        # logger.debug(f"Generate prompt:{prompt}")
+        logger.debug(f"Generate prompt:{prompt}")
         # print("Generate prompt:", prompt)
         responses = run_llm(
             prompt,
@@ -213,38 +254,41 @@ class KGEnv:
         # print("LLM responses:")
         # print(responses)
 
-        # print("Parsed generated relations:")
-        parsed_relations = parse_generated_relations(responses)
+        parsed_generations = parse_generated_relation_directions(responses)
 
-        # print(parsed_relations)
         result = []
-        for start_entity, relation in parsed_relations.items():
-            relation = relation[0] # LLM đề xuất 1 relation cho mỗi entity
-            
-            relation, _ = self.kg.get_best_relation_match(relation, 0.0)
-            # print(f"{start_entity}: {relation}")
-            # relation_id = self.kg.rel2id.get(relation)
-            
-            candidates = self.gnn.predict_topk(start_entity, relation, k=3, known=False)
+        for start_entity, (relation_text, direction) in parsed_generations.items():
+            relation, _ = self.kg.get_best_relation_match(relation_text)
+            if not relation:
+                continue
+
+            print(f"Found: {start_entity}: {relation}: {direction}")
+
+            candidates = self.gnn.predict_topk(start_entity, relation, direction, k=3, known=False)
+
             relation_paths = {}
             for candidate in candidates:
-                relation_path = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
+                if direction == 0:
+                    relation_path = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
+                else:
+                    relation_path = self.kg.get_shortest_path_with_relations(str(candidate), str(start_entity))
                 if relation_path == None:
                     continue
-                # if  len(relation_path["relations"]) > 6:
-                #     continue
-                # print("candidate:", candidate, end="\t")
-                # print("relation_path:", relation_path)
-                # relation_path is a dict with key path and relation_path
-                relation_path_str = f"{start_entity} -"
+                relation_path_str = ""
                 for i, ent, rel in zip(range(len(relation_path["relations"])), relation_path["path"][1:], relation_path["relations"]):
-                    relation_path_str += f"[{rel}]-"
-                relation_path_str = f"{candidate}: {relation_path_str}> {candidate}"
-                # print("relation_path_str:", relation_path_str)
+                    relation_path_str += f"[{shorten_relation(rel)}]-"
+                if direction == 0:
+                    relation_path_str = f"{candidate}: {start_entity} -{relation_path_str}> {candidate}"
+                else:
+                    relation_path_str = f"{candidate}: {candidate} -{relation_path_str}> {start_entity}"
+                print("relation_path_str:", relation_path_str)
                 relation_paths[candidate] = relation_path_str
-            verified_candidates = self.verify(start_entity, relation, relation_paths)
+            verified_candidates = self.verify(start_entity, relation, relation_paths, direction)
             for candidate in verified_candidates:
-                triple = [str(start_entity), str(relation), str(candidate)]
+                if direction == 0:
+                    triple = [str(start_entity), str(relation), str(candidate)]
+                else:
+                    triple = [str(candidate), str(relation), str(start_entity)]
                 triple_str = convert_triples_to_str([triple])
                 # print("Generated triple:", triple_str)
                 self.records[-1]["generated_triples"] = triple_str
@@ -258,12 +302,15 @@ class KGEnv:
     # Field names can be None for raw text chunks, so filter those out
         return [field_name for _, field_name, _, _ in Formatter().parse(template_string) if field_name is not None]
 
-    def verify(self, start_entity, relation, relation_paths):
+    def verify(self, start_entity, relation, relation_paths, direction):
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/verify_triples")
         prompt = format_prompt(prompt_path)
         # print("type of prompt:", type(prompt))
         # print("Format str:", self.get_template_variables(prompt))
-        prompt = prompt.format(subject=start_entity, relation=relation)
+        if direction == 0:
+            prompt = prompt.format(subject=start_entity, relation=relation, object="?")
+        else:
+            prompt = prompt.format(subject="?", relation=relation, object=start_entity)
         relation_path_str = [f"{relation_path}" for candidate, relation_path in relation_paths.items()]
         relation_path_str = "\n".join(relation_path_str)
         
@@ -308,7 +355,6 @@ class KGEnv:
         all_related_triples = []
         for entity_name in entity_names:
             entity_id = self.convert_name_to_id(entity_name)
-
             # Use KGInterface to get 1-hop triples
             if self.kg:
                 try:
@@ -353,9 +399,11 @@ class KGEnv:
 
             relations = sorted(relations)
             # logger.debug(f"Relations after abbreviation and sorting: {relations}")
+            # print(f"Relations after abbreviation and sorting: {relations}")
             ## Call LLM to filter relations for each entity
             filtered_relations = self.filter_relations(entity_name, relations, self.last_thought)
-            logger.debug(f"Relations after filter_relations (LLM filtered): {filtered_relations}")
+            # logger.debug(f"Relations after filter_relations (LLM filtered): {filtered_relations}")
+            # print(f"Relations after filter_relations (LLM filtered): {filtered_relations}")
 
             related_triples = self.sample_triples_by_relation(triples, filtered_relations)
             
@@ -409,7 +457,7 @@ class KGEnv:
             f"Relation: [{', '.join(relations)}]\n"
             f"Answer: "
         )
-
+        # print(f"Prompt: {prompt}")
         filtered_relations = run_llm(
             prompt,
             self.args.temperature,

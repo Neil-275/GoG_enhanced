@@ -157,6 +157,7 @@ class OneShotInterface:
         self,
         head: Entity,
         relation: Relation,
+        direction: int = [0,1],
         k: int = 10,
         known=True,
     ):
@@ -173,6 +174,8 @@ class OneShotInterface:
         # print("relation:", relation)
         hid = _to_id(head, self.entity2id, 'entity')
         rid = _to_id(relation, self.relation2id, 'relation')
+        if direction == 1:
+            rid = rid + self.kg.n_rel
         # print("rid:", rid)
         q_sub = torch.tensor([hid], dtype=torch.long)
         q_rel = torch.tensor([rid], dtype=torch.long)
