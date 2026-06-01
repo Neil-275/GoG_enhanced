@@ -6,7 +6,7 @@ Rules:
 - Evaluate the ENTIRE composed relation logically.
 - Do NOT select a candidate merely because the target relation name appears in the path.
 - A candidate is valid only if the path explicitly establishes the core relational structure required by the target relation.
-- Minor attributes (such as gender, subtype labels, or direction refinements) may be implicit or missing.
+- Minor attributes may be implicit or missing.
 - Reject candidates when the path shows weak association or does not establish the essential relational structure required by the target relation.
 
 
@@ -22,4 +22,4 @@ Keep each deduction short and grounded only in the provided path.
 Final Output:
 After the deductions, output only the final raw Candidate ID or "None".
 
-Input: ({subject}, {relation}, ?)
+Input: ({subject}, {relation}, {object})

@@ -43,35 +43,8 @@ lock = Lock()
 
 
 def answer_question_without_kg(env: KGEnv, prompt, args):
-    legal = False
-    n_retry = 0
-    while not legal:
-        n_retry += 1
-        if n_retry == 6:
-            answers = ["unknown"]
-            break
-
-        try:
-            output = run_llm(
-                prompt,
-                args.temperature,
-                512,
-                args.opeani_api_keys,
-                args.LLM_type,
-                stop=None,
-            )
-            logger.info(output)
-            
-            match = re.search("Finish(\[.*\])", output)
-            answers = match.group(1)
-            answers = parse_llm_output_to_list(answers)
-
-            legal = True
-        except:
-            continue
-
-    env.llm_output = output
-
+    answers = env.synthesize_answer(prompt)
+    # logger.info(env.llm_output)
     return answers
 
 
@@ -127,6 +100,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
             logger.info("-----------")
             logger.info(f"Process query {idx} ...")
             data = datas[idx]
+            # print("data: ", data)
             if "question" not in data:
                 data["question"] = data["ProcessedQuestion"]
 
@@ -138,6 +112,8 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 + f'Question: {data["question"]}\nTopic Entity: {topic_entity_names_str}\n'
             )
 
+            # print("base_prompt: ", base_prompt)
+            # exit()
             logger.info(f"Question: {data['question']}")
 
             env.assign_query(data["q_entity"], data['question'])
@@ -245,7 +221,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
 
             if not done:
                 logger.warning(
-                    f"Finish query {idx} without KG, prediction: {prediction}"
+                    f"Finish query {idx} without KG..."
                 )
                 prediction = answer_question_without_kg(env, prompt, args)
                 write_results(data, env, prediction, args)
@@ -277,7 +253,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--temperature",
         type=float,
-        default=0.7,
+        default=0.0,
         help="the temperature in exploration stage.",
     )
     parser.add_argument("--width", type=int, default=3, help="choose the search width of ToG.")
@@ -402,7 +378,7 @@ if __name__ == "__main__":
     #     #     break
     # datas = [data for data in datas if data['id'] in failed_cases]
     print(f"Number of datas to process: {len(datas)}")
-    # datas = datas[1:4]
+    datas = datas[1:4]
     idxes_to_process = range(len(datas))
 
 
@@ -417,8 +393,8 @@ if __name__ == "__main__":
     # args.reranker = FlagReranker("BAAI/bge-reranker-large", use_fp16=True)
     ## Produce a sample_args file
     import pickle as pkl
-    # with open("sample_args_family.pkl", "wb") as f:
-    #     pkl.dump(args, f)
+    with open("sample_args_fb15k_237.pkl", "wb") as f:
+        pkl.dump(args, f)
 
     env = KGEnv(args)
 

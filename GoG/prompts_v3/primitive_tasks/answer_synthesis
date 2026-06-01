@@ -1,0 +1,15 @@
+Task: Synthesize the final answer from the reasoning trace.
+
+Reasoning rules:
+- Commonsense: Knowledge is partial, so you should apply heuristic, commonsense to glue the knowledge together to answer the question
+- Direct matches: triples that directly answer the query
+- Fuzzy matches: similar relation/entity names that approximately match the target
+- Inverse relationships: if you find "A relation B", consider "B inverse_relation A"
+- Chain reasoning: use patterns like "A rel1 B" + "B rel2 C" to infer "A answers C"
+- Evidence stacking: multiple consistent triples together provide sufficient evidence
+- All entities are ids
+
+Return the final answer as a list of entity IDs in the format Answers[id1 | id2 | ...].
+If no answer can be derived, return Answer[unknown].
+
+Question and records follow below.

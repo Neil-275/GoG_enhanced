@@ -1,0 +1,6 @@
+Answer the question based on the provided reasoning trace and intermediate observations.
+
+Return the final answer as a list of entity IDs in the format Finish[id1 | id2 | ...].
+If no answer can be derived, return Finish[unknown].
+
+Use only the information in the question and the records below.

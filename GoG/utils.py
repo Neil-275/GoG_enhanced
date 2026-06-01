@@ -78,7 +78,12 @@ def convert_triples_to_str(triples, sep=", "):
 
 def shorten_relation(rel):
     rel = remove_ns(rel)
-    return ".".join(rel.split(".")[-2:])
+    # print(123)
+    tmp = rel.split("/")
+    if len(tmp) > 3:
+        rel = ".".join(tmp[:2]) + "." + ".".join(tmp[-2:])
+    return rel.strip(".")
+    # return ".".join(rel.split("/")[-2:])
 
 
 def read_file(filepath: str):
@@ -251,6 +256,33 @@ def parse_generated_relations(text):
         if relations:  # Only add if there are relations
             result[entity_id] = relations
     
+    return result
+
+
+def parse_generated_relation_directions(text):
+    """
+    Parse generated outputs in the form "EntityID: relation_name: direction".
+
+    Args:
+        text (str): Multi-line text where each matching line contains an entity
+            ID, a relation name, and a direction encoded as 0 or 1.
+
+    Returns:
+        dict: Mapping from entity IDs to (relation_name, direction) tuples.
+    """
+    result = {}
+    pattern = r"^\s*(\d+)\s*:\s*(.+?)\s*:\s*([01])\s*$"
+
+    for line in text.splitlines():
+        match = re.match(pattern, line)
+        if not match:
+            continue
+
+        entity_id = match.group(1)
+        relation = match.group(2).strip()
+        direction = int(match.group(3))
+        result[entity_id] = (relation, direction)
+
     return result
 
 

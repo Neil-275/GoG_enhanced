@@ -14,6 +14,8 @@ from torch_geometric.data import Data
 from sentence_transformers import SentenceTransformer, util, models
 import numpy as np
 
+from GoG.utils import shorten_relation
+
 embed_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # ============================================================================
@@ -188,6 +190,11 @@ class KGInterface:
         if self.dataset_name == "family":
             # Handle Family dataset's relation label inconsistency.
             self.relations = [rel + "_of" for rel in self.relations]
+        # if self.dataset_name == "fb15k_237":
+        #     print("12344124152")
+        #     self.relations = [shorten_relation(rel) for rel in self.relations]
+        # Backward-compatible alias for downstream code that expects `rels`.
+        self.rels = self.relations
         self.n_rel = len(self.relations)
         self.rel2id = {v: k for k, v in enumerate(self.relations)}
         self.create_rel_emb()
@@ -201,7 +208,7 @@ class KGInterface:
     def create_rel_emb(self):
         m_rel = []
         for rel in self.relations:
-            rel = rel.lower().replace("/", " ").replace("_", " ").strip()
+            rel = shorten_relation(rel)
             m_rel.append(rel)
         self.rel_emb = embed_model.encode(m_rel, convert_to_tensor=True)
 
@@ -537,12 +544,15 @@ class KGInterface:
         }
 
 
-    def get_best_relation_match(self, rel, threshold=0.6):
+    def get_best_relation_match(self, rel, k=None, threshold=0.0):
         """
         Matches an LLM-generated string to the closest KG relation.
+
+        If `k` is provided, return the top-k most similar relations instead of
+        a single thresholded match.
         """
         ## preprocess the relation
-        rel = rel.lower().replace("/", " ").replace("_", " ").strip()
+        rel = shorten_relation(rel)
         # Embed the LLM's "creative" output
         query_embedding = embed_model.encode(rel, convert_to_tensor=True)
         
@@ -554,6 +564,11 @@ class KGInterface:
         # Find the index of the highest score
         best_match_idx = int(np.argmax(cosine_scores.cpu()))
         max_score = cosine_scores[best_match_idx].item()
+
+        if k is not None:
+            top_k = min(int(k), len(self.relations))
+            top_indices = cosine_scores.topk(top_k).indices.tolist()
+            return [self.relations[idx] for idx in top_indices]
         
         # 4. Apply the "Safety Threshold"
         if max_score >= threshold:
