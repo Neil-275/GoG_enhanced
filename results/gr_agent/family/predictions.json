@@ -1,0 +1,8583 @@
+[
+  {
+    "id": "24",
+    "question": "Who is 444's father?",
+    "q_entity": [
+      "444"
+    ],
+    "prediction": [
+      "435",
+      "441",
+      "232"
+    ],
+    "ground_truth": [
+      "435"
+    ],
+    "ground_truth_entities": [
+      "435"
+    ],
+    "input": "Who is 444's father?",
+    "final_message": "The father of entity 444 is identified as entities 435, 441, and 232 based on the reasoning paths explored.",
+    "supporting_evidence": [
+      "444|son_of|435",
+      "444|son_of|441",
+      "441|mother_of|444",
+      "435|husband_of|441",
+      "1064|aunt_of|444",
+      "232|father_of|1064"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "25",
+    "question": "Who is 262's child?",
+    "q_entity": [
+      "262"
+    ],
+    "prediction": [
+      "266",
+      "134",
+      "132",
+      "264",
+      "265"
+    ],
+    "ground_truth": [
+      "265",
+      "264",
+      "266"
+    ],
+    "ground_truth_entities": [
+      "265",
+      "264",
+      "266"
+    ],
+    "input": "Who is 262's child?",
+    "final_message": "The child of entity 262 includes the following entities: 266, 134, 132, 264, and 265.",
+    "supporting_evidence": [
+      "262|father_of|266",
+      "262|son_of|134",
+      "262|son_of|132",
+      "264|son_of|262",
+      "265|son_of|262",
+      "266|son_of|262"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "33",
+    "question": "Who is 1474 the father of?",
+    "q_entity": [
+      "1474"
+    ],
+    "prediction": [
+      "1475"
+    ],
+    "ground_truth": [
+      "1476",
+      "1475"
+    ],
+    "ground_truth_entities": [
+      "1476",
+      "1475"
+    ],
+    "input": "Who is 1474 the father of?",
+    "final_message": "1474 is the father of 1475.",
+    "supporting_evidence": [
+      "1474|father_of|1475"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "67",
+    "question": "Who is 504's husband?",
+    "q_entity": [
+      "504"
+    ],
+    "prediction": [
+      "2157"
+    ],
+    "ground_truth": [
+      "2157"
+    ],
+    "ground_truth_entities": [
+      "2157"
+    ],
+    "input": "Who is 504's husband?",
+    "final_message": "504's husband is identified as entity 2157.",
+    "supporting_evidence": [
+      "2157|wife_of|504"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "86",
+    "question": "Who is 2813 the son of?",
+    "q_entity": [
+      "2813"
+    ],
+    "prediction": [
+      "2812",
+      "2815",
+      "2816",
+      "2774"
+    ],
+    "ground_truth": [
+      "2812",
+      "2774"
+    ],
+    "ground_truth_entities": [
+      "2812",
+      "2774"
+    ],
+    "input": "Who is 2813 the son of?",
+    "final_message": "The entity 2813 is the son of the following entities: 2812 and 2815. Additionally, 2813 is also identified as the father of entities 2816 and 2774.",
+    "supporting_evidence": [
+      "2813|son_of|2812",
+      "2815|son_of|2813",
+      "2813|father_of|2816",
+      "2774|father_of|2813"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "91",
+    "question": "Who is 1869's son?",
+    "q_entity": [
+      "1869"
+    ],
+    "prediction": [
+      "2453"
+    ],
+    "ground_truth": [
+      "2476",
+      "2451"
+    ],
+    "ground_truth_entities": [
+      "2476",
+      "2451"
+    ],
+    "input": "Who is 1869's son?",
+    "final_message": "1869's son is 2453.",
+    "supporting_evidence": [
+      "1869|son_of|2453"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "94",
+    "question": "Who is 1632 the son of?",
+    "q_entity": [
+      "1632"
+    ],
+    "prediction": [
+      "737",
+      "1634",
+      "1635"
+    ],
+    "ground_truth": [
+      "1634"
+    ],
+    "ground_truth_entities": [
+      "1634"
+    ],
+    "input": "Who is 1632 the son of?",
+    "final_message": "The entity 1632 is the son of the following entities:\n- 737 (father)\n- 1634 (father)\n- 1635 (mother)",
+    "supporting_evidence": [
+      "737|son_of|1632",
+      "1632|father_of|737",
+      "1634|father_of|1632",
+      "1635|mother_of|1632"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "99",
+    "question": "Who is 2367 the son of?",
+    "q_entity": [
+      "2367"
+    ],
+    "prediction": [
+      "2366",
+      "2369",
+      "2359"
+    ],
+    "ground_truth": [
+      "2366",
+      "2359"
+    ],
+    "ground_truth_entities": [
+      "2366",
+      "2359"
+    ],
+    "input": "Who is 2367 the son of?",
+    "final_message": "The entity 2367 is the son of entities 2366 and 2369, and it is also related to entity 2359 as a father.",
+    "supporting_evidence": [
+      "2367|father_of|2369",
+      "2359|father_of|2367",
+      "2366|mother_of|2367",
+      "2367|son_of|2366",
+      "2369|son_of|2367"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "129",
+    "question": "Who is 102 a nephew of?",
+    "q_entity": [
+      "102"
+    ],
+    "prediction": [
+      "25",
+      "83",
+      "79",
+      "39",
+      "500",
+      "57",
+      "463",
+      "147",
+      "86"
+    ],
+    "ground_truth": [
+      "39",
+      "85",
+      "83",
+      "84",
+      "25",
+      "86",
+      "79"
+    ],
+    "ground_truth_entities": [
+      "39",
+      "85",
+      "83",
+      "84",
+      "25",
+      "86",
+      "79"
+    ],
+    "input": "Who is 102 a nephew of?",
+    "final_message": "The entity 102 has several relatives, specifically:\n\n- As a nephew, 102 is related to the following entities: **25, 83, 79, and 39**.\n- Additionally, 102 has uncles: **500, 57, 463, and 147**.\n- 102 also has aunts: **79 and 39**.\n\nThus, 102 is a nephew of entities 25, 83, 79, and 39.",
+    "supporting_evidence": [
+      "102|nephew_of|25",
+      "102|nephew_of|83",
+      "102|nephew_of|79",
+      "102|nephew_of|39",
+      "102|uncle_of|500",
+      "102|uncle_of|57",
+      "102|uncle_of|463",
+      "102|uncle_of|147",
+      "86|uncle_of|102",
+      "79|aunt_of|102",
+      "39|aunt_of|102"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "130",
+    "question": "Who is 84's nephew?",
+    "q_entity": [
+      "84"
+    ],
+    "prediction": [
+      "81",
+      "461",
+      "80",
+      "50",
+      "21",
+      "38",
+      "85",
+      "86",
+      "504"
+    ],
+    "ground_truth": [
+      "39",
+      "85",
+      "83",
+      "25",
+      "86",
+      "79",
+      "102"
+    ],
+    "ground_truth_entities": [
+      "39",
+      "85",
+      "83",
+      "25",
+      "86",
+      "79",
+      "102"
+    ],
+    "input": "Who is 84's nephew?",
+    "final_message": "The nephew of entity 84 includes the following entities: \n\n- 81\n- 461\n- 80\n- 50\n- 21\n- 38\n- 85\n- 86\n- 504\n\nThese entities are connected to 84 through various paths indicating familial relationships.",
+    "supporting_evidence": [
+      "81|nephew_of|84",
+      "461|nephew_of|84",
+      "80|nephew_of|84",
+      "50|nephew_of|84",
+      "84|aunt_of|81",
+      "81|nephew_of|21",
+      "84|aunt_of|81",
+      "81|nephew_of|38",
+      "84|aunt_of|81",
+      "81|nephew_of|85",
+      "84|aunt_of|81",
+      "81|nephew_of|86",
+      "84|aunt_of|238",
+      "504|nephew_of|238"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "136",
+    "question": "Who is 1617 a nephew of?",
+    "q_entity": [
+      "1617"
+    ],
+    "prediction": [
+      "1640",
+      "333",
+      "337",
+      "336",
+      "1637",
+      "335",
+      "338",
+      "1638"
+    ],
+    "ground_truth": [
+      "1640",
+      "1638",
+      "339",
+      "1639",
+      "1637",
+      "338",
+      "337",
+      "334",
+      "336",
+      "333"
+    ],
+    "ground_truth_entities": [
+      "1640",
+      "1638",
+      "339",
+      "1639",
+      "1637",
+      "338",
+      "337",
+      "334",
+      "336",
+      "333"
+    ],
+    "input": "Who is 1617 a nephew of?",
+    "final_message": "The entity 1617 is a nephew of the following entities: 1640, 333, 337, 336, and 1637. Additionally, 1617 has aunts and uncles, including 1640, 335, 338, and 1638.",
+    "supporting_evidence": [
+      "1617|nephew_of|1640",
+      "1617|nephew_of|333",
+      "1617|nephew_of|337",
+      "1617|nephew_of|336",
+      "1617|nephew_of|1637",
+      "336|uncle_of|1617",
+      "337|uncle_of|1617",
+      "1640|aunt_of|1617",
+      "335|aunt_of|1617",
+      "338|aunt_of|1617",
+      "1638|aunt_of|1617"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "151",
+    "question": "Who is 708's nephew?",
+    "q_entity": [
+      "708"
+    ],
+    "prediction": [
+      "749",
+      "698",
+      "697",
+      "700",
+      "712",
+      "717",
+      "711"
+    ],
+    "ground_truth": [
+      "749",
+      "743",
+      "748",
+      "746",
+      "744"
+    ],
+    "ground_truth_entities": [
+      "749",
+      "743",
+      "748",
+      "746",
+      "744"
+    ],
+    "input": "Who is 708's nephew?",
+    "final_message": "The nephews of entity 708 are:\n\n- 749\n- 698\n- 697\n- 700\n- 712\n- 717\n- 711\n\nThese entities are connected to 708 through the relation \"nephew_of.\"",
+    "supporting_evidence": [
+      "708|nephew_of|749",
+      "698|nephew_of|708",
+      "697|nephew_of|708",
+      "700|nephew_of|708",
+      "745|aunt_of|708",
+      "712|nephew_of|745",
+      "745|aunt_of|708",
+      "717|nephew_of|745",
+      "745|aunt_of|708",
+      "711|nephew_of|745",
+      "746|aunt_of|708",
+      "712|nephew_of|746",
+      "746|aunt_of|708",
+      "717|nephew_of|746"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "166",
+    "question": "Who is 1335 the nephew of?",
+    "q_entity": [
+      "1335"
+    ],
+    "prediction": [
+      "1331",
+      "1490",
+      "1437"
+    ],
+    "ground_truth": [
+      "1330",
+      "1331",
+      "1437"
+    ],
+    "ground_truth_entities": [
+      "1330",
+      "1331",
+      "1437"
+    ],
+    "input": "Who is 1335 the nephew of?",
+    "final_message": "The entity 1335 is the nephew of the following entities:\n\n1. **1331** (who is also identified as an aunt of 1335)\n2. **1490** (who is an uncle of 1335)\n3. **1437** (who is also an uncle of 1335) \n\nThus, 1335 is related to these entities through familial connections.",
+    "supporting_evidence": [
+      "1335|nephew_of|1331",
+      "1331|aunt_of|1335",
+      "1335|uncle_of|1490",
+      "1437|uncle_of|1335"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "168",
+    "question": "Who is 336's nephew?",
+    "q_entity": [
+      "336"
+    ],
+    "prediction": [
+      "325",
+      "328",
+      "329",
+      "324",
+      "133",
+      "764",
+      "130",
+      "334",
+      "301",
+      "1637"
+    ],
+    "ground_truth": [
+      "335",
+      "334",
+      "339",
+      "340",
+      "333",
+      "337",
+      "203"
+    ],
+    "ground_truth_entities": [
+      "335",
+      "334",
+      "339",
+      "340",
+      "333",
+      "337",
+      "203"
+    ],
+    "input": "Who is 336's nephew?",
+    "final_message": "The entity 336 has several nephews, which include the following entities: \n\n- 325\n- 328\n- 329\n- 324\n- 133\n- 764\n- 130\n- 334\n- 301\n- 1637\n\nThese entities are connected to 336 through the relation \"nephew_of.\"",
+    "supporting_evidence": [
+      "336|nephew_of|325",
+      "336|nephew_of|328",
+      "336|nephew_of|329",
+      "336|nephew_of|324",
+      "133|nephew_of|336",
+      "326|aunt_of|336",
+      "764|nephew_of|326",
+      "326|aunt_of|336",
+      "130|nephew_of|326",
+      "326|aunt_of|336",
+      "334|nephew_of|326",
+      "326|aunt_of|336",
+      "301|nephew_of|326",
+      "326|aunt_of|336",
+      "1637|nephew_of|326"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "180",
+    "question": "Who is 895's nephew?",
+    "q_entity": [
+      "895"
+    ],
+    "prediction": [
+      "921",
+      "925",
+      "523",
+      "935",
+      "937",
+      "929",
+      "939"
+    ],
+    "ground_truth": [
+      "519",
+      "523",
+      "521",
+      "522",
+      "924"
+    ],
+    "ground_truth_entities": [
+      "519",
+      "523",
+      "521",
+      "522",
+      "924"
+    ],
+    "input": "Who is 895's nephew?",
+    "final_message": "The nephews of entity 895 are:\n\n- 921\n- 925\n- 523\n- 935\n- 937\n- 929\n- 939\n\nThese entities are connected to 895 through the relationship of being a nephew.",
+    "supporting_evidence": [
+      "921|nephew_of|895",
+      "925|nephew_of|895",
+      "895|aunt_of|924",
+      "924|nephew_of|523",
+      "895|aunt_of|924",
+      "935|nephew_of|924",
+      "895|aunt_of|924",
+      "937|nephew_of|924",
+      "895|aunt_of|535",
+      "929|nephew_of|535",
+      "895|aunt_of|535",
+      "939|nephew_of|535"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "189",
+    "question": "Who is 324's nephew?",
+    "q_entity": [
+      "324"
+    ],
+    "prediction": [
+      "301",
+      "336",
+      "325",
+      "326",
+      "330",
+      "328",
+      "2850"
+    ],
+    "ground_truth": [
+      "328",
+      "325",
+      "327",
+      "329",
+      "337"
+    ],
+    "ground_truth_entities": [
+      "328",
+      "325",
+      "327",
+      "329",
+      "337"
+    ],
+    "input": "Who is 324's nephew?",
+    "final_message": "The nephew of entity 324 includes the following entities: \n\n- 301\n- 336\n- 325\n- 326\n- 330\n- 328\n- 2850\n\nThese entities are connected to 324 through the relation \"nephew_of\" and \"aunt_of -> nephew_of\".",
+    "supporting_evidence": [
+      "301|nephew_of|324",
+      "336|nephew_of|324",
+      "324|aunt_of|764",
+      "764|nephew_of|325",
+      "324|aunt_of|764",
+      "764|nephew_of|326",
+      "324|aunt_of|764",
+      "764|nephew_of|330",
+      "324|aunt_of|764",
+      "764|nephew_of|328",
+      "324|aunt_of|764",
+      "764|nephew_of|2850"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "197",
+    "question": "Who is 831's nephew?",
+    "q_entity": [
+      "831"
+    ],
+    "prediction": [
+      "1004",
+      "845",
+      "850",
+      "843",
+      "835",
+      "828",
+      "775"
+    ],
+    "ground_truth": [
+      "832",
+      "2889",
+      "2100",
+      "2888",
+      "830",
+      "775",
+      "844"
+    ],
+    "ground_truth_entities": [
+      "832",
+      "2889",
+      "2100",
+      "2888",
+      "830",
+      "775",
+      "844"
+    ],
+    "input": "Who is 831's nephew?",
+    "final_message": "The nephews of entity 831 are:\n\n- 1004\n- 845\n- 850\n- 843\n- 835\n- 828 (through the aunt of 1004)\n- 775 (through the aunt of 1000)\n\nThese entities are connected to 831 through the relation \"nephew_of.\"",
+    "supporting_evidence": [
+      "831|nephew_of|1004",
+      "845|nephew_of|831",
+      "850|nephew_of|831",
+      "843|nephew_of|831",
+      "835|nephew_of|831",
+      "1004|aunt_of|831",
+      "828|nephew_of|1004",
+      "1000|aunt_of|831",
+      "775|nephew_of|1000"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "199",
+    "question": "Who is 768 a nephew of?",
+    "q_entity": [
+      "768"
+    ],
+    "prediction": [
+      "731",
+      "729",
+      "734",
+      "2123",
+      "2415",
+      "730"
+    ],
+    "ground_truth": [
+      "732",
+      "729",
+      "731",
+      "733",
+      "734"
+    ],
+    "ground_truth_entities": [
+      "732",
+      "729",
+      "731",
+      "733",
+      "734"
+    ],
+    "input": "Who is 768 a nephew of?",
+    "final_message": "The entity 768 is a nephew of the following individuals: 731, 729, 734, and 2123. Additionally, 768 has an aunt (734) and uncles (2415 and 730).",
+    "supporting_evidence": [
+      "768|nephew_of|731",
+      "768|nephew_of|729",
+      "768|nephew_of|734",
+      "2123|nephew_of|768",
+      "734|aunt_of|768",
+      "768|uncle_of|2415",
+      "730|uncle_of|768"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "201",
+    "question": "Who is 1977 the aunt of?",
+    "q_entity": [
+      "1977"
+    ],
+    "prediction": [
+      "1985",
+      "1987",
+      "1978",
+      "1982",
+      "1975"
+    ],
+    "ground_truth": [
+      "1987",
+      "1982",
+      "1985",
+      "1986",
+      "1978",
+      "1792"
+    ],
+    "ground_truth_entities": [
+      "1987",
+      "1982",
+      "1985",
+      "1986",
+      "1978",
+      "1792"
+    ],
+    "input": "Who is 1977 the aunt of?",
+    "final_message": "The entity \"1977\" is the aunt of the following individuals: **1985, 1987, 1978, 1982**, and **1975**.",
+    "supporting_evidence": [
+      "1977|aunt_of|1985",
+      "1977|aunt_of|1987",
+      "1977|aunt_of|1978",
+      "1977|aunt_of|1982",
+      "1978|nephew_of|1977",
+      "1977|niece_of|1975"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "207",
+    "question": "Who is 2083's aunt?",
+    "q_entity": [
+      "2083"
+    ],
+    "prediction": [
+      "1465",
+      "2079",
+      "1331"
+    ],
+    "ground_truth": [
+      "2087",
+      "2088",
+      "2090",
+      "2086",
+      "1490",
+      "2085",
+      "2079"
+    ],
+    "ground_truth_entities": [
+      "2087",
+      "2088",
+      "2090",
+      "2086",
+      "1490",
+      "2085",
+      "2079"
+    ],
+    "input": "Who is 2083's aunt?",
+    "final_message": "The aunts of entity 2083 are identified as entities 1465, 2079, and 1331.",
+    "supporting_evidence": [
+      "2083|brother_of|2089",
+      "1465|aunt_of|2089",
+      "2083|brother_of|2090",
+      "1465|aunt_of|2090",
+      "2085|brother_of|2083",
+      "2079|aunt_of|2085",
+      "1335|father_of|2083",
+      "1331|aunt_of|1335"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "209",
+    "question": "Who is 1042's aunt?",
+    "q_entity": [
+      "1042"
+    ],
+    "prediction": [
+      "1050",
+      "1047",
+      "470"
+    ],
+    "ground_truth": [
+      "1039",
+      "1044",
+      "1043",
+      "2706",
+      "1041",
+      "1040",
+      "2712",
+      "1035"
+    ],
+    "ground_truth_entities": [
+      "1039",
+      "1044",
+      "1043",
+      "2706",
+      "1041",
+      "1040",
+      "2712",
+      "1035"
+    ],
+    "input": "Who is 1042's aunt?",
+    "final_message": "The aunts of entity 1042 are identified as entities 1050, 1047, and 470.",
+    "supporting_evidence": [
+      "1042|aunt_of|1050",
+      "1042|aunt_of|1047",
+      "1042|aunt_of|1050",
+      "1050|nephew_of|1039",
+      "1042|aunt_of|1050",
+      "1050|nephew_of|1043",
+      "1042|aunt_of|1050",
+      "1050|nephew_of|1044",
+      "1042|aunt_of|1047",
+      "1047|nephew_of|1039",
+      "1042|aunt_of|1047",
+      "1047|nephew_of|1041",
+      "1041|brother_of|1042",
+      "470|aunt_of|1041",
+      "1040|brother_of|1042",
+      "1035|aunt_of|1040",
+      "1040|brother_of|1042",
+      "470|aunt_of|1040"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "216",
+    "question": "Who is 2417 the aunt of?",
+    "q_entity": [
+      "2417"
+    ],
+    "prediction": [
+      "2420",
+      "2130"
+    ],
+    "ground_truth": [
+      "2421",
+      "2130"
+    ],
+    "ground_truth_entities": [
+      "2421",
+      "2130"
+    ],
+    "input": "Who is 2417 the aunt of?",
+    "final_message": "The entity 2417 is the aunt of entities 2420 and 2130.",
+    "supporting_evidence": [
+      "2417|aunt_of|2421",
+      "2417|aunt_of|2421",
+      "2421|niece_of|2420",
+      "2417|aunt_of|2421",
+      "2421|sister_of|2130"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "232",
+    "question": "Who is 1630's aunt?",
+    "q_entity": [
+      "1630"
+    ],
+    "prediction": [
+      "2861"
+    ],
+    "ground_truth": [
+      "727",
+      "732",
+      "729",
+      "728",
+      "730",
+      "2862"
+    ],
+    "ground_truth_entities": [
+      "727",
+      "732",
+      "729",
+      "728",
+      "730",
+      "2862"
+    ],
+    "input": "Who is 1630's aunt?",
+    "final_message": "The aunt of 1630 is identified as entity 2861.",
+    "supporting_evidence": [
+      "2861|aunt_of|1630",
+      "2861|aunt_of|1630",
+      "2860|brother_of|2861",
+      "2861|aunt_of|1630",
+      "2862|sister_of|2861",
+      "2861|aunt_of|1630",
+      "726|sister_of|2861"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "256",
+    "question": "Who is 7 the aunt of?",
+    "q_entity": [
+      "7"
+    ],
+    "prediction": [
+      "17",
+      "26",
+      "122",
+      "121",
+      "38",
+      "14",
+      "28",
+      "86",
+      "13",
+      "29",
+      "24",
+      "39",
+      "121",
+      "38",
+      "76"
+    ],
+    "ground_truth": [
+      "72",
+      "83",
+      "15",
+      "123",
+      "21",
+      "16",
+      "129",
+      "77",
+      "85",
+      "75",
+      "121",
+      "29",
+      "73",
+      "38",
+      "28",
+      "26",
+      "18",
+      "86",
+      "122",
+      "97",
+      "13",
+      "17"
+    ],
+    "ground_truth_entities": [
+      "72",
+      "83",
+      "15",
+      "123",
+      "21",
+      "16",
+      "129",
+      "77",
+      "85",
+      "75",
+      "121",
+      "29",
+      "73",
+      "38",
+      "28",
+      "26",
+      "18",
+      "86",
+      "122",
+      "97",
+      "13",
+      "17"
+    ],
+    "input": "Who is 7 the aunt of?",
+    "final_message": "Entity 7 is the aunt of the following entities: \n\n- 17\n- 26\n- 122\n- 121\n- 38\n- 14\n- 28\n- 86\n- 13\n- 29\n- 24\n- 39\n- 121 (again)\n- 38 (again)\n- 76\n\nThese entities include both nieces and nephews of entity 7.",
+    "supporting_evidence": [
+      "7|aunt_of|17",
+      "7|aunt_of|26",
+      "7|aunt_of|122",
+      "7|aunt_of|121",
+      "7|aunt_of|38",
+      "14|nephew_of|7",
+      "28|nephew_of|7",
+      "86|nephew_of|7",
+      "13|nephew_of|7",
+      "29|nephew_of|7",
+      "24|niece_of|7",
+      "39|niece_of|7",
+      "121|niece_of|7",
+      "38|niece_of|7",
+      "76|niece_of|7"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "257",
+    "question": "Who is 7 the aunt of?",
+    "q_entity": [
+      "7"
+    ],
+    "prediction": [
+      "17",
+      "26",
+      "122",
+      "121",
+      "38",
+      "14",
+      "28",
+      "86",
+      "13",
+      "29",
+      "24",
+      "39",
+      "121",
+      "38",
+      "76"
+    ],
+    "ground_truth": [
+      "72",
+      "83",
+      "15",
+      "123",
+      "21",
+      "16",
+      "129",
+      "77",
+      "85",
+      "75",
+      "121",
+      "29",
+      "73",
+      "38",
+      "28",
+      "26",
+      "18",
+      "86",
+      "122",
+      "97",
+      "13",
+      "17"
+    ],
+    "ground_truth_entities": [
+      "72",
+      "83",
+      "15",
+      "123",
+      "21",
+      "16",
+      "129",
+      "77",
+      "85",
+      "75",
+      "121",
+      "29",
+      "73",
+      "38",
+      "28",
+      "26",
+      "18",
+      "86",
+      "122",
+      "97",
+      "13",
+      "17"
+    ],
+    "input": "Who is 7 the aunt of?",
+    "final_message": "The entity \"7\" is the aunt of the following entities: \n\n- 17\n- 26\n- 122\n- 121\n- 38\n- 14 (nephew)\n- 28 (nephew)\n- 86 (nephew)\n- 13 (nephew)\n- 29 (nephew)\n- 24 (niece)\n- 39 (niece)\n- 121 (niece)\n- 38 (niece)\n- 76 (niece)\n\nThus, \"7\" is the aunt of 17, 26, 122, 121, 38, and also has several nephews and nieces including 14, 28, 86, 13, 29, 24, 39, 121, 38, and 76.",
+    "supporting_evidence": [
+      "7|aunt_of|17",
+      "7|aunt_of|26",
+      "7|aunt_of|122",
+      "7|aunt_of|121",
+      "7|aunt_of|38",
+      "14|nephew_of|7",
+      "28|nephew_of|7",
+      "86|nephew_of|7",
+      "13|nephew_of|7",
+      "29|nephew_of|7",
+      "24|niece_of|7",
+      "39|niece_of|7",
+      "121|niece_of|7",
+      "38|niece_of|7",
+      "76|niece_of|7"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "273",
+    "question": "Who is 2913 the aunt of?",
+    "q_entity": [
+      "2913"
+    ],
+    "prediction": [
+      "749",
+      "2915",
+      "706",
+      "751",
+      "743",
+      "748",
+      "1341",
+      "1420",
+      "744",
+      "746"
+    ],
+    "ground_truth": [
+      "743",
+      "2915",
+      "747",
+      "751",
+      "742",
+      "749",
+      "748",
+      "745",
+      "744",
+      "706"
+    ],
+    "ground_truth_entities": [
+      "743",
+      "2915",
+      "747",
+      "751",
+      "742",
+      "749",
+      "748",
+      "745",
+      "744",
+      "706"
+    ],
+    "input": "Who is 2913 the aunt of?",
+    "final_message": "Entity 2913 is the aunt of the following individuals:\n\n- 749\n- 2915\n- 706\n- 751\n- 743\n\nAdditionally, 2913 is also the aunt of the following nephews and nieces:\n\n- Nephews: 748, 1341, 706, 743\n- Nieces: 749, 1420, 744, 2915, 746\n\nIn summary, 2913 has multiple nieces and nephews, indicating a broad family connection.",
+    "supporting_evidence": [
+      "2913|aunt_of|749",
+      "2913|aunt_of|2915",
+      "2913|aunt_of|706",
+      "2913|aunt_of|751",
+      "2913|aunt_of|743",
+      "748|nephew_of|2913",
+      "1341|nephew_of|2913",
+      "706|nephew_of|2913",
+      "743|nephew_of|2913",
+      "749|niece_of|2913",
+      "1420|niece_of|2913",
+      "744|niece_of|2913",
+      "2915|niece_of|2913",
+      "746|niece_of|2913"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "275",
+    "question": "Who is 744's aunt?",
+    "q_entity": [
+      "744"
+    ],
+    "prediction": [
+      "709",
+      "951",
+      "708",
+      "710",
+      "712"
+    ],
+    "ground_truth": [
+      "743",
+      "2915",
+      "747",
+      "751",
+      "742",
+      "749",
+      "748",
+      "745",
+      "706",
+      "2913"
+    ],
+    "ground_truth_entities": [
+      "743",
+      "2915",
+      "747",
+      "751",
+      "742",
+      "749",
+      "748",
+      "745",
+      "706",
+      "2913"
+    ],
+    "input": "Who is 744's aunt?",
+    "final_message": "The aunts of entity 744 are identified as entities 709, 951, 708, 710, and 712.",
+    "supporting_evidence": [
+      "744|aunt_of|709",
+      "744|aunt_of|951",
+      "744|aunt_of|708",
+      "744|aunt_of|710",
+      "744|aunt_of|712",
+      "744|aunt_of|709",
+      "709|aunt_of|701",
+      "744|aunt_of|709",
+      "709|aunt_of|699",
+      "744|aunt_of|709",
+      "749|aunt_of|709",
+      "744|aunt_of|709",
+      "747|aunt_of|709",
+      "744|aunt_of|709",
+      "745|aunt_of|709"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "277",
+    "question": "Who is 1152 the aunt of?",
+    "q_entity": [
+      "1152"
+    ],
+    "prediction": [
+      "1145",
+      "1182",
+      "1153",
+      "495",
+      "1074",
+      "1151",
+      "1140",
+      "1139"
+    ],
+    "ground_truth": [
+      "1182",
+      "688",
+      "1180",
+      "1145"
+    ],
+    "ground_truth_entities": [
+      "1182",
+      "688",
+      "1180",
+      "1145"
+    ],
+    "input": "Who is 1152 the aunt of?",
+    "final_message": "Entity 1152 is the aunt of the following individuals:\n\n- 1145\n- 1182\n- 1153\n- 495\n- 1074\n- 1151\n- 1140\n- 1139\n\nThese relationships are supported by the evidence found in the knowledge graph.",
+    "supporting_evidence": [
+      "1152|aunt_of|1145",
+      "1152|aunt_of|1182",
+      "1152|aunt_of|1145",
+      "1145|nephew_of|1153",
+      "1152|aunt_of|1145",
+      "1145|nephew_of|495",
+      "1074|aunt_of|1152",
+      "1151|niece_of|1074",
+      "1140|aunt_of|1152",
+      "495|niece_of|1140",
+      "1139|aunt_of|1152",
+      "1151|niece_of|1139"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "290",
+    "question": "Who is 713's aunt?",
+    "q_entity": [
+      "713"
+    ],
+    "prediction": [
+      "747"
+    ],
+    "ground_truth": [
+      "698",
+      "694",
+      "700",
+      "704",
+      "703"
+    ],
+    "ground_truth_entities": [
+      "698",
+      "694",
+      "700",
+      "704",
+      "703"
+    ],
+    "input": "Who is 713's aunt?",
+    "final_message": "The aunt of 713 is 747.",
+    "supporting_evidence": [
+      "747|aunt_of|713",
+      "747|aunt_of|713",
+      "739|mother_of|747",
+      "747|aunt_of|713",
+      "730|father_of|747",
+      "710|brother_of|713",
+      "747|aunt_of|710",
+      "710|brother_of|713",
+      "744|aunt_of|710"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "291",
+    "question": "Who is 713 the aunt of?",
+    "q_entity": [
+      "713"
+    ],
+    "prediction": [
+      "747",
+      "698",
+      "703",
+      "704",
+      "695",
+      "705"
+    ],
+    "ground_truth": [
+      "698",
+      "694",
+      "700",
+      "704",
+      "703"
+    ],
+    "ground_truth_entities": [
+      "698",
+      "694",
+      "700",
+      "704",
+      "703"
+    ],
+    "input": "Who is 713 the aunt of?",
+    "final_message": "Entity 713 is the aunt of the following individuals:\n\n- 747\n- 698\n- 703\n- 704\n- 695\n- 705\n\nThese relationships are established through the paths of \"aunt_of,\" \"nephew_of,\" and \"niece_of.\"",
+    "supporting_evidence": [
+      "747|aunt_of|713",
+      "698|nephew_of|713",
+      "703|nephew_of|713",
+      "704|nephew_of|713",
+      "713|niece_of|747",
+      "695|niece_of|713",
+      "705|niece_of|713"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "297",
+    "question": "Who is 210 the aunt of?",
+    "q_entity": [
+      "210"
+    ],
+    "prediction": [
+      "262",
+      "223",
+      "335",
+      "334",
+      "333",
+      "340",
+      "338"
+    ],
+    "ground_truth": [
+      "221",
+      "1",
+      "135",
+      "136",
+      "223",
+      "220",
+      "262"
+    ],
+    "ground_truth_entities": [
+      "221",
+      "1",
+      "135",
+      "136",
+      "223",
+      "220",
+      "262"
+    ],
+    "input": "Who is 210 the aunt of?",
+    "final_message": "Entity 210 is the aunt of the following entities: 262, 223, 335, 334, 333, 340, and 338.",
+    "supporting_evidence": [
+      "210|aunt_of|262",
+      "333|aunt_of|210",
+      "338|aunt_of|210",
+      "335|aunt_of|210",
+      "262|nephew_of|210",
+      "223|nephew_of|210",
+      "210|niece_of|335",
+      "210|niece_of|334",
+      "210|niece_of|333",
+      "210|niece_of|340",
+      "210|niece_of|338"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "307",
+    "question": "Who is 76 the aunt of?",
+    "q_entity": [
+      "76"
+    ],
+    "prediction": [
+      "81",
+      "82",
+      "424",
+      "11",
+      "8",
+      "423",
+      "421",
+      "7",
+      "428",
+      "4",
+      "5"
+    ],
+    "ground_truth": [
+      "426",
+      "81",
+      "425",
+      "82",
+      "421",
+      "420",
+      "424",
+      "423"
+    ],
+    "ground_truth_entities": [
+      "426",
+      "81",
+      "425",
+      "82",
+      "421",
+      "420",
+      "424",
+      "423"
+    ],
+    "input": "Who is 76 the aunt of?",
+    "final_message": "Entity 76 is the aunt of the following entities: \n\n- 81\n- 82\n- 424\n- 11\n- 8\n\nAdditionally, entity 76 is the aunt of the following nephews and nieces:\n\n- Nephews: 423, 421, 424\n- Nieces: 7, 428, 4, 5, 11\n\nIn summary, 76 is the aunt of entities 81, 82, 424, 11, 8, and has nephews 423, 421, 424 and nieces 7, 428, 4, 5, 11.",
+    "supporting_evidence": [
+      "76|aunt_of|81",
+      "76|aunt_of|82",
+      "76|aunt_of|424",
+      "11|aunt_of|76",
+      "8|aunt_of|76",
+      "423|nephew_of|76",
+      "421|nephew_of|76",
+      "424|nephew_of|76",
+      "76|niece_of|7",
+      "76|niece_of|428",
+      "76|niece_of|4",
+      "76|niece_of|5",
+      "76|niece_of|11"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "324",
+    "question": "Who is 102's aunt?",
+    "q_entity": [
+      "102"
+    ],
+    "prediction": [
+      "79",
+      "39"
+    ],
+    "ground_truth": [
+      "26",
+      "29",
+      "27",
+      "238",
+      "28",
+      "101",
+      "224"
+    ],
+    "ground_truth_entities": [
+      "26",
+      "29",
+      "27",
+      "238",
+      "28",
+      "101",
+      "224"
+    ],
+    "input": "Who is 102's aunt?",
+    "final_message": "The aunts of entity 102 are identified as entities 79 and 39.",
+    "supporting_evidence": [
+      "79|aunt_of|102",
+      "39|aunt_of|102",
+      "79|aunt_of|102",
+      "79|mother_of|81",
+      "79|aunt_of|102",
+      "79|mother_of|80",
+      "79|aunt_of|102",
+      "79|mother_of|82",
+      "79|aunt_of|102",
+      "5|mother_of|79",
+      "39|aunt_of|102",
+      "39|mother_of|47",
+      "79|aunt_of|102",
+      "79|sister_of|84",
+      "79|aunt_of|102",
+      "79|sister_of|38",
+      "79|aunt_of|102",
+      "84|sister_of|79",
+      "79|aunt_of|102",
+      "85|sister_of|79",
+      "39|aunt_of|102",
+      "39|sister_of|86",
+      "79|aunt_of|102",
+      "83|brother_of|79",
+      "39|aunt_of|102",
+      "83|brother_of|39"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "341",
+    "question": "Who is 428 the aunt of?",
+    "q_entity": [
+      "428"
+    ],
+    "prediction": [
+      "21",
+      "73",
+      "76",
+      "75",
+      "78",
+      "511",
+      "74",
+      "72"
+    ],
+    "ground_truth": [
+      "73",
+      "76",
+      "78",
+      "21",
+      "72",
+      "75",
+      "74"
+    ],
+    "ground_truth_entities": [
+      "73",
+      "76",
+      "78",
+      "21",
+      "72",
+      "75",
+      "74"
+    ],
+    "input": "Who is 428 the aunt of?",
+    "final_message": "Entity 428 is the aunt of the following individuals: \n\n- 21\n- 73\n- 76\n- 75\n- 78\n- 511\n- 74\n- 72\n\nThese entities are either her nieces or nephews.",
+    "supporting_evidence": [
+      "428|aunt_of|21",
+      "428|aunt_of|73",
+      "428|aunt_of|76",
+      "428|aunt_of|75",
+      "428|aunt_of|78",
+      "75|nephew_of|428",
+      "73|nephew_of|428",
+      "72|nephew_of|428",
+      "428|niece_of|511",
+      "78|niece_of|428",
+      "74|niece_of|428",
+      "76|niece_of|428"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "368",
+    "question": "Who is 1414 the aunt of?",
+    "q_entity": [
+      "1414"
+    ],
+    "prediction": [
+      "2540",
+      "1254",
+      "2502",
+      "2537",
+      "2518",
+      "1220"
+    ],
+    "ground_truth": [
+      "1217",
+      "1254",
+      "2540"
+    ],
+    "ground_truth_entities": [
+      "1217",
+      "1254",
+      "2540"
+    ],
+    "input": "Who is 1414 the aunt of?",
+    "final_message": "The entity 1414 is the aunt of the following individuals:\n\n- 2540\n- 1254\n- 2537 (nephew of 1254)\n- 2502 (also an aunt to 2518 and 1220)\n\nThus, 1414 is the aunt of 1254, who in turn is the uncle of 2537, and 2502, who is the aunt of 2518 and 1220.",
+    "supporting_evidence": [
+      "1414|aunt_of|2540",
+      "1414|aunt_of|1254",
+      "2502|aunt_of|1414",
+      "1414|aunt_of|1254",
+      "1254|nephew_of|2537",
+      "2502|aunt_of|1414",
+      "2502|niece_of|2518",
+      "2502|aunt_of|1414",
+      "1220|niece_of|2502"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "373",
+    "question": "Who is 737's husband?",
+    "q_entity": [
+      "737"
+    ],
+    "prediction": [
+      "738",
+      "1629",
+      "1628"
+    ],
+    "ground_truth": [
+      "738"
+    ],
+    "ground_truth_entities": [
+      "738"
+    ],
+    "input": "Who is 737's husband?",
+    "final_message": "The husband of entity 737 is represented by the entities 1629 and 1628. Additionally, entity 738 is identified as the wife of 737.",
+    "supporting_evidence": [
+      "738|wife_of|737",
+      "737|father_of|1627",
+      "1627|husband_of|1629",
+      "737|father_of|1627",
+      "1627|husband_of|1628"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "388",
+    "question": "Who is 338's daughter?",
+    "q_entity": [
+      "338"
+    ],
+    "prediction": [
+      "333",
+      "144",
+      "131",
+      "130",
+      "762"
+    ],
+    "ground_truth": [
+      "332",
+      "323"
+    ],
+    "ground_truth_entities": [
+      "332",
+      "323"
+    ],
+    "input": "Who is 338's daughter?",
+    "final_message": "The daughter of entity 338 is represented by the following entities: 333, 144, 131, 130, and 762.",
+    "supporting_evidence": [
+      "338|aunt_of|143",
+      "143|daughter_of|333",
+      "338|aunt_of|141",
+      "144|daughter_of|141",
+      "338|aunt_of|204",
+      "204|daughter_of|131",
+      "338|aunt_of|204",
+      "204|daughter_of|130",
+      "338|aunt_of|2146",
+      "2146|daughter_of|762"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "423",
+    "question": "Who is 1977 the daughter of?",
+    "q_entity": [
+      "1977"
+    ],
+    "prediction": [
+      "1966",
+      "1967"
+    ],
+    "ground_truth": [
+      "1966",
+      "1967"
+    ],
+    "ground_truth_entities": [
+      "1966",
+      "1967"
+    ],
+    "input": "Who is 1977 the daughter of?",
+    "final_message": "The entity \"1977\" is the daughter of \"1966\" and also has a mother identified as \"1967\".",
+    "supporting_evidence": [
+      "1977|daughter_of|1966",
+      "1967|mother_of|1977"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "430",
+    "question": "Who is 98 the daughter of?",
+    "q_entity": [
+      "98"
+    ],
+    "prediction": [
+      "6",
+      "96",
+      "890",
+      "97",
+      "78",
+      "21"
+    ],
+    "ground_truth": [
+      "6",
+      "94"
+    ],
+    "ground_truth_entities": [
+      "6",
+      "94"
+    ],
+    "input": "Who is 98 the daughter of?",
+    "final_message": "The entity \"98\" is the daughter of the following entities: **6, 96, 890, 97, 78, and 21**.",
+    "supporting_evidence": [
+      "98|daughter_of|6",
+      "98|aunt_of|1097",
+      "96|mother_of|1097",
+      "98|aunt_of|895",
+      "895|mother_of|890",
+      "98|aunt_of|588",
+      "97|mother_of|588",
+      "3|aunt_of|98",
+      "3|mother_of|78",
+      "3|aunt_of|98",
+      "3|mother_of|21"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "469",
+    "question": "Who is the nephew or niece of 708?",
+    "q_entity": [
+      "708"
+    ],
+    "prediction": [
+      "749",
+      "698",
+      "697",
+      "700",
+      "702",
+      "696",
+      "701",
+      "699",
+      "695"
+    ],
+    "ground_truth": [
+      "696",
+      "703",
+      "695",
+      "694",
+      "698"
+    ],
+    "ground_truth_entities": [
+      "696",
+      "703",
+      "695",
+      "694",
+      "698"
+    ],
+    "input": "Who is the nephew or niece of 708?",
+    "final_message": "The nephew or niece of entity 708 includes the following entities:\n\n- Nephews: 749, 698, 697, 700\n- Nieces: 702, 696, 701, 699, 695\n\nThese entities are connected to 708 through the relations \"nephew_of\" and \"niece_of\".",
+    "supporting_evidence": [
+      "708|nephew_of|749",
+      "698|nephew_of|708",
+      "697|nephew_of|708",
+      "700|nephew_of|708",
+      "702|niece_of|708",
+      "696|niece_of|708",
+      "701|niece_of|708",
+      "699|niece_of|708",
+      "695|niece_of|708"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "525",
+    "question": "Who is 535's uncle?",
+    "q_entity": [
+      "535"
+    ],
+    "prediction": [
+      "522",
+      "519",
+      "588"
+    ],
+    "ground_truth": [
+      "924",
+      "534",
+      "922",
+      "925",
+      "526",
+      "923",
+      "545",
+      "921",
+      "541",
+      "542",
+      "521"
+    ],
+    "ground_truth_entities": [
+      "924",
+      "534",
+      "922",
+      "925",
+      "526",
+      "923",
+      "545",
+      "921",
+      "541",
+      "542",
+      "521"
+    ],
+    "input": "Who is 535's uncle?",
+    "final_message": "The uncles of entity 535 are entities 522, 519, and 588.",
+    "supporting_evidence": [
+      "522|uncle_of|535",
+      "519|uncle_of|535",
+      "588|uncle_of|535"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "537",
+    "question": "Who is 36's uncle?",
+    "q_entity": [
+      "36"
+    ],
+    "prediction": [
+      "88",
+      "53",
+      "52",
+      "244",
+      "107"
+    ],
+    "ground_truth": [
+      "32",
+      "450",
+      "34",
+      "31",
+      "125",
+      "952",
+      "13"
+    ],
+    "ground_truth_entities": [
+      "32",
+      "450",
+      "34",
+      "31",
+      "125",
+      "952",
+      "13"
+    ],
+    "input": "Who is 36's uncle?",
+    "final_message": "The uncles of entity 36 are identified as entities 88, 53, 52, 244, and 107.",
+    "supporting_evidence": [
+      "36|uncle_of|88",
+      "36|uncle_of|53",
+      "36|uncle_of|52",
+      "36|uncle_of|244",
+      "36|uncle_of|107"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "544",
+    "question": "Who is the mother of 2806?",
+    "q_entity": [
+      "2806"
+    ],
+    "prediction": [
+      "2807",
+      "2804"
+    ],
+    "ground_truth": [
+      "2804",
+      "2807",
+      "2803"
+    ],
+    "ground_truth_entities": [
+      "2804",
+      "2807",
+      "2803"
+    ],
+    "input": "Who is the mother of 2806?",
+    "final_message": "The mother of entity 2806 is either entity 2807 or entity 2804.",
+    "supporting_evidence": [
+      "2806|daughter_of|2803",
+      "2803|mother_of|2807",
+      "2806|daughter_of|2803",
+      "2803|mother_of|2804"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "547",
+    "question": "Who is 728 the mother of?",
+    "q_entity": [
+      "728"
+    ],
+    "prediction": [
+      "2114",
+      "2115",
+      "765",
+      "2116",
+      "726"
+    ],
+    "ground_truth": [
+      "2116",
+      "2115",
+      "2119",
+      "766",
+      "2114",
+      "765",
+      "2117",
+      "768"
+    ],
+    "ground_truth_entities": [
+      "2116",
+      "2115",
+      "2119",
+      "766",
+      "2114",
+      "765",
+      "2117",
+      "768"
+    ],
+    "input": "Who is 728 the mother of?",
+    "final_message": "Entity 728 is the mother of the following entities: 2114, 2115, 765, 2116, and 726.",
+    "supporting_evidence": [
+      "728|mother_of|2114",
+      "728|mother_of|2115",
+      "728|mother_of|765",
+      "728|mother_of|2116",
+      "726|mother_of|728"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "555",
+    "question": "Who is 1038 the mother of?",
+    "q_entity": [
+      "1038"
+    ],
+    "prediction": [
+      "1040",
+      "1043",
+      "1044"
+    ],
+    "ground_truth": [
+      "1043",
+      "1042",
+      "1039",
+      "1044",
+      "1041",
+      "1040"
+    ],
+    "ground_truth_entities": [
+      "1043",
+      "1042",
+      "1039",
+      "1044",
+      "1041",
+      "1040"
+    ],
+    "input": "Who is 1038 the mother of?",
+    "final_message": "Entity 1038 is the mother of the following entities: 1040, 1043, and 1044.",
+    "supporting_evidence": [
+      "1038|mother_of|1040",
+      "1038|mother_of|1043",
+      "1038|mother_of|1044"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "560",
+    "question": "Who is 842's sister?",
+    "q_entity": [
+      "842"
+    ],
+    "prediction": [
+      "845",
+      "847",
+      "843"
+    ],
+    "ground_truth": [
+      "844",
+      "843",
+      "847",
+      "845"
+    ],
+    "ground_truth_entities": [
+      "844",
+      "843",
+      "847",
+      "845"
+    ],
+    "input": "Who is 842's sister?",
+    "final_message": "The sisters of entity 842 are entities 845, 847, and 843.",
+    "supporting_evidence": [
+      "842|sister_of|845",
+      "842|sister_of|847",
+      "842|sister_of|843"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "591",
+    "question": "Who is 331's sister?",
+    "q_entity": [
+      "331"
+    ],
+    "prediction": [
+      "326",
+      "330",
+      "323"
+    ],
+    "ground_truth": [
+      "323",
+      "326",
+      "330",
+      "327",
+      "325",
+      "329"
+    ],
+    "ground_truth_entities": [
+      "323",
+      "326",
+      "330",
+      "327",
+      "325",
+      "329"
+    ],
+    "input": "Who is 331's sister?",
+    "final_message": "The sisters of entity 331 are entities 326, 330, and 323.",
+    "supporting_evidence": [
+      "331|sister_of|326",
+      "331|sister_of|330",
+      "331|sister_of|323",
+      "326|sister_of|331",
+      "330|sister_of|331"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "607",
+    "question": "Who is 1699's sister?",
+    "q_entity": [
+      "1699"
+    ],
+    "prediction": [
+      "2902",
+      "2903"
+    ],
+    "ground_truth": [
+      "1114",
+      "1697"
+    ],
+    "ground_truth_entities": [
+      "1114",
+      "1697"
+    ],
+    "input": "Who is 1699's sister?",
+    "final_message": "The sister of entity 1699 is represented by two entities: 2902 and 2903.",
+    "supporting_evidence": [
+      "1699|aunt_of|2901",
+      "2901|sister_of|2902",
+      "1699|aunt_of|2901",
+      "2901|sister_of|2903",
+      "1699|aunt_of|2901",
+      "2902|sister_of|2901",
+      "1699|aunt_of|2901",
+      "2903|sister_of|2901",
+      "1699|aunt_of|2903",
+      "2903|sister_of|2901"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "623",
+    "question": "Who is 2529's sister?",
+    "q_entity": [
+      "2529"
+    ],
+    "prediction": [
+      "2527",
+      "2528",
+      "2526"
+    ],
+    "ground_truth": [
+      "603",
+      "2526"
+    ],
+    "ground_truth_entities": [
+      "603",
+      "2526"
+    ],
+    "input": "Who is 2529's sister?",
+    "final_message": "The sisters of entity 2529 are entities 2527, 2528, and 2526.",
+    "supporting_evidence": [
+      "2527|sister_of|2529",
+      "2528|sister_of|2529",
+      "2526|sister_of|2529"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "637",
+    "question": "Who is 43 the niece of?",
+    "q_entity": [
+      "43"
+    ],
+    "prediction": [
+      "561",
+      "558",
+      "560",
+      "1684",
+      "1683",
+      "20",
+      "1213",
+      "557",
+      "414",
+      "416",
+      "412",
+      "1029",
+      "2654",
+      "411"
+    ],
+    "ground_truth": [
+      "558",
+      "560",
+      "561",
+      "557"
+    ],
+    "ground_truth_entities": [
+      "558",
+      "560",
+      "561",
+      "557"
+    ],
+    "input": "Who is 43 the niece of?",
+    "final_message": "The entity \"43\" is the niece of the following entities: \n\n- 561\n- 558\n- 560\n- 1684\n- 1683\n- 20\n- 1213\n- 557\n- 414\n- 416\n- 412\n- 1029\n- 2654\n- 411\n\nThese entities represent the individuals who are related to \"43\" as their niece.",
+    "supporting_evidence": [
+      "43|niece_of|561",
+      "43|niece_of|558",
+      "43|niece_of|560",
+      "1684|niece_of|43",
+      "43|aunt_of|1684",
+      "43|aunt_of|1683",
+      "43|aunt_of|20",
+      "43|aunt_of|1213",
+      "557|aunt_of|43",
+      "414|brother_of|43",
+      "416|brother_of|43",
+      "43|sister_of|412",
+      "43|sister_of|416",
+      "43|sister_of|1029",
+      "43|sister_of|2654",
+      "43|sister_of|411"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "639",
+    "question": "Who is 413 the niece of?",
+    "q_entity": [
+      "413"
+    ],
+    "prediction": [
+      "558",
+      "560",
+      "1684",
+      "428",
+      "20",
+      "2665",
+      "2654",
+      "411",
+      "416",
+      "1029",
+      "511",
+      "412"
+    ],
+    "ground_truth": [
+      "557",
+      "559",
+      "560",
+      "558"
+    ],
+    "ground_truth_entities": [
+      "557",
+      "559",
+      "560",
+      "558"
+    ],
+    "input": "Who is 413 the niece of?",
+    "final_message": "The entity 413 is a niece of the following entities: \n\n- 558\n- 560\n- 1684\n\nAdditionally, 413 has relationships as an aunt to entities 1684, 428, 20, and 2665, and as a sister to entities 2654, 411, 416, 1029, and 511. It also has brothers, specifically 411 and 412.",
+    "supporting_evidence": [
+      "413|niece_of|558",
+      "413|niece_of|560",
+      "1684|niece_of|413",
+      "413|aunt_of|1684",
+      "413|aunt_of|428",
+      "413|aunt_of|20",
+      "413|aunt_of|2665",
+      "413|sister_of|2654",
+      "413|sister_of|411",
+      "413|sister_of|416",
+      "1029|sister_of|413",
+      "511|sister_of|413",
+      "411|brother_of|413",
+      "412|brother_of|413"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "659",
+    "question": "Who is 701 a niece of?",
+    "q_entity": [
+      "701"
+    ],
+    "prediction": [
+      "712",
+      "1625",
+      "708"
+    ],
+    "ground_truth": [
+      "712",
+      "708",
+      "709",
+      "710",
+      "1625"
+    ],
+    "ground_truth_entities": [
+      "712",
+      "708",
+      "709",
+      "710",
+      "1625"
+    ],
+    "input": "Who is 701 a niece of?",
+    "final_message": "The entity 701 is a niece of the following entities: 712, 1625, and 708.",
+    "supporting_evidence": [
+      "701|niece_of|712",
+      "701|niece_of|1625",
+      "701|niece_of|708",
+      "709|aunt_of|701",
+      "697|brother_of|701"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "663",
+    "question": "Who is 2829 the niece of?",
+    "q_entity": [
+      "2829"
+    ],
+    "prediction": [
+      "1123",
+      "601",
+      "1124",
+      "452",
+      "2832",
+      "958",
+      "1129",
+      "599",
+      "454",
+      "968"
+    ],
+    "ground_truth": [
+      "1664",
+      "606",
+      "1665",
+      "1667"
+    ],
+    "ground_truth_entities": [
+      "1664",
+      "606",
+      "1665",
+      "1667"
+    ],
+    "input": "Who is 2829 the niece of?",
+    "final_message": "The entity 2829 is the niece of the following entities: \n\n- 1123\n- 601\n- 1124\n- 452\n- 2832\n- 958\n- 1129\n- 599\n- 454\n- 968\n\nThese relationships were established through various paths in the knowledge graph, indicating that 2829 has multiple aunts and uncles, and thus several individuals to whom she is related as a niece.",
+    "supporting_evidence": [
+      "2829|aunt_of|1123",
+      "2829|aunt_of|601",
+      "2829|aunt_of|1124",
+      "2829|aunt_of|452",
+      "2829|aunt_of|2832",
+      "958|niece_of|2829",
+      "2829|aunt_of|1124",
+      "601|brother_of|1124",
+      "1129|niece_of|601",
+      "2829|aunt_of|452",
+      "452|brother_of|959",
+      "959|niece_of|599",
+      "2829|aunt_of|452",
+      "452|brother_of|959",
+      "454|niece_of|959",
+      "2829|aunt_of|452",
+      "452|brother_of|959",
+      "968|niece_of|959",
+      "2829|aunt_of|452",
+      "452|brother_of|958",
+      "958|niece_of|599"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "705",
+    "question": "Who is 233 the niece of?",
+    "q_entity": [
+      "233"
+    ],
+    "prediction": [
+      "163",
+      "2673",
+      "21",
+      "73",
+      "74",
+      "471",
+      "474",
+      "78",
+      "467",
+      "232",
+      "231",
+      "230",
+      "234"
+    ],
+    "ground_truth": [
+      "73",
+      "74",
+      "72",
+      "229",
+      "21",
+      "77",
+      "467",
+      "104",
+      "163",
+      "75",
+      "2673",
+      "465",
+      "78"
+    ],
+    "ground_truth_entities": [
+      "73",
+      "74",
+      "72",
+      "229",
+      "21",
+      "77",
+      "467",
+      "104",
+      "163",
+      "75",
+      "2673",
+      "465",
+      "78"
+    ],
+    "input": "Who is 233 the niece of?",
+    "final_message": "The entity 233 is the niece of the following entities: \n\n- 163\n- 2673\n- 21\n- 73\n- 74\n\nAdditionally, 233 has aunts who are:\n\n- 471\n- 474\n- 78\n- 467\n- 163\n\nFurthermore, 233 has siblings (sisters and brothers) who are:\n\n- Sisters: 232, 231, 230, 234\n- Brothers: 232, 231, 230, 234\n\nThus, 233 is connected to multiple relatives through various relationships.",
+    "supporting_evidence": [
+      "233|niece_of|163",
+      "233|niece_of|2673",
+      "233|niece_of|21",
+      "233|niece_of|73",
+      "233|niece_of|74",
+      "233|aunt_of|471",
+      "233|aunt_of|474",
+      "78|aunt_of|233",
+      "467|aunt_of|233",
+      "163|aunt_of|233",
+      "233|sister_of|232",
+      "233|sister_of|231",
+      "233|sister_of|230",
+      "233|sister_of|234",
+      "232|brother_of|233",
+      "231|brother_of|233",
+      "230|brother_of|233",
+      "234|brother_of|233"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "714",
+    "question": "Who is 571's niece?",
+    "q_entity": [
+      "571"
+    ],
+    "prediction": [
+      "1166",
+      "1169",
+      "1163",
+      "1161",
+      "1164"
+    ],
+    "ground_truth": [
+      "572",
+      "561"
+    ],
+    "ground_truth_entities": [
+      "572",
+      "561"
+    ],
+    "input": "Who is 571's niece?",
+    "final_message": "The nieces of entity 571 are identified by the following IDs: 1166, 1169, 1163, 1161, and 1164.",
+    "supporting_evidence": [
+      "571|niece_of|1166",
+      "571|niece_of|1169",
+      "571|niece_of|1163",
+      "571|niece_of|1161",
+      "571|niece_of|1164"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "730",
+    "question": "Who is 1286's niece?",
+    "q_entity": [
+      "1286"
+    ],
+    "prediction": [
+      "1267",
+      "1264",
+      "1273"
+    ],
+    "ground_truth": [
+      "1288",
+      "1749",
+      "1287",
+      "1289",
+      "1284",
+      "1283",
+      "1274"
+    ],
+    "ground_truth_entities": [
+      "1288",
+      "1749",
+      "1287",
+      "1289",
+      "1284",
+      "1283",
+      "1274"
+    ],
+    "input": "Who is 1286's niece?",
+    "final_message": "The nieces of entity 1286 are entities 1267, 1264, and 1273.",
+    "supporting_evidence": [
+      "1267|niece_of|1286",
+      "1264|niece_of|1286",
+      "1273|niece_of|1286"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "749",
+    "question": "Who is 428 the niece of?",
+    "q_entity": [
+      "428"
+    ],
+    "prediction": [
+      "21",
+      "73",
+      "76",
+      "75",
+      "78",
+      "511",
+      "20",
+      "427",
+      "412"
+    ],
+    "ground_truth": [
+      "511",
+      "1029",
+      "411",
+      "43",
+      "416",
+      "418"
+    ],
+    "ground_truth_entities": [
+      "511",
+      "1029",
+      "411",
+      "43",
+      "416",
+      "418"
+    ],
+    "input": "Who is 428 the niece of?",
+    "final_message": "The entity 428 is the niece of the following individuals: \n\n- 21\n- 73\n- 76\n- 75\n- 78\n- 511\n- 20\n- 427\n- 412\n\nThese entities represent the aunts and uncles related to 428.",
+    "supporting_evidence": [
+      "428|aunt_of|21",
+      "428|aunt_of|73",
+      "428|aunt_of|76",
+      "428|aunt_of|75",
+      "428|aunt_of|78",
+      "428|niece_of|511",
+      "78|niece_of|428",
+      "74|niece_of|428",
+      "76|niece_of|428",
+      "428|sister_of|20",
+      "428|daughter_of|427",
+      "428|daughter_of|412",
+      "412|father_of|428"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "755",
+    "question": "Who is 1263's niece?",
+    "q_entity": [
+      "1263"
+    ],
+    "prediction": [
+      "1290",
+      "1285",
+      "1289",
+      "1283",
+      "1284",
+      "1269",
+      "1265",
+      "2464",
+      "1275",
+      "1264"
+    ],
+    "ground_truth": [
+      "1272",
+      "1266",
+      "2464",
+      "1276",
+      "1270",
+      "1274",
+      "1271",
+      "2465",
+      "1267",
+      "1273",
+      "1268",
+      "1743",
+      "1258"
+    ],
+    "ground_truth_entities": [
+      "1272",
+      "1266",
+      "2464",
+      "1276",
+      "1270",
+      "1274",
+      "1271",
+      "2465",
+      "1267",
+      "1273",
+      "1268",
+      "1743",
+      "1258"
+    ],
+    "input": "Who is 1263's niece?",
+    "final_message": "The niece of entity 1263 includes the following entities: \n\n- 1290\n- 1285\n- 1289\n- 1283\n- 1284\n- 1269\n- 1265\n- 2464\n- 1275\n- 1264\n\nThese entities are connected to 1263 through the relation \"niece_of.\"",
+    "supporting_evidence": [
+      "1263|niece_of|1290",
+      "1263|niece_of|1285",
+      "1263|niece_of|1289",
+      "1263|niece_of|1283",
+      "1263|niece_of|1284",
+      "1263|aunt_of|1257",
+      "1257|niece_of|1269",
+      "1263|aunt_of|1257",
+      "1257|niece_of|1265",
+      "1263|aunt_of|1257",
+      "1257|niece_of|2464",
+      "1263|aunt_of|1257",
+      "1257|niece_of|1275",
+      "1263|aunt_of|1257",
+      "1257|niece_of|1264"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "756",
+    "question": "Who is 1268's niece?",
+    "q_entity": [
+      "1268"
+    ],
+    "prediction": [
+      "1283",
+      "1289",
+      "1288",
+      "1257",
+      "1370",
+      "1367",
+      "1276",
+      "1275",
+      "1272"
+    ],
+    "ground_truth": [
+      "1272",
+      "1263",
+      "1266",
+      "2464",
+      "1276",
+      "1270",
+      "1274",
+      "1271",
+      "2465",
+      "1267",
+      "1273",
+      "1743",
+      "1258"
+    ],
+    "ground_truth_entities": [
+      "1272",
+      "1263",
+      "1266",
+      "2464",
+      "1276",
+      "1270",
+      "1274",
+      "1271",
+      "2465",
+      "1267",
+      "1273",
+      "1743",
+      "1258"
+    ],
+    "input": "Who is 1268's niece?",
+    "final_message": "The niece of entity 1268 includes the following entities: \n\n- 1283\n- 1289\n- 1288\n- 1257\n- 1370\n- 1367\n- 1276\n- 1275\n- 1272\n\nThese entities are connected to 1268 through the relation \"niece_of.\"",
+    "supporting_evidence": [
+      "1268|niece_of|1283",
+      "1268|niece_of|1289",
+      "1268|niece_of|1288",
+      "1257|niece_of|1268",
+      "1283|aunt_of|1268",
+      "1283|niece_of|1370",
+      "1283|aunt_of|1268",
+      "1283|niece_of|1367",
+      "1283|aunt_of|1268",
+      "1276|niece_of|1283",
+      "1283|aunt_of|1268",
+      "1275|niece_of|1283",
+      "1283|aunt_of|1268",
+      "1272|niece_of|1283"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "763",
+    "question": "Who is 456 the son of?",
+    "q_entity": [
+      "456"
+    ],
+    "prediction": [
+      "1408",
+      "446",
+      "459"
+    ],
+    "ground_truth": [
+      "459",
+      "458"
+    ],
+    "ground_truth_entities": [
+      "459",
+      "458"
+    ],
+    "input": "Who is 456 the son of?",
+    "final_message": "The entity 456 is the son of the following entities: \n\n- 1408\n- 446\n- 459\n\nThese relationships are established through the paths indicating father and mother connections.",
+    "supporting_evidence": [
+      "456|father_of|1408",
+      "456|father_of|446",
+      "459|mother_of|456",
+      "456|son_of|459",
+      "446|son_of|456"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "767",
+    "question": "Who is 2377 the son of?",
+    "q_entity": [
+      "2377"
+    ],
+    "prediction": [
+      "2374"
+    ],
+    "ground_truth": [
+      "2374",
+      "2372"
+    ],
+    "ground_truth_entities": [
+      "2374",
+      "2372"
+    ],
+    "input": "Who is 2377 the son of?",
+    "final_message": "The entity 2377 is the son of entity 2374.",
+    "supporting_evidence": [
+      "2377|son_of|2374"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "770",
+    "question": "Who is 2454 the son of?",
+    "q_entity": [
+      "2454"
+    ],
+    "prediction": [
+      "2535"
+    ],
+    "ground_truth": [
+      "2535",
+      "2457"
+    ],
+    "ground_truth_entities": [
+      "2535",
+      "2457"
+    ],
+    "input": "Who is 2454 the son of?",
+    "final_message": "The entity 2454 is the son of entity 2535.",
+    "supporting_evidence": [
+      "2454|son_of|2535"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "774",
+    "question": "Who is 1308 the son of?",
+    "q_entity": [
+      "1308"
+    ],
+    "prediction": [
+      "1307"
+    ],
+    "ground_truth": [
+      "1307",
+      "1306"
+    ],
+    "ground_truth_entities": [
+      "1307",
+      "1306"
+    ],
+    "input": "Who is 1308 the son of?",
+    "final_message": "The entity 1308 is the son of 1307.",
+    "supporting_evidence": [
+      "1308|son_of|1307"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "777",
+    "question": "Who is 1367 the son of?",
+    "q_entity": [
+      "1367"
+    ],
+    "prediction": [
+      "1887",
+      "1366",
+      "1888"
+    ],
+    "ground_truth": [
+      "1366",
+      "1364"
+    ],
+    "ground_truth_entities": [
+      "1366",
+      "1364"
+    ],
+    "input": "Who is 1367 the son of?",
+    "final_message": "The entity 1367 is the son of the following entities:\n\n1. **1887** (father)\n2. **1366** (mother)\n3. **1888** (also identified as a son)\n\nThus, 1367 has a father (1887), a mother (1366), and is also related to another entity (1888) as a son.",
+    "supporting_evidence": [
+      "1367|father_of|1887",
+      "1366|mother_of|1367",
+      "1367|son_of|1366",
+      "1888|son_of|1367",
+      "1887|son_of|1367"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "797",
+    "question": "Who is 1160's brother?",
+    "q_entity": [
+      "1160"
+    ],
+    "prediction": [
+      "1163",
+      "1168",
+      "568",
+      "1166",
+      "1161"
+    ],
+    "ground_truth": [
+      "1168",
+      "568",
+      "1171",
+      "1164",
+      "1170",
+      "1161",
+      "1163",
+      "1165",
+      "1162",
+      "1167"
+    ],
+    "ground_truth_entities": [
+      "1168",
+      "568",
+      "1171",
+      "1164",
+      "1170",
+      "1161",
+      "1163",
+      "1165",
+      "1162",
+      "1167"
+    ],
+    "input": "Who is 1160's brother?",
+    "final_message": "The brothers of 1160 are 1163, 1168, 568, 1166, and 1161.",
+    "supporting_evidence": [
+      "1160|brother_of|1163",
+      "1160|brother_of|1168",
+      "1160|brother_of|568",
+      "1166|brother_of|1160",
+      "1161|brother_of|1160"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "802",
+    "question": "Who is 1154's brother?",
+    "q_entity": [
+      "1154"
+    ],
+    "prediction": [
+      "1156"
+    ],
+    "ground_truth": [
+      "1156",
+      "1157",
+      "638",
+      "1155",
+      "1158"
+    ],
+    "ground_truth_entities": [
+      "1156",
+      "1157",
+      "638",
+      "1155",
+      "1158"
+    ],
+    "input": "Who is 1154's brother?",
+    "final_message": "1154's brother is 1156.",
+    "supporting_evidence": [
+      "1154|brother_of|1156"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "807",
+    "question": "Who is the brother of 1241?",
+    "q_entity": [
+      "1241"
+    ],
+    "prediction": [
+      "1239",
+      "1234",
+      "1235",
+      "1242"
+    ],
+    "ground_truth": [
+      "1239",
+      "1236",
+      "1235",
+      "1234",
+      "1233",
+      "1240",
+      "1231",
+      "1238"
+    ],
+    "ground_truth_entities": [
+      "1239",
+      "1236",
+      "1235",
+      "1234",
+      "1233",
+      "1240",
+      "1231",
+      "1238"
+    ],
+    "input": "Who is the brother of 1241?",
+    "final_message": "The brothers of entity 1241 are 1239, 1234, 1235, and 1242.",
+    "supporting_evidence": [
+      "1241|brother_of|1239",
+      "1241|brother_of|1234",
+      "1235|brother_of|1241",
+      "1234|brother_of|1241",
+      "1242|brother_of|1241"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "816",
+    "question": "Who is the brother of 1266?",
+    "q_entity": [
+      "1266"
+    ],
+    "prediction": [
+      "1273",
+      "286",
+      "1269",
+      "1265"
+    ],
+    "ground_truth": [
+      "1273",
+      "1272",
+      "1268",
+      "1267",
+      "1276"
+    ],
+    "ground_truth_entities": [
+      "1273",
+      "1272",
+      "1268",
+      "1267",
+      "1276"
+    ],
+    "input": "Who is the brother of 1266?",
+    "final_message": "The brothers of entity 1266 are 1273, 286, 1269, and 1265.",
+    "supporting_evidence": [
+      "1266|brother_of|1273",
+      "286|brother_of|1266",
+      "1269|brother_of|1266",
+      "1265|brother_of|1266"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "821",
+    "question": "Who is 692's brother?",
+    "q_entity": [
+      "692"
+    ],
+    "prediction": [
+      "2857",
+      "694",
+      "701",
+      "697"
+    ],
+    "ground_truth": [
+      "2858",
+      "2857",
+      "1625"
+    ],
+    "ground_truth_entities": [
+      "2858",
+      "2857",
+      "1625"
+    ],
+    "input": "Who is 692's brother?",
+    "final_message": "The brother of entity 692 is identified as entity 2857. Additionally, there are other entities (694, 701, and 697) that are also connected as brothers through various paths in the knowledge graph.",
+    "supporting_evidence": [
+      "692|brother_of|2857",
+      "692|brother_of|2857",
+      "2857|sister_of|2858",
+      "692|brother_of|2857",
+      "2857|daughter_of|1630",
+      "692|father_of|694",
+      "700|brother_of|694",
+      "692|father_of|701",
+      "697|brother_of|701",
+      "692|father_of|697",
+      "697|brother_of|698",
+      "692|father_of|697",
+      "697|brother_of|702",
+      "692|father_of|697",
+      "697|brother_of|701"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "843",
+    "question": "Who is 1397's brother?",
+    "q_entity": [
+      "1397"
+    ],
+    "prediction": [
+      "1519",
+      "1518"
+    ],
+    "ground_truth": [
+      "1860",
+      "1519",
+      "1518"
+    ],
+    "ground_truth_entities": [
+      "1860",
+      "1519",
+      "1518"
+    ],
+    "input": "Who is 1397's brother?",
+    "final_message": "The brothers of 1397 are 1519 and 1518.",
+    "supporting_evidence": [
+      "1397|brother_of|1519",
+      "1518|brother_of|1397",
+      "1519|brother_of|1397"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "865",
+    "question": "Who is 1869's brother?",
+    "q_entity": [
+      "1869"
+    ],
+    "prediction": [
+      "2473"
+    ],
+    "ground_truth": [
+      "2472",
+      "2471",
+      "2474",
+      "2470"
+    ],
+    "ground_truth_entities": [
+      "2472",
+      "2471",
+      "2474",
+      "2470"
+    ],
+    "input": "Who is 1869's brother?",
+    "final_message": "The brother of 1869 is identified as entity 2473.",
+    "supporting_evidence": [
+      "2473|brother_of|1869",
+      "2473|brother_of|1869",
+      "2473|brother_of|2469",
+      "2473|brother_of|1869",
+      "2473|brother_of|2472",
+      "2473|brother_of|1869",
+      "2471|brother_of|2473",
+      "2473|brother_of|1869",
+      "2470|brother_of|2473",
+      "2473|brother_of|1869",
+      "2451|nephew_of|2473"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "872",
+    "question": "Who is 1664's brother?",
+    "q_entity": [
+      "1664"
+    ],
+    "prediction": [
+      "606",
+      "1665",
+      "1667",
+      "598",
+      "2697"
+    ],
+    "ground_truth": [
+      "1665",
+      "606",
+      "1666",
+      "1667",
+      "71"
+    ],
+    "ground_truth_entities": [
+      "1665",
+      "606",
+      "1666",
+      "1667",
+      "71"
+    ],
+    "input": "Who is 1664's brother?",
+    "final_message": "1664 has several brothers, specifically identified as:\n\n- 606\n- 1665\n- 1667\n\nAdditionally, 606 has sisters, including:\n\n- 598\n- 2697\n\nThus, the direct brothers of 1664 are 606, 1665, and 1667.",
+    "supporting_evidence": [
+      "1664|brother_of|606",
+      "1664|brother_of|1665",
+      "1664|brother_of|1667",
+      "1664|brother_of|606",
+      "598|sister_of|606",
+      "1664|brother_of|606",
+      "1665|sister_of|606",
+      "1664|brother_of|606",
+      "1667|sister_of|606",
+      "1664|brother_of|606",
+      "2697|sister_of|606",
+      "1664|brother_of|1665",
+      "1665|sister_of|606"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "876",
+    "question": "Who is 1625's brother?",
+    "q_entity": [
+      "1625"
+    ],
+    "prediction": [
+      "2857",
+      "2856"
+    ],
+    "ground_truth": [
+      "2857",
+      "692",
+      "2856"
+    ],
+    "ground_truth_entities": [
+      "2857",
+      "692",
+      "2856"
+    ],
+    "input": "Who is 1625's brother?",
+    "final_message": "The brothers of 1625 are 2857 and 2856.",
+    "supporting_evidence": [
+      "1625|brother_of|2857",
+      "1625|brother_of|2856"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "888",
+    "question": "Who is 422's brother?",
+    "q_entity": [
+      "422"
+    ],
+    "prediction": [
+      "423",
+      "421",
+      "424",
+      "425"
+    ],
+    "ground_truth": [
+      "423",
+      "424",
+      "426",
+      "421"
+    ],
+    "ground_truth_entities": [
+      "423",
+      "424",
+      "426",
+      "421"
+    ],
+    "input": "Who is 422's brother?",
+    "final_message": "The brothers of entity 422 are 423, 421, 424, and 425.",
+    "supporting_evidence": [
+      "422|brother_of|423",
+      "422|brother_of|421",
+      "422|brother_of|424",
+      "425|brother_of|422",
+      "423|brother_of|422"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "894",
+    "question": "Who is 1460's brother?",
+    "q_entity": [
+      "1460"
+    ],
+    "prediction": [
+      "1458",
+      "1459"
+    ],
+    "ground_truth": [
+      "1457",
+      "1458"
+    ],
+    "ground_truth_entities": [
+      "1457",
+      "1458"
+    ],
+    "input": "Who is 1460's brother?",
+    "final_message": "1460 has two brothers: 1458 and 1459.",
+    "supporting_evidence": [
+      "1460|brother_of|1458",
+      "1459|brother_of|1460",
+      "1458|brother_of|1460"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "919",
+    "question": "Who is 152's brother?",
+    "q_entity": [
+      "152"
+    ],
+    "prediction": [
+      "151",
+      "491",
+      "492",
+      "94",
+      "150"
+    ],
+    "ground_truth": [
+      "150",
+      "151",
+      "40",
+      "492",
+      "491",
+      "94"
+    ],
+    "ground_truth_entities": [
+      "150",
+      "151",
+      "40",
+      "492",
+      "491",
+      "94"
+    ],
+    "input": "Who is 152's brother?",
+    "final_message": "The entity \"152\" has several brothers, identified as follows:\n\n1. 151\n2. 491\n3. 492\n4. 94\n5. 150\n\nThese entities are connected through the relation \"brother_of.\"",
+    "supporting_evidence": [
+      "152|brother_of|151",
+      "152|brother_of|491",
+      "152|brother_of|492",
+      "152|brother_of|94",
+      "152|brother_of|150",
+      "152|brother_of|151",
+      "151|brother_of|491",
+      "152|brother_of|151",
+      "151|brother_of|492",
+      "152|brother_of|151",
+      "151|brother_of|94",
+      "152|brother_of|151",
+      "151|brother_of|150",
+      "152|brother_of|151",
+      "40|brother_of|151"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "925",
+    "question": "Who is 444's father?",
+    "q_entity": [
+      "444"
+    ],
+    "prediction": [
+      "435",
+      "441",
+      "232"
+    ],
+    "ground_truth": [
+      "443",
+      "442",
+      "435"
+    ],
+    "ground_truth_entities": [
+      "443",
+      "442",
+      "435"
+    ],
+    "input": "Who is 444's father?",
+    "final_message": "The father of entity 444 is identified as entities 435, 441, and 232.",
+    "supporting_evidence": [
+      "444|son_of|435",
+      "444|son_of|441",
+      "1064|aunt_of|444",
+      "232|father_of|1064"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "931",
+    "question": "Who is 468 the father of?",
+    "q_entity": [
+      "468"
+    ],
+    "prediction": [
+      "309",
+      "475",
+      "875",
+      "874"
+    ],
+    "ground_truth": [
+      "972",
+      "973",
+      "976",
+      "974"
+    ],
+    "ground_truth_entities": [
+      "972",
+      "973",
+      "976",
+      "974"
+    ],
+    "input": "Who is 468 the father of?",
+    "final_message": "Entity 468 is the father of the following entities: 309, 475, 875, and 874.",
+    "supporting_evidence": [
+      "436|aunt_of|468",
+      "309|father_of|436",
+      "436|aunt_of|468",
+      "475|son_of|436",
+      "436|aunt_of|468",
+      "875|son_of|436",
+      "436|aunt_of|468",
+      "874|son_of|436"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "954",
+    "question": "Who is 21's brother?",
+    "q_entity": [
+      "21"
+    ],
+    "prediction": [
+      "77",
+      "76",
+      "72",
+      "75",
+      "73",
+      "10",
+      "4",
+      "9"
+    ],
+    "ground_truth": [
+      "78",
+      "76",
+      "77",
+      "72",
+      "73"
+    ],
+    "ground_truth_entities": [
+      "78",
+      "76",
+      "77",
+      "72",
+      "73"
+    ],
+    "input": "Who is 21's brother?",
+    "final_message": "21 has several brothers identified in the knowledge graph. The entities that are recognized as 21's brothers include:\n\n- 77\n- 76\n- 72\n- 75\n- 73\n\nAdditionally, there are other entities connected through an aunt relationship, which also leads to brothers, such as:\n\n- 10\n- 4\n- 9\n\nThus, 21's brothers are 77, 76, 72, 75, 73, and potentially others through indirect relationships.",
+    "supporting_evidence": [
+      "21|brother_of|77",
+      "21|brother_of|76",
+      "21|brother_of|72",
+      "75|brother_of|21",
+      "73|brother_of|21",
+      "11|aunt_of|21",
+      "10|brother_of|11",
+      "11|aunt_of|21",
+      "4|brother_of|11",
+      "11|aunt_of|21",
+      "9|brother_of|11",
+      "8|aunt_of|21",
+      "10|brother_of|8",
+      "5|aunt_of|21",
+      "10|brother_of|5"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "973",
+    "question": "Who is 698's brother?",
+    "q_entity": [
+      "698"
+    ],
+    "prediction": [
+      "702",
+      "699",
+      "695",
+      "700",
+      "705"
+    ],
+    "ground_truth": [
+      "702",
+      "700",
+      "701",
+      "695",
+      "694",
+      "699",
+      "705",
+      "704"
+    ],
+    "ground_truth_entities": [
+      "702",
+      "700",
+      "701",
+      "695",
+      "694",
+      "699",
+      "705",
+      "704"
+    ],
+    "input": "Who is 698's brother?",
+    "final_message": "The brothers of entity 698 are entities 702, 699, 695, 700, and 705.",
+    "supporting_evidence": [
+      "698|brother_of|702",
+      "698|brother_of|699",
+      "698|brother_of|695",
+      "698|brother_of|700",
+      "698|brother_of|705"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "976",
+    "question": "Who is 447's brother?",
+    "q_entity": [
+      "447"
+    ],
+    "prediction": [
+      "448",
+      "1059",
+      "449"
+    ],
+    "ground_truth": [
+      "1059",
+      "448",
+      "445"
+    ],
+    "ground_truth_entities": [
+      "1059",
+      "448",
+      "445"
+    ],
+    "input": "Who is 447's brother?",
+    "final_message": "The brothers of entity 447 are 448, 1059, and 449.",
+    "supporting_evidence": [
+      "447|brother_of|448",
+      "447|brother_of|1059",
+      "448|brother_of|447",
+      "449|brother_of|447"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1007",
+    "question": "Who is 416 a nephew of?",
+    "q_entity": [
+      "416"
+    ],
+    "prediction": [
+      "563",
+      "559",
+      "562",
+      "558",
+      "1683",
+      "561",
+      "512",
+      "44",
+      "353",
+      "1213"
+    ],
+    "ground_truth": [
+      "559",
+      "557",
+      "558",
+      "562",
+      "563"
+    ],
+    "ground_truth_entities": [
+      "559",
+      "557",
+      "558",
+      "562",
+      "563"
+    ],
+    "input": "Who is 416 a nephew of?",
+    "final_message": "The entity 416 has several relatives, including:\n\n- **Nephews**: 563, 559, 562, 558, and 1683.\n- **Aunts**: 561 and 559.\n- **Uncles**: 512, 44, 353, 1213, and 563.\n\nThus, 416 is a nephew of entities 563, 559, 562, 558, and 1683.",
+    "supporting_evidence": [
+      "416|nephew_of|563",
+      "416|nephew_of|559",
+      "416|nephew_of|562",
+      "416|nephew_of|558",
+      "1683|nephew_of|416",
+      "561|aunt_of|416",
+      "559|aunt_of|416",
+      "416|uncle_of|512",
+      "416|uncle_of|44",
+      "416|uncle_of|353",
+      "416|uncle_of|1213",
+      "563|uncle_of|416"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1020",
+    "question": "Who is 231 the nephew of?",
+    "q_entity": [
+      "231"
+    ],
+    "prediction": [
+      "163",
+      "2673",
+      "21",
+      "229",
+      "465",
+      "471",
+      "1064",
+      "75",
+      "467",
+      "77"
+    ],
+    "ground_truth": [
+      "104",
+      "229",
+      "163",
+      "21",
+      "75",
+      "72",
+      "2673",
+      "467",
+      "465",
+      "74"
+    ],
+    "ground_truth_entities": [
+      "104",
+      "229",
+      "163",
+      "21",
+      "75",
+      "72",
+      "2673",
+      "467",
+      "465",
+      "74"
+    ],
+    "input": "Who is 231 the nephew of?",
+    "final_message": "The entity 231 is the nephew of the following individuals: \n\n- 163\n- 2673\n- 21\n- 229\n- 465\n\nAdditionally, 231 has uncles and aunts, including:\n\n- Uncles: 471, 1064, 75, 229\n- Aunts: 163, 2673, 467, 77\n\nThis indicates that 231 is connected to multiple family members through the relationships of nephew, uncle, and aunt.",
+    "supporting_evidence": [
+      "231|nephew_of|163",
+      "231|nephew_of|2673",
+      "231|nephew_of|21",
+      "231|nephew_of|229",
+      "231|nephew_of|465",
+      "231|uncle_of|471",
+      "231|uncle_of|1064",
+      "465|uncle_of|231",
+      "75|uncle_of|231",
+      "229|uncle_of|231",
+      "163|aunt_of|231",
+      "2673|aunt_of|231",
+      "467|aunt_of|231",
+      "77|aunt_of|231"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1022",
+    "question": "Who is the nephew of 2529?",
+    "q_entity": [
+      "2529"
+    ],
+    "prediction": [
+      "2716",
+      "2722",
+      "2526",
+      "603",
+      "2743",
+      "2740",
+      "2528"
+    ],
+    "ground_truth": [
+      "603",
+      "2715"
+    ],
+    "ground_truth_entities": [
+      "603",
+      "2715"
+    ],
+    "input": "Who is the nephew of 2529?",
+    "final_message": "The nephews of entity 2529 are:\n\n- 2716\n- 2722\n- 2526\n- 603\n- 2743\n- 2740\n- 2528\n\nThese entities are connected to 2529 through various familial relationships.",
+    "supporting_evidence": [
+      "2716|nephew_of|2529",
+      "2722|nephew_of|2529",
+      "2529|aunt_of|2718",
+      "2718|nephew_of|2526",
+      "2529|aunt_of|2718",
+      "2718|nephew_of|603",
+      "1059|aunt_of|2529",
+      "2743|nephew_of|1059",
+      "1059|aunt_of|2529",
+      "2740|nephew_of|1059",
+      "2529|aunt_of|2714",
+      "2715|brother_of|2714",
+      "2715|nephew_of|603",
+      "2529|aunt_of|2718",
+      "2718|brother_of|2720",
+      "2720|nephew_of|2528",
+      "2529|aunt_of|2718",
+      "2718|brother_of|2720",
+      "2720|nephew_of|2526",
+      "2529|aunt_of|2718",
+      "2720|brother_of|2718",
+      "2720|nephew_of|2528",
+      "2529|aunt_of|2718",
+      "2720|brother_of|2718",
+      "2720|nephew_of|2526"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1033",
+    "question": "Who is 890's nephew?",
+    "q_entity": [
+      "890"
+    ],
+    "prediction": [
+      "911",
+      "910",
+      "528",
+      "892",
+      "910",
+      "891",
+      "919"
+    ],
+    "ground_truth": [
+      "907",
+      "903",
+      "917"
+    ],
+    "ground_truth_entities": [
+      "907",
+      "903",
+      "917"
+    ],
+    "input": "Who is 890's nephew?",
+    "final_message": "The nephews of entity 890 are:\n\n- 911\n- 910\n- 528\n- 892\n- 891\n- 919\n\nThese entities are connected to 890 through various relationships indicating they are its nephews.",
+    "supporting_evidence": [
+      "911|nephew_of|890",
+      "910|nephew_of|890",
+      "904|brother_of|890",
+      "904|nephew_of|528",
+      "904|brother_of|890",
+      "892|nephew_of|904",
+      "904|brother_of|890",
+      "910|nephew_of|904",
+      "903|brother_of|890",
+      "891|nephew_of|903",
+      "903|brother_of|890",
+      "919|nephew_of|903"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1071",
+    "question": "Who is 991 the father of?",
+    "q_entity": [
+      "991"
+    ],
+    "prediction": [
+      "1003",
+      "1005",
+      "1001",
+      "774",
+      "988"
+    ],
+    "ground_truth": [
+      "1000",
+      "1001",
+      "999",
+      "1005",
+      "774",
+      "1002",
+      "1006",
+      "1004",
+      "1003",
+      "1007"
+    ],
+    "ground_truth_entities": [
+      "1000",
+      "1001",
+      "999",
+      "1005",
+      "774",
+      "1002",
+      "1006",
+      "1004",
+      "1003",
+      "1007"
+    ],
+    "input": "Who is 991 the father of?",
+    "final_message": "Entity 991 is the father of the following entities: 1003, 1005, 1001, and 774. Additionally, entity 988 is identified as the son of entity 991.",
+    "supporting_evidence": [
+      "991|father_of|1003",
+      "991|father_of|1005",
+      "991|father_of|1001",
+      "991|father_of|774",
+      "991|son_of|988",
+      "1005|son_of|991"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1085",
+    "question": "Who is 600 the father of?",
+    "q_entity": [
+      "600"
+    ],
+    "prediction": [
+      "1123",
+      "1124",
+      "1118",
+      "1134",
+      "1135"
+    ],
+    "ground_truth": [
+      "1133",
+      "1135",
+      "1123",
+      "1124"
+    ],
+    "ground_truth_entities": [
+      "1133",
+      "1135",
+      "1123",
+      "1124"
+    ],
+    "input": "Who is 600 the father of?",
+    "final_message": "Entity 600 is the father of the following entities:\n\n- 1123\n- 1124\n- 1118 (who is also a son of 600)\n- 1134 (daughter of 600)\n- 1135 (daughter of 600)",
+    "supporting_evidence": [
+      "600|father_of|1123",
+      "600|father_of|1124",
+      "1118|father_of|600",
+      "600|son_of|1118",
+      "1134|daughter_of|600",
+      "1135|daughter_of|600"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1104",
+    "question": "Who is 451's father?",
+    "q_entity": [
+      "451"
+    ],
+    "prediction": [
+      "452",
+      "1129",
+      "1128",
+      "600",
+      "2738",
+      "604"
+    ],
+    "ground_truth": [
+      "2738",
+      "2829",
+      "597"
+    ],
+    "ground_truth_entities": [
+      "2738",
+      "2829",
+      "597"
+    ],
+    "input": "Who is 451's father?",
+    "final_message": "The entity \"451\" has several potential fathers based on the reasoning paths explored. The identified father entities are:\n\n- **452**\n- **1129**\n- **1128**\n- **600**\n- **2738**\n- **604**\n\nThese entities represent different possible fathers of \"451\" based on the relationships found in the knowledge graph.",
+    "supporting_evidence": [
+      "452|son_of|451",
+      "451|aunt_of|1124",
+      "1124|father_of|1129",
+      "451|aunt_of|1124",
+      "1124|father_of|1128",
+      "451|aunt_of|1124",
+      "600|father_of|1124",
+      "451|aunt_of|2832",
+      "2738|father_of|2832",
+      "2697|aunt_of|451",
+      "604|father_of|2697"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1112",
+    "question": "Who is 637 the father of?",
+    "q_entity": [
+      "637"
+    ],
+    "prediction": [
+      "1157",
+      "1074",
+      "1138",
+      "1154"
+    ],
+    "ground_truth": [
+      "1157",
+      "1154",
+      "1074",
+      "1138",
+      "1155",
+      "1159",
+      "1140"
+    ],
+    "ground_truth_entities": [
+      "1157",
+      "1154",
+      "1074",
+      "1138",
+      "1155",
+      "1159",
+      "1140"
+    ],
+    "input": "Who is 637 the father of?",
+    "final_message": "Entity 637 is the father of the following entities: 1157, 1074, 1138, and 1154.",
+    "supporting_evidence": [
+      "637|father_of|1157",
+      "637|father_of|1074",
+      "637|father_of|1138",
+      "637|father_of|1154"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1134",
+    "question": "Who is 232's child?",
+    "q_entity": [
+      "232"
+    ],
+    "prediction": [
+      "1064",
+      "471",
+      "405",
+      "76"
+    ],
+    "ground_truth": [
+      "1064",
+      "471"
+    ],
+    "ground_truth_entities": [
+      "1064",
+      "471"
+    ],
+    "input": "Who is 232's child?",
+    "final_message": "The children of entity 232 are:\n\n- 1064 (daughter)\n- 471 (son)\n- 405 (father)\n- 76 (mother)\n\nThese relationships indicate that 232 has a daughter (1064) and a son (471), and is also connected to entities 405 and 76 as parents.",
+    "supporting_evidence": [
+      "1064|daughter_of|232",
+      "471|son_of|232",
+      "232|father_of|1064",
+      "405|father_of|232",
+      "76|mother_of|232"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1152",
+    "question": "Who is 991 the father of?",
+    "q_entity": [
+      "991"
+    ],
+    "prediction": [
+      "1003",
+      "1005",
+      "1001",
+      "774",
+      "1002",
+      "999",
+      "988"
+    ],
+    "ground_truth": [
+      "1000",
+      "1001",
+      "999",
+      "1005",
+      "774",
+      "1002",
+      "1006",
+      "1004",
+      "1003",
+      "1007"
+    ],
+    "ground_truth_entities": [
+      "1000",
+      "1001",
+      "999",
+      "1005",
+      "774",
+      "1002",
+      "1006",
+      "1004",
+      "1003",
+      "1007"
+    ],
+    "input": "Who is 991 the father of?",
+    "final_message": "The entity 991 is the father of the following entities: \n\n- 1003\n- 1005\n- 1001\n- 774\n\nAdditionally, 991 is also associated with the following children:\n\n- 774 (daughter)\n- 1002 (daughter)\n- 999 (daughter)\n- 988 (son)\n- 1005 (son)\n\nThus, 991 has multiple children, including both sons and daughters.",
+    "supporting_evidence": [
+      "991|father_of|1003",
+      "991|father_of|1005",
+      "991|father_of|1001",
+      "991|father_of|774",
+      "774|daughter_of|991",
+      "1002|daughter_of|991",
+      "999|daughter_of|991",
+      "991|son_of|988",
+      "1005|son_of|991"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1153",
+    "question": "Who is 921 the father of?",
+    "q_entity": [
+      "921"
+    ],
+    "prediction": [
+      "935",
+      "938",
+      "528",
+      "939"
+    ],
+    "ground_truth": [
+      "939",
+      "938",
+      "935",
+      "937"
+    ],
+    "ground_truth_entities": [
+      "939",
+      "938",
+      "935",
+      "937"
+    ],
+    "input": "Who is 921 the father of?",
+    "final_message": "Entity 921 is the father of the following entities: 935, 938, 528, and 939.",
+    "supporting_evidence": [
+      "921|father_of|935",
+      "921|father_of|938",
+      "921|son_of|528",
+      "935|son_of|921",
+      "939|son_of|921"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1155",
+    "question": "Who is 2666 the father of?",
+    "q_entity": [
+      "2666"
+    ],
+    "prediction": [
+      "2670",
+      "2675",
+      "2672",
+      "42",
+      "2669"
+    ],
+    "ground_truth": [
+      "2669",
+      "2675",
+      "2670",
+      "2672"
+    ],
+    "ground_truth_entities": [
+      "2669",
+      "2675",
+      "2670",
+      "2672"
+    ],
+    "input": "Who is 2666 the father of?",
+    "final_message": "The entity 2666 is the father of the following entities: 2670, 2675, 2672, 42, and 2669.",
+    "supporting_evidence": [
+      "2666|father_of|2670",
+      "2666|father_of|2675",
+      "2666|father_of|2672",
+      "2666|son_of|42",
+      "2669|son_of|2666",
+      "2672|son_of|2666"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1162",
+    "question": "Who is 492 a nephew of?",
+    "q_entity": [
+      "492"
+    ],
+    "prediction": [
+      "493",
+      "2666",
+      "2665",
+      "155",
+      "1568",
+      "98",
+      "156",
+      "1362"
+    ],
+    "ground_truth": [
+      "357",
+      "493",
+      "2665",
+      "2666"
+    ],
+    "ground_truth_entities": [
+      "357",
+      "493",
+      "2665",
+      "2666"
+    ],
+    "input": "Who is 492 a nephew of?",
+    "final_message": "The entity 492 is a nephew of the following entities: \n\n- 493\n- 2666\n- 2665\n- 155\n- 1568\n\nAdditionally, 492 is also an uncle to:\n\n- 98\n- 155\n- 156\n- 1568\n- 1362\n\nThus, 492 has multiple familial connections as a nephew and an uncle.",
+    "supporting_evidence": [
+      "492|nephew_of|493",
+      "492|nephew_of|2666",
+      "492|nephew_of|2665",
+      "155|nephew_of|492",
+      "1568|nephew_of|492",
+      "492|uncle_of|98",
+      "492|uncle_of|155",
+      "492|uncle_of|156",
+      "492|uncle_of|1568",
+      "492|uncle_of|1362"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1167",
+    "question": "Who is 259's nephew?",
+    "q_entity": [
+      "259"
+    ],
+    "prediction": [
+      "12",
+      "604",
+      "41",
+      "256",
+      "606",
+      "405",
+      "552",
+      "229",
+      "155",
+      "1568",
+      "1664",
+      "153"
+    ],
+    "ground_truth": [
+      "420",
+      "257",
+      "258",
+      "425",
+      "256",
+      "1030"
+    ],
+    "ground_truth_entities": [
+      "420",
+      "257",
+      "258",
+      "425",
+      "256",
+      "1030"
+    ],
+    "input": "Who is 259's nephew?",
+    "final_message": "The nephew of entity 259 includes the following individuals: \n\n- 12\n- 604\n- 41\n- 256\n- 606\n- 405\n- 552\n- 229\n- 155\n- 1568\n- 1664\n- 153\n\nThese entities are connected to 259 through various familial relationships.",
+    "supporting_evidence": [
+      "259|nephew_of|12",
+      "259|nephew_of|604",
+      "259|nephew_of|41",
+      "253|aunt_of|259",
+      "256|nephew_of|253",
+      "12|aunt_of|259",
+      "606|nephew_of|12",
+      "12|aunt_of|259",
+      "405|nephew_of|12",
+      "12|aunt_of|259",
+      "552|nephew_of|12",
+      "12|aunt_of|259",
+      "229|nephew_of|12",
+      "41|aunt_of|259",
+      "1663|brother_of|41",
+      "155|nephew_of|1663",
+      "41|aunt_of|259",
+      "1663|brother_of|41",
+      "1568|nephew_of|1663",
+      "41|aunt_of|259",
+      "1663|brother_of|41",
+      "1664|nephew_of|1663",
+      "41|aunt_of|259",
+      "1663|brother_of|41",
+      "552|nephew_of|1663",
+      "41|aunt_of|259",
+      "1663|brother_of|41",
+      "153|nephew_of|1663"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1172",
+    "question": "Who is 563 the nephew of?",
+    "q_entity": [
+      "563"
+    ],
+    "prediction": [
+      "414",
+      "653",
+      "412",
+      "416",
+      "561",
+      "560",
+      "562",
+      "558",
+      "559",
+      "557",
+      "511",
+      "416",
+      "1029",
+      "2654",
+      "413"
+    ],
+    "ground_truth": [
+      "572"
+    ],
+    "ground_truth_entities": [
+      "572"
+    ],
+    "input": "Who is 563 the nephew of?",
+    "final_message": "The entity 563 is a nephew of the following entities: \n\n- 414\n- 653\n- 412\n- 416\n\nAdditionally, 563 has several siblings and uncles, including:\n\n- Brothers: 561, 560, 562, 558, 559\n- Sister: 557\n- Uncles: 511, 416, 1029, 2654, 413\n\nThis indicates that 563 is connected to multiple family members through various relationships.",
+    "supporting_evidence": [
+      "414|nephew_of|563",
+      "653|nephew_of|563",
+      "412|nephew_of|563",
+      "416|nephew_of|563",
+      "563|brother_of|561",
+      "563|brother_of|560",
+      "563|brother_of|562",
+      "563|brother_of|558",
+      "563|brother_of|559",
+      "557|sister_of|563",
+      "563|uncle_of|511",
+      "563|uncle_of|416",
+      "563|uncle_of|1029",
+      "563|uncle_of|2654",
+      "563|uncle_of|413"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1176",
+    "question": "Who is 1178's nephew?",
+    "q_entity": [
+      "1178"
+    ],
+    "prediction": [
+      "2126",
+      "770",
+      "1162",
+      "341",
+      "2125",
+      "2124",
+      "568",
+      "1166"
+    ],
+    "ground_truth": [
+      "1177",
+      "1160"
+    ],
+    "ground_truth_entities": [
+      "1177",
+      "1160"
+    ],
+    "input": "Who is 1178's nephew?",
+    "final_message": "1178 has several nephews, which include the following entities:\n\n- 2126\n- 770\n- 341\n- 2125\n- 2124\n- 568\n- 1166\n\nThese entities are connected to 1178 through various familial relationships.",
+    "supporting_evidence": [
+      "1178|nephew_of|2126",
+      "1178|nephew_of|770",
+      "1162|nephew_of|1178",
+      "1178|brother_of|1177",
+      "1177|nephew_of|341",
+      "1178|brother_of|1177",
+      "1177|nephew_of|2125",
+      "1178|brother_of|1177",
+      "1177|nephew_of|2124",
+      "1178|brother_of|1177",
+      "568|nephew_of|1177",
+      "1178|brother_of|1177",
+      "1166|nephew_of|1177"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1198",
+    "question": "Who is 1368's nephew?",
+    "q_entity": [
+      "1368"
+    ],
+    "prediction": [
+      "1287",
+      "1887",
+      "1261",
+      "1882",
+      "1888",
+      "1370",
+      "1369",
+      "1367",
+      "1497",
+      "1278",
+      "286",
+      "1496",
+      "1279"
+    ],
+    "ground_truth": [
+      "1370",
+      "1367",
+      "1290"
+    ],
+    "ground_truth_entities": [
+      "1370",
+      "1367",
+      "1290"
+    ],
+    "input": "Who is 1368's nephew?",
+    "final_message": "The nephew of 1368 includes the following entities: \n\n- 1287\n- 1887\n- 1261\n- 1882\n- 1888\n- 1370\n- 1369\n- 1367\n- 1497\n- 1278\n- 286\n- 1496\n- 1279\n\nThese entities are connected to 1368 through various familial relationships, specifically as nephews.",
+    "supporting_evidence": [
+      "1287|nephew_of|1368",
+      "1887|nephew_of|1368",
+      "1261|nephew_of|1368",
+      "1882|nephew_of|1368",
+      "1888|nephew_of|1368",
+      "1368|aunt_of|1882",
+      "1882|nephew_of|1370",
+      "1368|aunt_of|1882",
+      "1882|nephew_of|1369",
+      "1368|aunt_of|1287",
+      "1287|nephew_of|1370",
+      "1368|aunt_of|1287",
+      "1287|nephew_of|1367",
+      "1368|aunt_of|1287",
+      "1497|nephew_of|1287",
+      "1368|aunt_of|1287",
+      "1287|brother_of|1284",
+      "1278|nephew_of|1284",
+      "1368|aunt_of|1287",
+      "1287|brother_of|1284",
+      "286|nephew_of|1284",
+      "1368|aunt_of|1287",
+      "1287|brother_of|1284",
+      "1496|nephew_of|1284",
+      "1368|aunt_of|1287",
+      "1287|brother_of|1284",
+      "1497|nephew_of|1284",
+      "1368|aunt_of|1287",
+      "1287|brother_of|1284",
+      "1279|nephew_of|1284"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1204",
+    "question": "Who is 2666 a nephew of?",
+    "q_entity": [
+      "2666"
+    ],
+    "prediction": [
+      "511",
+      "412",
+      "416",
+      "1029",
+      "1296",
+      "2677",
+      "1571",
+      "1572",
+      "165",
+      "151"
+    ],
+    "ground_truth": [
+      "1029",
+      "414",
+      "416",
+      "1296",
+      "511",
+      "413",
+      "654",
+      "412"
+    ],
+    "ground_truth_entities": [
+      "1029",
+      "414",
+      "416",
+      "1296",
+      "511",
+      "413",
+      "654",
+      "412"
+    ],
+    "input": "Who is 2666 a nephew of?",
+    "final_message": "The entity 2666 is a nephew of the following entities: \n\n- 511\n- 412\n- 416\n- 1029\n- 1296\n\nAdditionally, 2666 has aunts and uncles, including:\n\n- Aunts: 1029, 511, 654\n- Uncles: 2677, 1571, 1572, 165, 151\n\nThus, 2666 is a nephew of multiple individuals, as indicated by the relationships discovered in the knowledge graph.",
+    "supporting_evidence": [
+      "2666|nephew_of|511",
+      "2666|nephew_of|412",
+      "2666|nephew_of|416",
+      "2666|nephew_of|1029",
+      "2666|nephew_of|1296",
+      "1029|aunt_of|2666",
+      "511|aunt_of|2666",
+      "654|aunt_of|2666",
+      "2666|uncle_of|2677",
+      "2666|uncle_of|1571",
+      "2666|uncle_of|1572",
+      "2666|uncle_of|165",
+      "2666|uncle_of|151"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1206",
+    "question": "Who is 2084 the nephew of?",
+    "q_entity": [
+      "2084"
+    ],
+    "prediction": [
+      "1334",
+      "2079",
+      "1333",
+      "1331"
+    ],
+    "ground_truth": [
+      "2079"
+    ],
+    "ground_truth_entities": [
+      "2079"
+    ],
+    "input": "Who is 2084 the nephew of?",
+    "final_message": "The entity 2084 is the nephew of the following entities: **1334**, **2079**, **1333**, and **1331**.",
+    "supporting_evidence": [
+      "2084|brother_of|2087",
+      "2087|niece_of|1334",
+      "2084|brother_of|2087",
+      "2087|niece_of|2079",
+      "2084|brother_of|2087",
+      "2087|niece_of|1333",
+      "2084|brother_of|2089",
+      "2089|niece_of|1334",
+      "2084|brother_of|2087",
+      "2087|daughter_of|1335",
+      "1335|nephew_of|1331",
+      "2084|brother_of|2086",
+      "2086|daughter_of|1335",
+      "1335|nephew_of|1331",
+      "2084|brother_of|2089",
+      "2089|daughter_of|1335",
+      "1335|nephew_of|1331"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1207",
+    "question": "Who is 896's nephew?",
+    "q_entity": [
+      "896"
+    ],
+    "prediction": [
+      "1341",
+      "751",
+      "2417",
+      "2131",
+      "739",
+      "2913",
+      "2517"
+    ],
+    "ground_truth": [
+      "729",
+      "728",
+      "590",
+      "732",
+      "2913",
+      "748"
+    ],
+    "ground_truth_entities": [
+      "729",
+      "728",
+      "590",
+      "732",
+      "2913",
+      "748"
+    ],
+    "input": "Who is 896's nephew?",
+    "final_message": "The nephew of entity 896 is identified as follows:\n\n1. **Direct Nephews**:\n   - 1341\n   - 751\n\n2. **Nephews through Intermediate Relations**:\n   - 2417 (via 1341)\n   - 2131 (via 1341)\n   - 739 (via 1341)\n   - 2913 (via 1341)\n   - 2517 (via 1341)\n\nThus, the nephews of 896 are **1341, 751, 2417, 2131, 739, 2913, and 2517**.",
+    "supporting_evidence": [
+      "1341|nephew_of|896",
+      "751|nephew_of|896",
+      "896|aunt_of|751",
+      "751|brother_of|1341",
+      "1341|nephew_of|2417",
+      "896|aunt_of|751",
+      "751|brother_of|1341",
+      "1341|nephew_of|2131",
+      "896|aunt_of|751",
+      "751|brother_of|1341",
+      "1341|nephew_of|739",
+      "896|aunt_of|751",
+      "751|brother_of|1341",
+      "1341|nephew_of|2913",
+      "896|aunt_of|751",
+      "751|brother_of|1341",
+      "2517|nephew_of|1341"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1208",
+    "question": "Who is 706 the nephew of?",
+    "q_entity": [
+      "706"
+    ],
+    "prediction": [
+      "590",
+      "729",
+      "732",
+      "734",
+      "529",
+      "2913",
+      "2128",
+      "951",
+      "727"
+    ],
+    "ground_truth": [
+      "734",
+      "590",
+      "729",
+      "529",
+      "733",
+      "732",
+      "2913",
+      "896",
+      "727"
+    ],
+    "ground_truth_entities": [
+      "734",
+      "590",
+      "729",
+      "529",
+      "733",
+      "732",
+      "2913",
+      "896",
+      "727"
+    ],
+    "input": "Who is 706 the nephew of?",
+    "final_message": "The entity 706 is the nephew of the following individuals:\n\n- 590\n- 729\n- 732\n- 734\n- 529\n\nAdditionally, 706 has the following aunts and uncles:\n\n- Aunt: 2913, 729\n- Uncle: 2128, 951, 727, 529, 590\n\nThis means that 706 is related to these individuals through the nephew relationship.",
+    "supporting_evidence": [
+      "706|nephew_of|590",
+      "706|nephew_of|729",
+      "706|nephew_of|732",
+      "706|nephew_of|734",
+      "706|nephew_of|529",
+      "2913|aunt_of|706",
+      "729|aunt_of|706",
+      "706|uncle_of|2128",
+      "706|uncle_of|951",
+      "727|uncle_of|706",
+      "529|uncle_of|706",
+      "590|uncle_of|706"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1241",
+    "question": "Who is 282's nephew?",
+    "q_entity": [
+      "282"
+    ],
+    "prediction": [
+      "30",
+      "280",
+      "288",
+      "87"
+    ],
+    "ground_truth": [
+      "280",
+      "30"
+    ],
+    "ground_truth_entities": [
+      "280",
+      "30"
+    ],
+    "input": "Who is 282's nephew?",
+    "final_message": "The nephew of entity 282 is identified as entities 30, 280, 288, and 87.",
+    "supporting_evidence": [
+      "282|nephew_of|30",
+      "282|brother_of|283",
+      "283|nephew_of|280",
+      "30|aunt_of|282",
+      "288|nephew_of|30",
+      "30|aunt_of|282",
+      "33|daughter_of|30",
+      "87|nephew_of|33"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1272",
+    "question": "Who is 2750 the nephew of?",
+    "q_entity": [
+      "2750"
+    ],
+    "prediction": [
+      "2747",
+      "2746",
+      "2748"
+    ],
+    "ground_truth": [
+      "2748",
+      "2747",
+      "2746"
+    ],
+    "ground_truth_entities": [
+      "2748",
+      "2747",
+      "2746"
+    ],
+    "input": "Who is 2750 the nephew of?",
+    "final_message": "The entity 2750 is the nephew of the following entities: **2747**, **2746**, and **2748**.",
+    "supporting_evidence": [
+      "2750|nephew_of|2747",
+      "2750|brother_of|2751",
+      "2746|aunt_of|2751",
+      "2750|brother_of|2753",
+      "2748|aunt_of|2753",
+      "2750|brother_of|2753",
+      "2746|aunt_of|2753",
+      "2751|brother_of|2750",
+      "2746|aunt_of|2751"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1278",
+    "question": "Who is 57 the nephew of?",
+    "q_entity": [
+      "57"
+    ],
+    "prediction": [
+      "103",
+      "2673",
+      "405",
+      "478",
+      "480",
+      "2629",
+      "2631",
+      "405",
+      "463",
+      "147",
+      "476",
+      "148",
+      "60",
+      "61",
+      "58",
+      "104"
+    ],
+    "ground_truth": [
+      "405",
+      "163",
+      "2673",
+      "103"
+    ],
+    "ground_truth_entities": [
+      "405",
+      "163",
+      "2673",
+      "103"
+    ],
+    "input": "Who is 57 the nephew of?",
+    "final_message": "The entity \"57\" is the nephew of the following entities:\n\n- 103\n- 2673\n- 405\n- 478\n- 480\n\nAdditionally, \"57\" has the following family relations that may also be relevant:\n\n- Uncle of 2629, 478, 480, and 2631\n- Brother of 463, 147, and 476\n- Sister of 148 and 147\n- Father of 60, 61, 58, and 104\n\nThese relationships indicate that \"57\" has multiple familial connections, including several individuals to whom it is a nephew.",
+    "supporting_evidence": [
+      "57|nephew_of|103",
+      "57|nephew_of|2673",
+      "57|nephew_of|405",
+      "478|nephew_of|57",
+      "480|nephew_of|57",
+      "57|uncle_of|2629",
+      "57|uncle_of|478",
+      "57|uncle_of|480",
+      "57|uncle_of|2631",
+      "405|uncle_of|57",
+      "57|brother_of|463",
+      "57|brother_of|147",
+      "57|brother_of|476",
+      "148|sister_of|57",
+      "147|sister_of|57",
+      "57|father_of|60",
+      "57|father_of|61",
+      "57|father_of|58",
+      "104|father_of|57"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1304",
+    "question": "Who is 892's aunt?",
+    "q_entity": [
+      "892"
+    ],
+    "prediction": [
+      "1097"
+    ],
+    "ground_truth": [
+      "891",
+      "911",
+      "909",
+      "912",
+      "910",
+      "906"
+    ],
+    "ground_truth_entities": [
+      "891",
+      "911",
+      "909",
+      "912",
+      "910",
+      "906"
+    ],
+    "input": "Who is 892's aunt?",
+    "final_message": "The aunt of entity 892 is entity 1097.",
+    "supporting_evidence": [
+      "905|aunt_of|892",
+      "875|father_of|892",
+      "1097|aunt_of|875"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1316",
+    "question": "Who is 831's aunt?",
+    "q_entity": [
+      "831"
+    ],
+    "prediction": [
+      "1004",
+      "999",
+      "1000",
+      "829",
+      "775",
+      "776",
+      "832",
+      "828",
+      "1003",
+      "1005",
+      "998",
+      "847",
+      "835"
+    ],
+    "ground_truth": [
+      "830",
+      "775",
+      "776",
+      "1007"
+    ],
+    "ground_truth_entities": [
+      "830",
+      "775",
+      "776",
+      "1007"
+    ],
+    "input": "Who is 831's aunt?",
+    "final_message": "The aunts of entity 831 are as follows:\n\n1. Entity 1004\n2. Entity 999\n3. Entity 1000\n4. Entity 829\n5. Entity 775\n6. Entity 776\n7. Entity 832\n8. Entity 828\n9. Entity 1003\n10. Entity 1005\n11. Entity 998\n12. Entity 847\n13. Entity 835\n\nThese entities are connected to 831 through various familial relationships, specifically as aunts.",
+    "supporting_evidence": [
+      "1004|aunt_of|831",
+      "999|aunt_of|831",
+      "1000|aunt_of|831",
+      "1004|aunt_of|831",
+      "1004|aunt_of|829",
+      "1004|aunt_of|831",
+      "1004|aunt_of|775",
+      "1004|aunt_of|831",
+      "1004|aunt_of|776",
+      "1004|aunt_of|831",
+      "1004|aunt_of|832",
+      "1004|aunt_of|831",
+      "1004|aunt_of|828",
+      "999|aunt_of|831",
+      "1003|brother_of|999",
+      "999|aunt_of|831",
+      "1005|brother_of|999",
+      "1000|aunt_of|831",
+      "1003|brother_of|1000",
+      "1000|aunt_of|831",
+      "1001|brother_of|1000",
+      "1004|aunt_of|831",
+      "998|mother_of|1004",
+      "999|aunt_of|831",
+      "998|mother_of|999",
+      "1000|aunt_of|831",
+      "998|mother_of|1000",
+      "831|brother_of|829",
+      "829|aunt_of|847",
+      "831|brother_of|829",
+      "829|aunt_of|835",
+      "831|brother_of|829",
+      "999|aunt_of|829",
+      "831|brother_of|829",
+      "1004|aunt_of|829",
+      "831|brother_of|829",
+      "1000|aunt_of|829"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1329",
+    "question": "Who is 1762's nephew?",
+    "q_entity": [
+      "1762"
+    ],
+    "prediction": [
+      "1545",
+      "1784",
+      "1754",
+      "1759",
+      "1757"
+    ],
+    "ground_truth": [
+      "1761",
+      "1758",
+      "1760",
+      "1764"
+    ],
+    "ground_truth_entities": [
+      "1761",
+      "1758",
+      "1760",
+      "1764"
+    ],
+    "input": "Who is 1762's nephew?",
+    "final_message": "The nephew of 1762 is identified as follows:\n\n1. **1545** - Directly identified as a nephew of 1762.\n2. **1784** - Identified through the brother of 1762 (1754), who is a nephew of 1784.\n3. **1754** - Also identified as a nephew through the brother relationship.\n4. **1759** - Identified as a nephew of 1545, who is related to 1762.\n5. **1757** - Another nephew of 1545.\n\nThus, the nephews of 1762 are **1545, 1784, 1754, 1759, and 1757**.",
+    "supporting_evidence": [
+      "1545|nephew_of|1762",
+      "1754|brother_of|1762",
+      "1754|nephew_of|1784",
+      "1754|brother_of|1762",
+      "1545|nephew_of|1754",
+      "1543|brother_of|1762",
+      "1543|nephew_of|1784",
+      "1762|aunt_of|1545",
+      "1545|nephew_of|1759",
+      "1762|aunt_of|1545",
+      "1545|nephew_of|1754",
+      "1762|aunt_of|1545",
+      "1545|nephew_of|1757"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1345",
+    "question": "Who is 234 the nephew of?",
+    "q_entity": [
+      "234"
+    ],
+    "prediction": [
+      "163",
+      "21",
+      "73",
+      "229",
+      "466",
+      "471",
+      "1064",
+      "73",
+      "465",
+      "75"
+    ],
+    "ground_truth": [
+      "229",
+      "466",
+      "75",
+      "74",
+      "163",
+      "2673",
+      "73",
+      "78",
+      "21"
+    ],
+    "ground_truth_entities": [
+      "229",
+      "466",
+      "75",
+      "74",
+      "163",
+      "2673",
+      "73",
+      "78",
+      "21"
+    ],
+    "input": "Who is 234 the nephew of?",
+    "final_message": "The entity 234 is the nephew of the following entities: \n\n- 163\n- 21\n- 73\n- 229\n- 466\n- 471\n- 1064\n- 75\n\nAdditionally, entity 73 is also an uncle of 234, and entity 465 is another uncle.",
+    "supporting_evidence": [
+      "234|nephew_of|163",
+      "234|nephew_of|21",
+      "234|nephew_of|73",
+      "234|nephew_of|229",
+      "234|nephew_of|466",
+      "234|uncle_of|471",
+      "234|uncle_of|1064",
+      "73|uncle_of|234",
+      "465|uncle_of|234",
+      "75|uncle_of|234"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1350",
+    "question": "Who is 1232 the aunt of?",
+    "q_entity": [
+      "1232"
+    ],
+    "prediction": [
+      "1331",
+      "1330",
+      "1023",
+      "1437",
+      "2294",
+      "2071",
+      "1257",
+      "2073",
+      "1348",
+      "1603"
+    ],
+    "ground_truth": [
+      "1338",
+      "1412",
+      "1411",
+      "1603",
+      "1348",
+      "1331",
+      "1023",
+      "2294",
+      "1501",
+      "2071",
+      "1437",
+      "1502",
+      "1330"
+    ],
+    "ground_truth_entities": [
+      "1338",
+      "1412",
+      "1411",
+      "1603",
+      "1348",
+      "1331",
+      "1023",
+      "2294",
+      "1501",
+      "2071",
+      "1437",
+      "1502",
+      "1330"
+    ],
+    "input": "Who is 1232 the aunt of?",
+    "final_message": "The entity 1232 is the aunt of the following individuals:\n\n- 1331\n- 1330\n- 1023\n- 1437\n- 2294\n- 2071 (nephew)\n- 1257 (niece)\n- 2073 (niece)\n- 1348 (niece)\n- 1603 (niece)\n\nThese relationships are supported by the evidence found in the knowledge graph.",
+    "supporting_evidence": [
+      "1232|aunt_of|1331",
+      "1232|aunt_of|1330",
+      "1232|aunt_of|1023",
+      "1232|aunt_of|1437",
+      "1232|aunt_of|2294",
+      "2071|nephew_of|1232",
+      "1437|nephew_of|1232",
+      "1232|niece_of|1257",
+      "1331|niece_of|1232",
+      "2073|niece_of|1232",
+      "1348|niece_of|1232",
+      "1603|niece_of|1232"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1352",
+    "question": "Who is 79's aunt?",
+    "q_entity": [
+      "79"
+    ],
+    "prediction": [
+      "101",
+      "48",
+      "102",
+      "103",
+      "46"
+    ],
+    "ground_truth": [
+      "310",
+      "76",
+      "17",
+      "121",
+      "73",
+      "21",
+      "27",
+      "74",
+      "26",
+      "14",
+      "13",
+      "311",
+      "75",
+      "29",
+      "39",
+      "98",
+      "95",
+      "83",
+      "129",
+      "77",
+      "86",
+      "38",
+      "24",
+      "97",
+      "8"
+    ],
+    "ground_truth_entities": [
+      "310",
+      "76",
+      "17",
+      "121",
+      "73",
+      "21",
+      "27",
+      "74",
+      "26",
+      "14",
+      "13",
+      "311",
+      "75",
+      "29",
+      "39",
+      "98",
+      "95",
+      "83",
+      "129",
+      "77",
+      "86",
+      "38",
+      "24",
+      "97",
+      "8"
+    ],
+    "input": "Who is 79's aunt?",
+    "final_message": "The aunts of entity 79 are represented by the following entities: 101, 48, 102, 103, and 46.",
+    "supporting_evidence": [
+      "79|aunt_of|101",
+      "79|aunt_of|48",
+      "79|aunt_of|102",
+      "79|aunt_of|103",
+      "79|aunt_of|46",
+      "79|aunt_of|48",
+      "50|brother_of|48",
+      "79|aunt_of|102",
+      "103|brother_of|102",
+      "79|aunt_of|103",
+      "103|brother_of|102",
+      "79|aunt_of|46",
+      "50|brother_of|46",
+      "79|aunt_of|50",
+      "50|brother_of|48",
+      "79|aunt_of|101",
+      "101|sister_of|102",
+      "79|aunt_of|101",
+      "101|sister_of|103",
+      "79|aunt_of|101",
+      "238|sister_of|101",
+      "79|aunt_of|48",
+      "48|sister_of|46",
+      "79|aunt_of|48",
+      "48|sister_of|49"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1371",
+    "question": "Who is 1284 the aunt of?",
+    "q_entity": [
+      "1284"
+    ],
+    "prediction": [
+      "1278",
+      "286",
+      "1276",
+      "1265",
+      "1272",
+      "1367",
+      "2234",
+      "1271",
+      "1496",
+      "1497",
+      "1279"
+    ],
+    "ground_truth": [
+      "1271",
+      "1264",
+      "1280",
+      "1272",
+      "1267",
+      "1279",
+      "1268",
+      "1278",
+      "1270",
+      "1265",
+      "1275",
+      "1266",
+      "286",
+      "1276"
+    ],
+    "ground_truth_entities": [
+      "1271",
+      "1264",
+      "1280",
+      "1272",
+      "1267",
+      "1279",
+      "1268",
+      "1278",
+      "1270",
+      "1265",
+      "1275",
+      "1266",
+      "286",
+      "1276"
+    ],
+    "input": "Who is 1284 the aunt of?",
+    "final_message": "Entity 1284 is the aunt of the following individuals:\n\n- 1278\n- 286\n- 1276\n- 1265\n- 1272\n- 1367\n- 2234\n- 1271\n- 1496\n- 1497\n- 1279\n\nThese entities are either nieces or nephews of 1284, as evidenced by the relationships found in the knowledge graph.",
+    "supporting_evidence": [
+      "1284|aunt_of|1278",
+      "1284|aunt_of|286",
+      "1284|aunt_of|1276",
+      "1284|aunt_of|1265",
+      "1284|aunt_of|1272",
+      "1278|nephew_of|1284",
+      "286|nephew_of|1284",
+      "1496|nephew_of|1284",
+      "1497|nephew_of|1284",
+      "1279|nephew_of|1284",
+      "1284|niece_of|1367",
+      "2234|niece_of|1284",
+      "1276|niece_of|1284",
+      "1271|niece_of|1284",
+      "1272|niece_of|1284"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1392",
+    "question": "Who is 999's aunt?",
+    "q_entity": [
+      "999"
+    ],
+    "prediction": [
+      "775",
+      "829",
+      "831",
+      "830",
+      "994"
+    ],
+    "ground_truth": [
+      "986",
+      "774",
+      "1000",
+      "1003",
+      "1006",
+      "1005",
+      "1001",
+      "1019",
+      "1018",
+      "1007",
+      "995"
+    ],
+    "ground_truth_entities": [
+      "986",
+      "774",
+      "1000",
+      "1003",
+      "1006",
+      "1005",
+      "1001",
+      "1019",
+      "1018",
+      "1007",
+      "995"
+    ],
+    "input": "Who is 999's aunt?",
+    "final_message": "999 has several aunts, specifically identified as entities 775, 829, 831, 830, and 994.",
+    "supporting_evidence": [
+      "999|aunt_of|775",
+      "999|aunt_of|829",
+      "999|aunt_of|831",
+      "999|aunt_of|830",
+      "994|aunt_of|999"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1395",
+    "question": "Who is 699's aunt?",
+    "q_entity": [
+      "699"
+    ],
+    "prediction": [
+      "709",
+      "714",
+      "701",
+      "749",
+      "747",
+      "745",
+      "744",
+      "2856",
+      "2857",
+      "2858"
+    ],
+    "ground_truth": [
+      "705",
+      "695",
+      "704",
+      "701",
+      "703",
+      "697",
+      "694",
+      "1622",
+      "696",
+      "2854",
+      "2856"
+    ],
+    "ground_truth_entities": [
+      "705",
+      "695",
+      "704",
+      "701",
+      "703",
+      "697",
+      "694",
+      "1622",
+      "696",
+      "2854",
+      "2856"
+    ],
+    "input": "Who is 699's aunt?",
+    "final_message": "The aunts of entity 699 are identified as follows:\n\n1. Entity 709\n2. Entity 714\n3. Entity 701\n4. Entity 749\n5. Entity 747\n6. Entity 745\n7. Entity 744\n8. Entity 2856\n9. Entity 2857\n10. Entity 2858\n\nThese entities are connected to 699 through various paths indicating their relationship as aunts.",
+    "supporting_evidence": [
+      "709|aunt_of|699",
+      "714|aunt_of|699",
+      "709|aunt_of|699",
+      "709|aunt_of|701",
+      "709|aunt_of|699",
+      "749|aunt_of|709",
+      "709|aunt_of|699",
+      "747|aunt_of|709",
+      "709|aunt_of|699",
+      "745|aunt_of|709",
+      "709|aunt_of|699",
+      "744|aunt_of|709",
+      "709|aunt_of|699",
+      "710|brother_of|709",
+      "714|aunt_of|699",
+      "711|brother_of|714",
+      "697|brother_of|699",
+      "2856|aunt_of|697",
+      "697|brother_of|699",
+      "2857|aunt_of|697",
+      "697|brother_of|699",
+      "2858|aunt_of|697",
+      "700|brother_of|699",
+      "2857|aunt_of|700",
+      "700|brother_of|699",
+      "2858|aunt_of|700"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1400",
+    "question": "Who is 2963's aunt?",
+    "q_entity": [
+      "2963"
+    ],
+    "prediction": [
+      "241"
+    ],
+    "ground_truth": [
+      "808",
+      "65"
+    ],
+    "ground_truth_entities": [
+      "808",
+      "65"
+    ],
+    "input": "Who is 2963's aunt?",
+    "final_message": "The aunt of entity 2963 is entity 241.",
+    "supporting_evidence": [
+      "241|aunt_of|2963",
+      "241|aunt_of|2963",
+      "1712|brother_of|241",
+      "241|aunt_of|2963",
+      "242|brother_of|241",
+      "241|aunt_of|2963",
+      "239|father_of|241",
+      "241|aunt_of|2963",
+      "93|mother_of|241",
+      "241|aunt_of|2963",
+      "241|sister_of|65",
+      "241|aunt_of|2963",
+      "241|sister_of|1712",
+      "241|aunt_of|2963",
+      "65|sister_of|241",
+      "241|aunt_of|2963",
+      "240|sister_of|241"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1417",
+    "question": "Who is 1699 the aunt of?",
+    "q_entity": [
+      "1699"
+    ],
+    "prediction": [
+      "2901",
+      "2903",
+      "1117",
+      "2975",
+      "138",
+      "1118",
+      "205",
+      "139"
+    ],
+    "ground_truth": [
+      "1117",
+      "2901",
+      "2903",
+      "1116"
+    ],
+    "ground_truth_entities": [
+      "1117",
+      "2901",
+      "2903",
+      "1116"
+    ],
+    "input": "Who is 1699 the aunt of?",
+    "final_message": "The entity 1699 is the aunt of the following individuals:\n\n- 2901\n- 2903\n- 1117\n- 2975\n- 138\n- 1118 (nephew)\n- 205\n- 139\n\nThese relationships are supported by various evidence paths in the knowledge graph.",
+    "supporting_evidence": [
+      "1699|aunt_of|2901",
+      "1699|aunt_of|2903",
+      "1699|aunt_of|1117",
+      "2975|aunt_of|1699",
+      "138|aunt_of|1699",
+      "1118|nephew_of|1699",
+      "1699|niece_of|2975",
+      "1699|niece_of|138",
+      "1699|niece_of|205",
+      "1699|niece_of|139",
+      "2901|niece_of|1699",
+      "1699|aunt_of|1117",
+      "600|nephew_of|1117",
+      "2975|aunt_of|1699",
+      "1114|nephew_of|2975",
+      "2975|aunt_of|1699",
+      "1737|nephew_of|2975",
+      "138|aunt_of|1699",
+      "1698|nephew_of|138",
+      "138|aunt_of|1699",
+      "1737|nephew_of|138",
+      "1699|aunt_of|2901",
+      "2901|niece_of|1114",
+      "1699|aunt_of|2903",
+      "2903|niece_of|1114",
+      "1699|aunt_of|1117",
+      "1117|niece_of|1698",
+      "1699|aunt_of|1117",
+      "1117|niece_of|1108",
+      "1699|aunt_of|1117",
+      "1117|niece_of|1107"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1418",
+    "question": "Who is 745's aunt?",
+    "q_entity": [
+      "745"
+    ],
+    "prediction": [
+      "720",
+      "709",
+      "951",
+      "693",
+      "708"
+    ],
+    "ground_truth": [
+      "746",
+      "747",
+      "743",
+      "749",
+      "744",
+      "742",
+      "728"
+    ],
+    "ground_truth_entities": [
+      "746",
+      "747",
+      "743",
+      "749",
+      "744",
+      "742",
+      "728"
+    ],
+    "input": "Who is 745's aunt?",
+    "final_message": "745 has several aunts, specifically the following entities: 720, 709, 951, 693, and 708.",
+    "supporting_evidence": [
+      "745|aunt_of|720",
+      "745|aunt_of|709",
+      "745|aunt_of|951",
+      "745|aunt_of|693",
+      "745|aunt_of|708"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1434",
+    "question": "Who is 746's aunt?",
+    "q_entity": [
+      "746"
+    ],
+    "prediction": [
+      "720",
+      "709",
+      "951",
+      "708",
+      "712",
+      "749",
+      "747",
+      "745",
+      "701",
+      "699",
+      "717",
+      "710",
+      "711",
+      "706",
+      "707",
+      "751",
+      "715",
+      "749",
+      "707",
+      "2114",
+      "2115"
+    ],
+    "ground_truth": [
+      "742",
+      "751",
+      "2915",
+      "743",
+      "744",
+      "747",
+      "748",
+      "706",
+      "896"
+    ],
+    "ground_truth_entities": [
+      "742",
+      "751",
+      "2915",
+      "743",
+      "744",
+      "747",
+      "748",
+      "706",
+      "896"
+    ],
+    "input": "Who is 746's aunt?",
+    "final_message": "The aunts of entity 746 are identified as follows:\n\n1. **720**\n2. **709**\n3. **951**\n4. **708**\n5. **712**\n6. **749**\n7. **747**\n8. **745**\n9. **701**\n10. **699**\n11. **717**\n12. **710**\n13. **711**\n14. **706**\n15. **707**\n16. **751**\n17. **715**\n18. **2114**\n19. **2115**\n\nThese entities are connected to 746 through the relation \"aunt_of.\"",
+    "supporting_evidence": [
+      "746|aunt_of|720",
+      "746|aunt_of|709",
+      "746|aunt_of|951",
+      "746|aunt_of|708",
+      "746|aunt_of|712",
+      "746|aunt_of|720",
+      "749|aunt_of|720",
+      "746|aunt_of|720",
+      "747|aunt_of|720",
+      "746|aunt_of|720",
+      "745|aunt_of|720",
+      "746|aunt_of|709",
+      "709|aunt_of|701",
+      "746|aunt_of|709",
+      "709|aunt_of|699",
+      "746|aunt_of|720",
+      "717|brother_of|720",
+      "746|aunt_of|709",
+      "710|brother_of|709",
+      "746|aunt_of|708",
+      "708|brother_of|711",
+      "746|aunt_of|708",
+      "712|brother_of|708",
+      "746|aunt_of|708",
+      "710|brother_of|708",
+      "746|aunt_of|720",
+      "720|daughter_of|706",
+      "746|aunt_of|709",
+      "709|daughter_of|707",
+      "746|aunt_of|951",
+      "951|daughter_of|751",
+      "746|aunt_of|2128",
+      "2128|daughter_of|751",
+      "746|aunt_of|718",
+      "718|daughter_of|715",
+      "746|aunt_of|720",
+      "715|mother_of|720",
+      "746|aunt_of|951",
+      "749|mother_of|951",
+      "746|aunt_of|708",
+      "707|mother_of|708",
+      "728|aunt_of|746",
+      "728|mother_of|2114",
+      "728|aunt_of|746",
+      "728|mother_of|2115"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1435",
+    "question": "Who is 561 the aunt of?",
+    "q_entity": [
+      "561"
+    ],
+    "prediction": [
+      "652",
+      "416",
+      "1681",
+      "511",
+      "571",
+      "414",
+      "653",
+      "412",
+      "1682",
+      "43"
+    ],
+    "ground_truth": [
+      "652",
+      "1681",
+      "653",
+      "511",
+      "413",
+      "1029",
+      "43",
+      "416",
+      "2654",
+      "411"
+    ],
+    "ground_truth_entities": [
+      "652",
+      "1681",
+      "653",
+      "511",
+      "413",
+      "1029",
+      "43",
+      "416",
+      "2654",
+      "411"
+    ],
+    "input": "Who is 561 the aunt of?",
+    "final_message": "Entity 561 is the aunt of the following individuals:\n\n- 652\n- 416\n- 1681\n- 511\n- 571\n- 414\n- 653\n- 412\n- 1682\n- 43\n\nThese relationships are supported by the evidence found in the knowledge graph.",
+    "supporting_evidence": [
+      "561|aunt_of|652",
+      "561|aunt_of|416",
+      "561|aunt_of|1681",
+      "561|aunt_of|511",
+      "571|aunt_of|561",
+      "652|nephew_of|561",
+      "414|nephew_of|561",
+      "653|nephew_of|561",
+      "412|nephew_of|561",
+      "511|niece_of|561",
+      "1682|niece_of|561",
+      "43|niece_of|561"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1445",
+    "question": "Who is 1764's aunt?",
+    "q_entity": [
+      "1764"
+    ],
+    "prediction": [
+      "1759",
+      "1762",
+      "1512"
+    ],
+    "ground_truth": [
+      "1760"
+    ],
+    "ground_truth_entities": [
+      "1760"
+    ],
+    "input": "Who is 1764's aunt?",
+    "final_message": "The aunts of 1764 are identified as entities 1759, 1762, and 1512.",
+    "supporting_evidence": [
+      "1545|brother_of|1764",
+      "1759|aunt_of|1545",
+      "1545|brother_of|1764",
+      "1762|aunt_of|1545",
+      "1764|husband_of|1765",
+      "1765|aunt_of|1512"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1466",
+    "question": "Who is 7 the aunt of?",
+    "q_entity": [
+      "7"
+    ],
+    "prediction": [
+      "17",
+      "26",
+      "122",
+      "121",
+      "38",
+      "14",
+      "28",
+      "86",
+      "13",
+      "29",
+      "24",
+      "39",
+      "121",
+      "38",
+      "76"
+    ],
+    "ground_truth": [
+      "72",
+      "83",
+      "15",
+      "123",
+      "21",
+      "16",
+      "129",
+      "77",
+      "85",
+      "75",
+      "121",
+      "29",
+      "73",
+      "38",
+      "28",
+      "26",
+      "18",
+      "86",
+      "122",
+      "97",
+      "13",
+      "17"
+    ],
+    "ground_truth_entities": [
+      "72",
+      "83",
+      "15",
+      "123",
+      "21",
+      "16",
+      "129",
+      "77",
+      "85",
+      "75",
+      "121",
+      "29",
+      "73",
+      "38",
+      "28",
+      "26",
+      "18",
+      "86",
+      "122",
+      "97",
+      "13",
+      "17"
+    ],
+    "input": "Who is 7 the aunt of?",
+    "final_message": "Entity 7 is the aunt of the following individuals:\n\n- 17\n- 26\n- 122\n- 121\n- 38\n- 14\n- 28\n- 86\n- 13\n- 29\n- 24\n- 39\n- 121 (also listed as a niece)\n- 38 (also listed as a niece)\n- 76\n\nThese entities represent the nieces and nephews of entity 7.",
+    "supporting_evidence": [
+      "7|aunt_of|17",
+      "7|aunt_of|26",
+      "7|aunt_of|122",
+      "7|aunt_of|121",
+      "7|aunt_of|38",
+      "14|nephew_of|7",
+      "28|nephew_of|7",
+      "86|nephew_of|7",
+      "13|nephew_of|7",
+      "29|nephew_of|7",
+      "24|niece_of|7",
+      "39|niece_of|7",
+      "121|niece_of|7",
+      "38|niece_of|7",
+      "76|niece_of|7"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1469",
+    "question": "Who is 733 the aunt of?",
+    "q_entity": [
+      "733"
+    ],
+    "prediction": [
+      "748",
+      "590",
+      "729",
+      "728",
+      "732",
+      "2913",
+      "720",
+      "709",
+      "951",
+      "693",
+      "714"
+    ],
+    "ground_truth": [
+      "2115",
+      "2118",
+      "766",
+      "765",
+      "2116",
+      "747",
+      "736",
+      "2119",
+      "748",
+      "768",
+      "746"
+    ],
+    "ground_truth_entities": [
+      "2115",
+      "2118",
+      "766",
+      "765",
+      "2116",
+      "747",
+      "736",
+      "2119",
+      "748",
+      "768",
+      "746"
+    ],
+    "input": "Who is 733 the aunt of?",
+    "final_message": "The entity 733 is the aunt of the following entities:\n\n- 590\n- 729\n- 728\n- 732\n- 2913\n- 720\n- 709\n- 951\n- 693\n- 714\n\nAdditionally, 733 is also directly related to entity 748, which is a key connection in this relationship.",
+    "supporting_evidence": [
+      "733|aunt_of|748",
+      "733|aunt_of|2115",
+      "733|aunt_of|748",
+      "748|nephew_of|590",
+      "733|aunt_of|748",
+      "748|nephew_of|729",
+      "733|aunt_of|748",
+      "748|nephew_of|728",
+      "733|aunt_of|748",
+      "748|nephew_of|732",
+      "733|aunt_of|748",
+      "748|nephew_of|2913",
+      "733|aunt_of|748",
+      "720|niece_of|748",
+      "733|aunt_of|748",
+      "709|niece_of|748",
+      "733|aunt_of|748",
+      "951|niece_of|748",
+      "733|aunt_of|748",
+      "693|niece_of|748",
+      "733|aunt_of|748",
+      "714|niece_of|748"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1470",
+    "question": "Who is 2780 the aunt of?",
+    "q_entity": [
+      "2780"
+    ],
+    "prediction": [
+      "2807",
+      "2799",
+      "2811",
+      "2776",
+      "2775",
+      "2773",
+      "2806",
+      "2804"
+    ],
+    "ground_truth": [
+      "2811",
+      "2807",
+      "2799",
+      "2809"
+    ],
+    "ground_truth_entities": [
+      "2811",
+      "2807",
+      "2799",
+      "2809"
+    ],
+    "input": "Who is 2780 the aunt of?",
+    "final_message": "Entity 2780 is the aunt of the following entities:\n\n- 2807\n- 2799\n- 2811\n- 2776\n- 2775\n- 2773\n- 2806\n- 2804\n\nThese relationships are established through the paths indicating that 2780 is an aunt, as well as through connections to nephews and nieces.",
+    "supporting_evidence": [
+      "2780|aunt_of|2807",
+      "2780|aunt_of|2799",
+      "2780|aunt_of|2811",
+      "2776|aunt_of|2780",
+      "2775|aunt_of|2780",
+      "2807|nephew_of|2780",
+      "2780|niece_of|2776",
+      "2780|niece_of|2773",
+      "2806|niece_of|2780",
+      "2804|niece_of|2780"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1472",
+    "question": "Who is 74 the aunt of?",
+    "q_entity": [
+      "74"
+    ],
+    "prediction": [
+      "426",
+      "439",
+      "421",
+      "424",
+      "8",
+      "425",
+      "80",
+      "11",
+      "9",
+      "6",
+      "428",
+      "233"
+    ],
+    "ground_truth": [
+      "439",
+      "81",
+      "425",
+      "231",
+      "234",
+      "421",
+      "424",
+      "230",
+      "422",
+      "232",
+      "80",
+      "426"
+    ],
+    "ground_truth_entities": [
+      "439",
+      "81",
+      "425",
+      "231",
+      "234",
+      "421",
+      "424",
+      "230",
+      "422",
+      "232",
+      "80",
+      "426"
+    ],
+    "input": "Who is 74 the aunt of?",
+    "final_message": "The entity \"74\" is the aunt of the following individuals:\n\n- 426\n- 439\n- 421\n- 424\n- 8\n- 425 (nephew)\n- 80 (nephew)\n- 11 (niece)\n- 9 (niece)\n- 6 (niece)\n- 428 (niece)\n- 233 (niece)\n\nThese relationships are established through various paths indicating that 74 is an aunt, as well as being a niece or nephew to others.",
+    "supporting_evidence": [
+      "74|aunt_of|426",
+      "74|aunt_of|439",
+      "74|aunt_of|421",
+      "74|aunt_of|424",
+      "8|aunt_of|74",
+      "425|nephew_of|74",
+      "80|nephew_of|74",
+      "421|nephew_of|74",
+      "74|niece_of|11",
+      "74|niece_of|9",
+      "74|niece_of|6",
+      "74|niece_of|428",
+      "233|niece_of|74"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1483",
+    "question": "Who is 2529's aunt?",
+    "q_entity": [
+      "2529"
+    ],
+    "prediction": [
+      "2714",
+      "2718",
+      "2723",
+      "2729",
+      "2724"
+    ],
+    "ground_truth": [
+      "2714",
+      "2715",
+      "2724",
+      "2723",
+      "2729",
+      "2718"
+    ],
+    "ground_truth_entities": [
+      "2714",
+      "2715",
+      "2724",
+      "2723",
+      "2729",
+      "2718"
+    ],
+    "input": "Who is 2529's aunt?",
+    "final_message": "The entity 2529 has several aunts, identified by the following entities: \n\n- 2714\n- 2718\n- 2723\n- 2729\n- 2724\n\nThese entities represent the aunts of 2529 based on the relationships found in the knowledge graph.",
+    "supporting_evidence": [
+      "2529|aunt_of|2714",
+      "2529|aunt_of|2718",
+      "2529|aunt_of|2723",
+      "2529|aunt_of|2729",
+      "2529|aunt_of|2724",
+      "2529|aunt_of|2714",
+      "2715|brother_of|2714",
+      "2529|aunt_of|2718",
+      "2718|brother_of|2720",
+      "2529|aunt_of|2714",
+      "2714|daughter_of|2713",
+      "2529|aunt_of|2714",
+      "2526|mother_of|2714",
+      "2529|aunt_of|2723",
+      "2724|sister_of|2723"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1488",
+    "question": "Who is 829 the aunt of?",
+    "q_entity": [
+      "829"
+    ],
+    "prediction": [
+      "847",
+      "835",
+      "845",
+      "850",
+      "1003",
+      "1005"
+    ],
+    "ground_truth": [
+      "847",
+      "1431",
+      "835",
+      "844",
+      "846",
+      "843"
+    ],
+    "ground_truth_entities": [
+      "847",
+      "1431",
+      "835",
+      "844",
+      "846",
+      "843"
+    ],
+    "input": "Who is 829 the aunt of?",
+    "final_message": "Entity 829 is the aunt of the following entities: 847, 835, 845, 850, 1003, and 1005.",
+    "supporting_evidence": [
+      "829|aunt_of|847",
+      "829|aunt_of|835",
+      "845|nephew_of|829",
+      "850|nephew_of|829",
+      "829|niece_of|1003",
+      "829|niece_of|1005"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1512",
+    "question": "Who is 853 the daughter of?",
+    "q_entity": [
+      "853"
+    ],
+    "prediction": [
+      "854",
+      "855"
+    ],
+    "ground_truth": [
+      "854",
+      "855"
+    ],
+    "ground_truth_entities": [
+      "854",
+      "855"
+    ],
+    "input": "Who is 853 the daughter of?",
+    "final_message": "The entity 853 is the daughter of two entities: 854 and 855.",
+    "supporting_evidence": [
+      "853|daughter_of|854",
+      "855|mother_of|853"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1531",
+    "question": "Who is 1860 the daughter of?",
+    "q_entity": [
+      "1860"
+    ],
+    "prediction": [
+      "1517",
+      "1398",
+      "1380",
+      "1397"
+    ],
+    "ground_truth": [
+      "1517",
+      "1388"
+    ],
+    "ground_truth_entities": [
+      "1517",
+      "1388"
+    ],
+    "input": "Who is 1860 the daughter of?",
+    "final_message": "The entity \"1860\" is identified as the daughter of the following entities:\n\n1. **1517**\n2. **1398**\n3. **1380**\n4. **1397**\n\nThese relationships were established through various paths in the knowledge graph, indicating that \"1860\" has multiple connections to these entities as her parents or through familial relations.",
+    "supporting_evidence": [
+      "1860|daughter_of|1517",
+      "1860|aunt_of|1401",
+      "1401|daughter_of|1398",
+      "1386|aunt_of|1860",
+      "1386|daughter_of|1380",
+      "1860|aunt_of|1400",
+      "1400|brother_of|1403",
+      "1403|daughter_of|1397",
+      "1860|aunt_of|1400",
+      "1400|brother_of|1401",
+      "1401|daughter_of|1398",
+      "1860|aunt_of|1399",
+      "1399|brother_of|1401",
+      "1401|daughter_of|1398",
+      "1860|aunt_of|1399",
+      "1399|brother_of|1403",
+      "1403|daughter_of|1397"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1536",
+    "question": "Who is 2106 the daughter of?",
+    "q_entity": [
+      "2106"
+    ],
+    "prediction": [
+      "1427",
+      "2110"
+    ],
+    "ground_truth": [
+      "1427",
+      "1430"
+    ],
+    "ground_truth_entities": [
+      "1427",
+      "1430"
+    ],
+    "input": "Who is 2106 the daughter of?",
+    "final_message": "The entity 2106 is the daughter of entity 2110 and is also related to entity 1427.",
+    "supporting_evidence": [
+      "2106|daughter_of|1427",
+      "2106|mother_of|2110"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1552",
+    "question": "Who is 2100 the daughter of?",
+    "q_entity": [
+      "2100"
+    ],
+    "prediction": [
+      "841",
+      "2889",
+      "2887",
+      "833",
+      "845",
+      "850",
+      "842",
+      "847",
+      "773"
+    ],
+    "ground_truth": [
+      "841",
+      "840"
+    ],
+    "ground_truth_entities": [
+      "841",
+      "840"
+    ],
+    "input": "Who is 2100 the daughter of?",
+    "final_message": "The entity \"2100\" is the daughter of the entity \"841\". Additionally, \"841\" has multiple mothers, including entities \"2889\", \"2887\", and \"833\". \n\nFurthermore, through the relation paths, we also find that \"2100\" has an aunt (entity \"846\") who has a daughter (entity \"828\"), and \"828\" is the father of several entities, including \"845\", \"850\", \"842\", \"847\", and \"773\". \n\nIn summary, the direct parent of \"2100\" is \"841\", and the mothers of \"841\" are \"2889\", \"2887\", and \"833\".",
+    "supporting_evidence": [
+      "2100|daughter_of|841",
+      "2100|daughter_of|841",
+      "841|mother_of|2889",
+      "2100|daughter_of|841",
+      "841|mother_of|2887",
+      "2100|daughter_of|841",
+      "841|mother_of|833",
+      "2100|aunt_of|846",
+      "846|daughter_of|828",
+      "828|father_of|845",
+      "2100|aunt_of|846",
+      "846|daughter_of|828",
+      "828|father_of|850",
+      "2100|aunt_of|846",
+      "846|daughter_of|828",
+      "828|father_of|842",
+      "2100|aunt_of|846",
+      "846|daughter_of|828",
+      "828|father_of|847",
+      "2100|aunt_of|846",
+      "846|daughter_of|828",
+      "773|father_of|828"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1563",
+    "question": "Who is 12 the daughter of?",
+    "q_entity": [
+      "12"
+    ],
+    "prediction": [
+      "226",
+      "18",
+      "15",
+      "13"
+    ],
+    "ground_truth": [
+      "226",
+      "225"
+    ],
+    "ground_truth_entities": [
+      "226",
+      "225"
+    ],
+    "input": "Who is 12 the daughter of?",
+    "final_message": "The entity \"12\" is the daughter of the following entities: \n\n- Entity 226\n- Entity 18\n- Entity 15\n- Entity 13\n\nThese relationships are supported by the evidence paths discovered in the knowledge graph.",
+    "supporting_evidence": [
+      "12|daughter_of|226",
+      "12|mother_of|18",
+      "12|mother_of|15",
+      "12|mother_of|13"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1565",
+    "question": "Who is 1655 the daughter of?",
+    "q_entity": [
+      "1655"
+    ],
+    "prediction": [
+      "1618",
+      "1617"
+    ],
+    "ground_truth": [
+      "1618",
+      "1617"
+    ],
+    "ground_truth_entities": [
+      "1618",
+      "1617"
+    ],
+    "input": "Who is 1655 the daughter of?",
+    "final_message": "The entity 1655 is the daughter of two individuals: 1618 and 1617.",
+    "supporting_evidence": [
+      "1655|daughter_of|1618",
+      "1642|brother_of|1655",
+      "1617|father_of|1642"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1578",
+    "question": "Who is 15 the daughter of?",
+    "q_entity": [
+      "15"
+    ],
+    "prediction": [
+      "4",
+      "125",
+      "12"
+    ],
+    "ground_truth": [
+      "4",
+      "12"
+    ],
+    "ground_truth_entities": [
+      "4",
+      "12"
+    ],
+    "input": "Who is 15 the daughter of?",
+    "final_message": "The entity \"15\" is the daughter of the following entities: \n\n- Entity 4\n- Entity 125\n- Entity 12\n\nThese relationships are established through the paths \"daughter_of\" and \"mother_of\".",
+    "supporting_evidence": [
+      "15|daughter_of|4",
+      "15|mother_of|125",
+      "12|mother_of|15"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1589",
+    "question": "Who is 935's uncle?",
+    "q_entity": [
+      "935"
+    ],
+    "prediction": [
+      "925",
+      "922",
+      "923",
+      "924"
+    ],
+    "ground_truth": [
+      "932",
+      "938",
+      "927",
+      "924"
+    ],
+    "ground_truth_entities": [
+      "932",
+      "938",
+      "927",
+      "924"
+    ],
+    "input": "Who is 935's uncle?",
+    "final_message": "The uncles of entity 935 are identified as entities 925, 922, 923, and 924.",
+    "supporting_evidence": [
+      "925|uncle_of|935",
+      "922|uncle_of|935",
+      "921|father_of|935",
+      "921|brother_of|923",
+      "921|father_of|935",
+      "921|brother_of|925",
+      "921|father_of|935",
+      "924|brother_of|921",
+      "921|father_of|935",
+      "925|brother_of|921"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1603",
+    "question": "Who is 418 the uncle of?",
+    "q_entity": [
+      "418"
+    ],
+    "prediction": [
+      "558",
+      "562"
+    ],
+    "ground_truth": [
+      "20",
+      "1028",
+      "2666",
+      "1683",
+      "44",
+      "1213",
+      "512",
+      "428"
+    ],
+    "ground_truth_entities": [
+      "20",
+      "1028",
+      "2666",
+      "1683",
+      "44",
+      "1213",
+      "512",
+      "428"
+    ],
+    "input": "Who is 418 the uncle of?",
+    "final_message": "Entity 418 is the uncle of entities 558 and 562.",
+    "supporting_evidence": [
+      "558|uncle_of|418",
+      "562|uncle_of|418"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1605",
+    "question": "Who is 2997 the uncle of?",
+    "q_entity": [
+      "2997"
+    ],
+    "prediction": [
+      "3006",
+      "2989",
+      "243"
+    ],
+    "ground_truth": [
+      "3010",
+      "243"
+    ],
+    "ground_truth_entities": [
+      "3010",
+      "243"
+    ],
+    "input": "Who is 2997 the uncle of?",
+    "final_message": "Entity 2997 is the uncle of the following individuals:\n\n- 3006\n- 2989 (nephew)\n- 243 (niece)",
+    "supporting_evidence": [
+      "3006|uncle_of|2997",
+      "2989|nephew_of|2997",
+      "243|niece_of|2997"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1619",
+    "question": "Who is 130 the uncle of?",
+    "q_entity": [
+      "130"
+    ],
+    "prediction": [
+      "2146",
+      "290",
+      "326",
+      "330",
+      "325",
+      "1653"
+    ],
+    "ground_truth": [
+      "1617",
+      "2146",
+      "290"
+    ],
+    "ground_truth_entities": [
+      "1617",
+      "2146",
+      "290"
+    ],
+    "input": "Who is 130 the uncle of?",
+    "final_message": "Entity 130 is the uncle of the following entities: 2146, 290, 326, 330, 325, and 1653.",
+    "supporting_evidence": [
+      "130|uncle_of|2146",
+      "130|uncle_of|290",
+      "130|nephew_of|326",
+      "130|nephew_of|330",
+      "130|nephew_of|325",
+      "2146|niece_of|130",
+      "1653|niece_of|130"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1634",
+    "question": "Who is 2481 the uncle of?",
+    "q_entity": [
+      "2481"
+    ],
+    "prediction": [
+      "1495"
+    ],
+    "ground_truth": [
+      "1495",
+      "1739"
+    ],
+    "ground_truth_entities": [
+      "1495",
+      "1739"
+    ],
+    "input": "Who is 2481 the uncle of?",
+    "final_message": "2481 is the uncle of 1495.",
+    "supporting_evidence": [
+      "2481|uncle_of|1495"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1640",
+    "question": "Who is 1241 the uncle of?",
+    "q_entity": [
+      "1241"
+    ],
+    "prediction": [
+      "1338",
+      "2073",
+      "1329"
+    ],
+    "ground_truth": [
+      "1338",
+      "1348",
+      "1502",
+      "1437",
+      "2073",
+      "1330",
+      "2072",
+      "1329",
+      "1412"
+    ],
+    "ground_truth_entities": [
+      "1338",
+      "1348",
+      "1502",
+      "1437",
+      "2073",
+      "1330",
+      "2072",
+      "1329",
+      "1412"
+    ],
+    "input": "Who is 1241 the uncle of?",
+    "final_message": "The entity 1241 is the uncle of the following entities: 1338, 2073, and 1329.",
+    "supporting_evidence": [
+      "1241|uncle_of|1338",
+      "1241|uncle_of|2073",
+      "1241|uncle_of|1329",
+      "1256|uncle_of|1241"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1641",
+    "question": "Who is 1241 the uncle of?",
+    "q_entity": [
+      "1241"
+    ],
+    "prediction": [
+      "1338",
+      "2073",
+      "1329"
+    ],
+    "ground_truth": [
+      "1338",
+      "1348",
+      "1502",
+      "1437",
+      "2073",
+      "1330",
+      "2072",
+      "1329",
+      "1412"
+    ],
+    "ground_truth_entities": [
+      "1338",
+      "1348",
+      "1502",
+      "1437",
+      "2073",
+      "1330",
+      "2072",
+      "1329",
+      "1412"
+    ],
+    "input": "Who is 1241 the uncle of?",
+    "final_message": "The entity 1241 is the uncle of the following entities: 1338, 2073, and 1329.",
+    "supporting_evidence": [
+      "1241|uncle_of|1338",
+      "1241|uncle_of|2073",
+      "1241|uncle_of|1329",
+      "1256|uncle_of|1241"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1645",
+    "question": "Who is 64's uncle?",
+    "q_entity": [
+      "64"
+    ],
+    "prediction": [
+      "60",
+      "61"
+    ],
+    "ground_truth": [
+      "63",
+      "58"
+    ],
+    "ground_truth_entities": [
+      "63",
+      "58"
+    ],
+    "input": "Who is 64's uncle?",
+    "final_message": "The uncles of 64 are entities 60 and 61.",
+    "supporting_evidence": [
+      "60|uncle_of|64",
+      "61|uncle_of|64",
+      "63|brother_of|64",
+      "60|uncle_of|63",
+      "63|brother_of|64",
+      "61|uncle_of|63"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1653",
+    "question": "Who is 2997 the uncle of?",
+    "q_entity": [
+      "2997"
+    ],
+    "prediction": [
+      "3006",
+      "2989",
+      "243"
+    ],
+    "ground_truth": [
+      "3010",
+      "243"
+    ],
+    "ground_truth_entities": [
+      "3010",
+      "243"
+    ],
+    "input": "Who is 2997 the uncle of?",
+    "final_message": "Entity 2997 is the uncle of the following individuals:\n\n- 3006\n- 2989 (nephew)\n- 243 (niece)",
+    "supporting_evidence": [
+      "3006|uncle_of|2997",
+      "2989|nephew_of|2997",
+      "243|niece_of|2997"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1661",
+    "question": "Who is 204's uncle?",
+    "q_entity": [
+      "204"
+    ],
+    "prediction": [
+      "339",
+      "334",
+      "336",
+      "133",
+      "132",
+      "212",
+      "213",
+      "202"
+    ],
+    "ground_truth": [
+      "133",
+      "215",
+      "209",
+      "290",
+      "212",
+      "203",
+      "217",
+      "214",
+      "210",
+      "216",
+      "143",
+      "1617",
+      "213",
+      "337"
+    ],
+    "ground_truth_entities": [
+      "133",
+      "215",
+      "209",
+      "290",
+      "212",
+      "203",
+      "217",
+      "214",
+      "210",
+      "216",
+      "143",
+      "1617",
+      "213",
+      "337"
+    ],
+    "input": "Who is 204's uncle?",
+    "final_message": "The entity 204 has several uncles, which are represented by the following entities: 339, 334, and 336. Additionally, 204 has brothers represented by the entities 133, 132, 212, 213, and 202.",
+    "supporting_evidence": [
+      "339|uncle_of|204",
+      "334|uncle_of|204",
+      "336|uncle_of|204",
+      "133|brother_of|204",
+      "132|brother_of|204",
+      "212|brother_of|204",
+      "213|brother_of|204",
+      "202|brother_of|204"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1684",
+    "question": "Who is the nephew of 1627?",
+    "q_entity": [
+      "1627"
+    ],
+    "prediction": [
+      "730",
+      "727",
+      "731",
+      "732",
+      "748",
+      "768",
+      "706",
+      "765",
+      "766"
+    ],
+    "ground_truth": [
+      "729",
+      "731",
+      "732",
+      "733",
+      "728"
+    ],
+    "ground_truth_entities": [
+      "729",
+      "731",
+      "732",
+      "733",
+      "728"
+    ],
+    "input": "Who is the nephew of 1627?",
+    "final_message": "The nephew of 1627 includes the following entities: \n\n- 730\n- 727\n- 731\n- 732\n- 748\n- 768\n- 706\n- 765\n- 766\n\nThese entities are connected to 1627 through the relation \"nephew_of\" and other related paths.",
+    "supporting_evidence": [
+      "730|nephew_of|1627",
+      "727|nephew_of|1627",
+      "731|nephew_of|1627",
+      "732|nephew_of|1627",
+      "1627|brother_of|2862",
+      "2862|aunt_of|729",
+      "748|nephew_of|729",
+      "1627|brother_of|2862",
+      "2862|aunt_of|729",
+      "768|nephew_of|729",
+      "1627|brother_of|2862",
+      "2862|aunt_of|729",
+      "706|nephew_of|729",
+      "1627|brother_of|2862",
+      "2862|aunt_of|729",
+      "765|nephew_of|729",
+      "1627|brother_of|2862",
+      "2862|aunt_of|732",
+      "766|nephew_of|732"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1692",
+    "question": "Who is the mother of 1265?",
+    "q_entity": [
+      "1265"
+    ],
+    "prediction": [
+      "1261",
+      "2234",
+      "1281",
+      "1282"
+    ],
+    "ground_truth": [
+      "1268",
+      "1271",
+      "1274",
+      "286",
+      "1276",
+      "1270",
+      "1275",
+      "1262"
+    ],
+    "ground_truth_entities": [
+      "1268",
+      "1271",
+      "1274",
+      "286",
+      "1276",
+      "1270",
+      "1275",
+      "1262"
+    ],
+    "input": "Who is the mother of 1265?",
+    "final_message": "The mother of entity 1265 is represented by the following entities:\n\n1. **1261** - identified as the father of 1265, which implies that the mother is likely a spouse or partner of this entity.\n2. **2234** - identified as a daughter of an aunt of 1265, suggesting a familial connection.\n3. **1281** and **1282** - both identified as daughters of an aunt of 1265, indicating they may also be related through the maternal line.\n\nThus, while the direct mother is not explicitly named, the evidence suggests that the mother could be associated with the entity **1261**.",
+    "supporting_evidence": [
+      "1261|father_of|1265",
+      "1283|aunt_of|1265",
+      "2234|daughter_of|1283",
+      "1284|aunt_of|1265",
+      "1284|daughter_of|1281",
+      "1284|aunt_of|1265",
+      "1284|daughter_of|1282"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1701",
+    "question": "Who is 76 the mother of?",
+    "q_entity": [
+      "76"
+    ],
+    "prediction": [
+      "230",
+      "231",
+      "232",
+      "233",
+      "439",
+      "234"
+    ],
+    "ground_truth": [
+      "231",
+      "230",
+      "232",
+      "234",
+      "233"
+    ],
+    "ground_truth_entities": [
+      "231",
+      "230",
+      "232",
+      "234",
+      "233"
+    ],
+    "input": "Who is 76 the mother of?",
+    "final_message": "The entity \"76\" is the mother of the following entities: **230, 231, 232, 233, 439, and 234**.",
+    "supporting_evidence": [
+      "76|mother_of|232",
+      "76|mother_of|231",
+      "76|mother_of|230",
+      "233|daughter_of|76",
+      "439|son_of|76",
+      "231|son_of|76",
+      "234|son_of|76"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1718",
+    "question": "Who is 647 the mother of?",
+    "q_entity": [
+      "647"
+    ],
+    "prediction": [
+      "640"
+    ],
+    "ground_truth": [
+      "641",
+      "640"
+    ],
+    "ground_truth_entities": [
+      "641",
+      "640"
+    ],
+    "input": "Who is 647 the mother of?",
+    "final_message": "The entity 647 is the mother of entity 640.",
+    "supporting_evidence": [
+      "647|mother_of|640",
+      "640|son_of|647"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1720",
+    "question": "Who is 5's child?",
+    "q_entity": [
+      "5"
+    ],
+    "prediction": [
+      "2",
+      "85",
+      "39",
+      "86",
+      "83",
+      "79",
+      "38"
+    ],
+    "ground_truth": [
+      "39",
+      "79",
+      "83",
+      "38",
+      "86",
+      "84"
+    ],
+    "ground_truth_entities": [
+      "39",
+      "79",
+      "83",
+      "38",
+      "86",
+      "84"
+    ],
+    "input": "Who is 5's child?",
+    "final_message": "The children of entity 5 are as follows: \n\n- 2\n- 85\n- 39\n- 86\n- 83\n- 79\n- 38\n\nThese entities are identified as either sons or daughters of entity 5 based on the relationships found in the knowledge graph.",
+    "supporting_evidence": [
+      "5|daughter_of|2",
+      "85|daughter_of|5",
+      "39|daughter_of|5",
+      "86|son_of|5",
+      "83|son_of|5",
+      "5|mother_of|79",
+      "5|mother_of|83",
+      "5|mother_of|39",
+      "5|mother_of|38",
+      "5|mother_of|86"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1723",
+    "question": "Who is the mother of 324?",
+    "q_entity": [
+      "324"
+    ],
+    "prediction": [
+      "650"
+    ],
+    "ground_truth": [
+      "328",
+      "331",
+      "327",
+      "330",
+      "323",
+      "322"
+    ],
+    "ground_truth_entities": [
+      "328",
+      "331",
+      "327",
+      "330",
+      "323",
+      "322"
+    ],
+    "input": "Who is the mother of 324?",
+    "final_message": "The mother of 324 is 650.",
+    "supporting_evidence": [
+      "324|mother_of|650"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1731",
+    "question": "Who is 2999 the mother of?",
+    "q_entity": [
+      "2999"
+    ],
+    "prediction": [
+      "3003",
+      "3004"
+    ],
+    "ground_truth": [
+      "3003",
+      "3004",
+      "2996"
+    ],
+    "ground_truth_entities": [
+      "3003",
+      "3004",
+      "2996"
+    ],
+    "input": "Who is 2999 the mother of?",
+    "final_message": "2999 is the mother of entities 3003 and 3004.",
+    "supporting_evidence": [
+      "2999|mother_of|3003",
+      "2999|mother_of|3004",
+      "3000|mother_of|2999"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1740",
+    "question": "Who is 598's child?",
+    "q_entity": [
+      "598"
+    ],
+    "prediction": [
+      "2829",
+      "451",
+      "605"
+    ],
+    "ground_truth": [
+      "2829",
+      "2738",
+      "451"
+    ],
+    "ground_truth_entities": [
+      "2829",
+      "2738",
+      "451"
+    ],
+    "input": "Who is 598's child?",
+    "final_message": "The children of entity 598 are identified as entities 2829, 451, and 605.",
+    "supporting_evidence": [
+      "2829|daughter_of|598",
+      "451|daughter_of|598",
+      "598|mother_of|2829",
+      "605|mother_of|598"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1750",
+    "question": "Who is 1284's mother?",
+    "q_entity": [
+      "1284"
+    ],
+    "prediction": [
+      "1281",
+      "1282",
+      "1277",
+      "1262"
+    ],
+    "ground_truth": [
+      "1287",
+      "1283",
+      "1288",
+      "1285",
+      "1261",
+      "1290",
+      "1282"
+    ],
+    "ground_truth_entities": [
+      "1287",
+      "1283",
+      "1288",
+      "1285",
+      "1261",
+      "1290",
+      "1282"
+    ],
+    "input": "Who is 1284's mother?",
+    "final_message": "The mother of entity 1284 is identified as entities 1281, 1282, 1277, and 1262 based on the reasoning paths explored. Here are the details:\n\n- **1284 is a daughter of 1281**\n- **1284 is a daughter of 1282**\n- **1284 has an aunt (1278) whose mother is 1277**\n- **1284 has an aunt (1276) whose mother is 1262**\n- **1284 has an aunt (1275) whose mother is 1262**\n- **1284 has an aunt (1268) whose mother is 1262**\n- **1284 has an aunt (1270) whose mother is 1262**\n\nThus, the mothers associated with 1284 are 1277 and 1262, along with the direct relationships to 1281 and 1282.",
+    "supporting_evidence": [
+      "1284|daughter_of|1281",
+      "1284|daughter_of|1282",
+      "1284|aunt_of|1278",
+      "1277|mother_of|1278",
+      "1284|aunt_of|1276",
+      "1262|mother_of|1276",
+      "1284|aunt_of|1275",
+      "1262|mother_of|1275",
+      "1284|aunt_of|1268",
+      "1262|mother_of|1268",
+      "1284|aunt_of|1270",
+      "1262|mother_of|1270"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1778",
+    "question": "Who is 2537 the uncle of?",
+    "q_entity": [
+      "2537"
+    ],
+    "prediction": [
+      "1254",
+      "2501"
+    ],
+    "ground_truth": [
+      "1217",
+      "1254"
+    ],
+    "ground_truth_entities": [
+      "1217",
+      "1254"
+    ],
+    "input": "Who is 2537 the uncle of?",
+    "final_message": "Entity 2537 is the uncle of entities 1254 and 2501.",
+    "supporting_evidence": [
+      "2537|uncle_of|1254",
+      "2501|uncle_of|2537"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1792",
+    "question": "Who is 467's sister?",
+    "q_entity": [
+      "467"
+    ],
+    "prediction": [
+      "465",
+      "2673"
+    ],
+    "ground_truth": [
+      "229",
+      "465",
+      "2673",
+      "104"
+    ],
+    "ground_truth_entities": [
+      "229",
+      "465",
+      "2673",
+      "104"
+    ],
+    "input": "Who is 467's sister?",
+    "final_message": "The sisters of entity 467 are entities 465 and 2673.",
+    "supporting_evidence": [
+      "467|sister_of|465",
+      "467|sister_of|2673",
+      "163|sister_of|467"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1795",
+    "question": "Who is 1167's sister?",
+    "q_entity": [
+      "1167"
+    ],
+    "prediction": [
+      "1165",
+      "1168",
+      "1160",
+      "1169"
+    ],
+    "ground_truth": [
+      "1165",
+      "1171",
+      "1168",
+      "1162",
+      "1170",
+      "1169",
+      "1160"
+    ],
+    "ground_truth_entities": [
+      "1165",
+      "1171",
+      "1168",
+      "1162",
+      "1170",
+      "1169",
+      "1160"
+    ],
+    "input": "Who is 1167's sister?",
+    "final_message": "The sisters of entity 1167 are entities 1165, 1168, 1160, and 1169.",
+    "supporting_evidence": [
+      "1167|sister_of|1165",
+      "1167|sister_of|1168",
+      "1167|sister_of|1160",
+      "1169|sister_of|1167",
+      "1165|sister_of|1167"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1823",
+    "question": "Who is the niece of 1287?",
+    "q_entity": [
+      "1287"
+    ],
+    "prediction": [
+      "2234",
+      "1275",
+      "1273",
+      "1267",
+      "1271"
+    ],
+    "ground_truth": [
+      "1288",
+      "1749",
+      "1286",
+      "1289",
+      "1284",
+      "1283",
+      "1274"
+    ],
+    "ground_truth_entities": [
+      "1288",
+      "1749",
+      "1286",
+      "1289",
+      "1284",
+      "1283",
+      "1274"
+    ],
+    "input": "Who is the niece of 1287?",
+    "final_message": "The nieces of entity 1287 are identified as follows:\n\n1. Entity 2234\n2. Entity 1275\n3. Entity 1273\n4. Entity 1267\n5. Entity 1271\n\nThese entities are all connected to 1287 through the relation \"niece_of.\"",
+    "supporting_evidence": [
+      "2234|niece_of|1287",
+      "1275|niece_of|1287",
+      "1273|niece_of|1287",
+      "1267|niece_of|1287",
+      "1271|niece_of|1287"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1828",
+    "question": "Who is 993's niece?",
+    "q_entity": [
+      "993"
+    ],
+    "prediction": [
+      "999",
+      "1000",
+      "1006",
+      "1025",
+      "1342",
+      "774",
+      "1007"
+    ],
+    "ground_truth": [
+      "992",
+      "994",
+      "996",
+      "1007"
+    ],
+    "ground_truth_entities": [
+      "992",
+      "994",
+      "996",
+      "1007"
+    ],
+    "input": "Who is 993's niece?",
+    "final_message": "The niece of entity 993 includes the following entities: \n\n- 999\n- 1000\n- 1006\n- 1025\n- 1342\n- 774\n- 1007\n\nThese entities are connected to 993 through the relation \"niece_of\".",
+    "supporting_evidence": [
+      "999|niece_of|993",
+      "1000|niece_of|993",
+      "1006|niece_of|993",
+      "993|brother_of|994",
+      "994|niece_of|1025",
+      "993|brother_of|994",
+      "994|niece_of|1342",
+      "993|brother_of|994",
+      "774|niece_of|994",
+      "993|brother_of|994",
+      "1007|niece_of|994",
+      "993|brother_of|994",
+      "1006|niece_of|994"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1838",
+    "question": "Who is 447's niece?",
+    "q_entity": [
+      "447"
+    ],
+    "prediction": [
+      "610",
+      "472",
+      "2529",
+      "472",
+      "2527",
+      "2528",
+      "1672",
+      "123"
+    ],
+    "ground_truth": [
+      "449",
+      "2526"
+    ],
+    "ground_truth_entities": [
+      "449",
+      "2526"
+    ],
+    "input": "Who is 447's niece?",
+    "final_message": "The nieces of entity 447 are identified as follows:\n\n1. Entity 610\n2. Entity 472\n3. Entity 2529\n4. Entity 2527\n5. Entity 2528\n6. Entity 1672\n7. Entity 123\n\nThese entities are connected to 447 through the relation \"niece_of\".",
+    "supporting_evidence": [
+      "610|niece_of|447",
+      "472|niece_of|447",
+      "2529|niece_of|447",
+      "447|brother_of|448",
+      "472|niece_of|448",
+      "447|brother_of|448",
+      "2527|niece_of|448",
+      "447|brother_of|448",
+      "2528|niece_of|448",
+      "447|brother_of|448",
+      "1672|niece_of|448",
+      "447|brother_of|1059",
+      "1059|niece_of|123"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1863",
+    "question": "Who is 2079's niece?",
+    "q_entity": [
+      "2079"
+    ],
+    "prediction": [
+      "2087",
+      "1334",
+      "1333"
+    ],
+    "ground_truth": [
+      "1333",
+      "1465",
+      "2086"
+    ],
+    "ground_truth_entities": [
+      "1333",
+      "1465",
+      "2086"
+    ],
+    "input": "Who is 2079's niece?",
+    "final_message": "2079's niece is identified as entities 2087, 1334, and 1333.",
+    "supporting_evidence": [
+      "2087|niece_of|2079",
+      "2079|aunt_of|2087",
+      "2087|niece_of|1334",
+      "2079|aunt_of|2087",
+      "2087|niece_of|1333"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1871",
+    "question": "Who is 94 the niece of?",
+    "q_entity": [
+      "94"
+    ],
+    "prediction": [
+      "493",
+      "2666",
+      "353",
+      "1355",
+      "156",
+      "1357",
+      "154",
+      "1358",
+      "164",
+      "151",
+      "149",
+      "150",
+      "152",
+      "492"
+    ],
+    "ground_truth": [
+      "2666",
+      "493",
+      "353",
+      "357"
+    ],
+    "ground_truth_entities": [
+      "2666",
+      "493",
+      "353",
+      "357"
+    ],
+    "input": "Who is 94 the niece of?",
+    "final_message": "The entity \"94\" is a niece of the following entities: \n\n- 493\n- 2666\n- 353\n- 1355\n- 156\n- 1357\n- 154\n- 1358\n- 164\n- 151\n- 149\n- 150\n- 152\n- 492\n\nThese entities represent the individuals who are related to \"94\" as their niece.",
+    "supporting_evidence": [
+      "94|niece_of|493",
+      "94|niece_of|2666",
+      "94|niece_of|353",
+      "1355|niece_of|94",
+      "156|niece_of|94",
+      "94|aunt_of|156",
+      "94|aunt_of|1357",
+      "94|aunt_of|154",
+      "94|aunt_of|1358",
+      "94|aunt_of|164",
+      "94|sister_of|151",
+      "94|sister_of|149",
+      "94|sister_of|150",
+      "94|sister_of|152",
+      "151|brother_of|94",
+      "149|brother_of|94",
+      "492|brother_of|94",
+      "152|brother_of|94"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1877",
+    "question": "Who is 555's niece?",
+    "q_entity": [
+      "555"
+    ],
+    "prediction": [
+      "571"
+    ],
+    "ground_truth": [
+      "572",
+      "571"
+    ],
+    "ground_truth_entities": [
+      "572",
+      "571"
+    ],
+    "input": "Who is 555's niece?",
+    "final_message": "555's niece is identified as entity 571.",
+    "supporting_evidence": [
+      "555|niece_of|571"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1899",
+    "question": "Who is 728's niece?",
+    "q_entity": [
+      "728"
+    ],
+    "prediction": [
+      "2861"
+    ],
+    "ground_truth": [
+      "733",
+      "896",
+      "2913",
+      "590",
+      "727",
+      "529",
+      "732",
+      "729",
+      "749"
+    ],
+    "ground_truth_entities": [
+      "733",
+      "896",
+      "2913",
+      "590",
+      "727",
+      "529",
+      "732",
+      "729",
+      "749"
+    ],
+    "input": "Who is 728's niece?",
+    "final_message": "728's niece is 2861.",
+    "supporting_evidence": [
+      "728|niece_of|2861"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1904",
+    "question": "Who is 1255 the niece of?",
+    "q_entity": [
+      "1255"
+    ],
+    "prediction": [
+      "1334"
+    ],
+    "ground_truth": [
+      "1333",
+      "1465"
+    ],
+    "ground_truth_entities": [
+      "1333",
+      "1465"
+    ],
+    "input": "Who is 1255 the niece of?",
+    "final_message": "The entity 1255 is the niece of entity 1334.",
+    "supporting_evidence": [
+      "1255|daughter_of|1334",
+      "1334|brother_of|2079",
+      "1255|daughter_of|1334",
+      "1334|brother_of|1465",
+      "1255|daughter_of|1334",
+      "1334|brother_of|1333",
+      "1255|daughter_of|1334",
+      "1335|brother_of|1334",
+      "1255|daughter_of|1334",
+      "1595|mother_of|1334",
+      "1255|daughter_of|1334",
+      "1334|uncle_of|2088",
+      "1255|daughter_of|1334",
+      "1334|uncle_of|2085",
+      "1255|daughter_of|1334",
+      "1334|uncle_of|1466",
+      "1255|daughter_of|1334",
+      "1334|uncle_of|1488",
+      "1255|daughter_of|1334",
+      "1334|uncle_of|1489"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1905",
+    "question": "Who is 1200's niece?",
+    "q_entity": [
+      "1200"
+    ],
+    "prediction": [
+      "638",
+      "1155",
+      "1159",
+      "1157",
+      "690",
+      "1201",
+      "1198",
+      "1197",
+      "1194",
+      "1195"
+    ],
+    "ground_truth": [
+      "1201",
+      "1196",
+      "1195",
+      "1199",
+      "1198",
+      "1119"
+    ],
+    "ground_truth_entities": [
+      "1201",
+      "1196",
+      "1195",
+      "1199",
+      "1198",
+      "1119"
+    ],
+    "input": "Who is 1200's niece?",
+    "final_message": "The niece of 1200 includes the following entities: \n\n- 638\n- 1155\n- 1159\n- 1157\n- 690\n- 1201\n- 1198\n- 1197\n- 1194\n- 1195\n\nThese entities represent the individuals who are identified as nieces of 1200 based on the explored relationships.",
+    "supporting_evidence": [
+      "1200|niece_of|638",
+      "1200|niece_of|1155",
+      "1200|niece_of|1159",
+      "1200|niece_of|1157",
+      "690|niece_of|1200",
+      "1200|aunt_of|690",
+      "690|niece_of|1201",
+      "1200|aunt_of|1441",
+      "1441|niece_of|1198",
+      "1200|aunt_of|1441",
+      "1441|niece_of|1197",
+      "1200|aunt_of|1440",
+      "1440|niece_of|1194",
+      "1200|aunt_of|1440",
+      "1440|niece_of|1195"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1908",
+    "question": "Who is 2829 the niece of?",
+    "q_entity": [
+      "2829"
+    ],
+    "prediction": [
+      "1123",
+      "601",
+      "1124",
+      "452",
+      "2832",
+      "958",
+      "1129",
+      "599",
+      "454",
+      "968"
+    ],
+    "ground_truth": [
+      "1664",
+      "606",
+      "1665",
+      "1667"
+    ],
+    "ground_truth_entities": [
+      "1664",
+      "606",
+      "1665",
+      "1667"
+    ],
+    "input": "Who is 2829 the niece of?",
+    "final_message": "The entity 2829 is the niece of several individuals. Based on the reasoning paths explored, here are the entities that are identified as aunts or related through familial connections:\n\n1. 1123\n2. 601\n3. 1124\n4. 452\n5. 2832\n6. 958\n7. 1129\n8. 599\n9. 454\n10. 968\n\nThese entities represent the aunts or relatives connected to 2829 through various familial relationships.",
+    "supporting_evidence": [
+      "2829|aunt_of|1123",
+      "2829|aunt_of|601",
+      "2829|aunt_of|1124",
+      "2829|aunt_of|452",
+      "2829|aunt_of|2832",
+      "958|niece_of|2829",
+      "2829|aunt_of|1124",
+      "601|brother_of|1124",
+      "1129|niece_of|601",
+      "2829|aunt_of|452",
+      "452|brother_of|959",
+      "959|niece_of|599",
+      "2829|aunt_of|452",
+      "452|brother_of|959",
+      "454|niece_of|959",
+      "2829|aunt_of|452",
+      "452|brother_of|959",
+      "968|niece_of|959",
+      "2829|aunt_of|452",
+      "452|brother_of|958",
+      "958|niece_of|599"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1910",
+    "question": "Who is 1392's niece?",
+    "q_entity": [
+      "1392"
+    ],
+    "prediction": [
+      "1766",
+      "1395"
+    ],
+    "ground_truth": [
+      "1398"
+    ],
+    "ground_truth_entities": [
+      "1398"
+    ],
+    "input": "Who is 1392's niece?",
+    "final_message": "The niece of 1392 is identified as two individuals: 1766 and 1395.",
+    "supporting_evidence": [
+      "1392|niece_of|1766",
+      "1513|brother_of|1392",
+      "1395|niece_of|1513",
+      "1514|brother_of|1392",
+      "1395|niece_of|1514"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1913",
+    "question": "Who is the niece of 2856?",
+    "q_entity": [
+      "2856"
+    ],
+    "prediction": [
+      "694",
+      "702",
+      "695",
+      "696",
+      "699",
+      "701"
+    ],
+    "ground_truth": [
+      "708",
+      "710",
+      "712",
+      "1625",
+      "2857",
+      "714",
+      "2858",
+      "711",
+      "699"
+    ],
+    "ground_truth_entities": [
+      "708",
+      "710",
+      "712",
+      "1625",
+      "2857",
+      "714",
+      "2858",
+      "711",
+      "699"
+    ],
+    "input": "Who is the niece of 2856?",
+    "final_message": "The nieces of entity 2856 are identified as follows:\n\n- Entity 694\n- Entity 702\n- Entity 695\n- Entity 696\n- Entity 699 (through a brother)\n- Entity 701 (through a brother)\n\nThese entities are connected to 2856 as nieces either directly or through a brother.",
+    "supporting_evidence": [
+      "694|niece_of|2856",
+      "702|niece_of|2856",
+      "695|niece_of|2856",
+      "696|niece_of|2856",
+      "1625|brother_of|2856",
+      "699|niece_of|1625",
+      "1625|brother_of|2856",
+      "695|niece_of|1625",
+      "1625|brother_of|2856",
+      "701|niece_of|1625"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1920",
+    "question": "Who is 1006's niece?",
+    "q_entity": [
+      "1006"
+    ],
+    "prediction": [
+      "994",
+      "993",
+      "995",
+      "1003",
+      "1005",
+      "1007",
+      "1004",
+      "1001"
+    ],
+    "ground_truth": [
+      "1005",
+      "1000",
+      "1003",
+      "1001",
+      "830"
+    ],
+    "ground_truth_entities": [
+      "1005",
+      "1000",
+      "1003",
+      "1001",
+      "830"
+    ],
+    "input": "Who is 1006's niece?",
+    "final_message": "The nieces of entity 1006 are:\n\n- 994\n- 993\n- 995\n- 1003\n- 1005\n- 1007\n- 1004\n- 1001\n\nThese entities are connected to 1006 through the relation \"niece_of\" and \"aunt_of -> niece_of\".",
+    "supporting_evidence": [
+      "1006|niece_of|994",
+      "1006|niece_of|993",
+      "1006|niece_of|995",
+      "1006|aunt_of|829",
+      "829|niece_of|1003",
+      "1006|aunt_of|829",
+      "829|niece_of|1005",
+      "1006|aunt_of|829",
+      "829|niece_of|1007",
+      "1006|aunt_of|829",
+      "829|niece_of|1004",
+      "1006|aunt_of|829",
+      "829|niece_of|1001"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1923",
+    "question": "Who is the niece of 1155?",
+    "q_entity": [
+      "1155"
+    ],
+    "prediction": [
+      "1198",
+      "1200"
+    ],
+    "ground_truth": [
+      "1159",
+      "1154",
+      "1156",
+      "1196"
+    ],
+    "ground_truth_entities": [
+      "1159",
+      "1154",
+      "1156",
+      "1196"
+    ],
+    "input": "Who is the niece of 1155?",
+    "final_message": "The nieces of entity 1155 are entities 1198 and 1200.",
+    "supporting_evidence": [
+      "1198|niece_of|1155",
+      "1200|niece_of|1155"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1925",
+    "question": "Who is the niece of 559?",
+    "q_entity": [
+      "559"
+    ],
+    "prediction": [
+      "572"
+    ],
+    "ground_truth": [
+      "557",
+      "562",
+      "558",
+      "560",
+      "563",
+      "2654"
+    ],
+    "ground_truth_entities": [
+      "557",
+      "562",
+      "558",
+      "560",
+      "563",
+      "2654"
+    ],
+    "input": "Who is the niece of 559?",
+    "final_message": "The niece of entity 559 is entity 572.",
+    "supporting_evidence": [
+      "559|niece_of|572"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1930",
+    "question": "Who is 744's niece?",
+    "q_entity": [
+      "744"
+    ],
+    "prediction": [
+      "529",
+      "590",
+      "2913",
+      "720",
+      "714"
+    ],
+    "ground_truth": [
+      "747",
+      "749",
+      "743",
+      "713"
+    ],
+    "ground_truth_entities": [
+      "747",
+      "749",
+      "743",
+      "713"
+    ],
+    "input": "Who is 744's niece?",
+    "final_message": "The nieces of entity 744 are identified by the following IDs: 529, 590, 2913, 720, and 714.",
+    "supporting_evidence": [
+      "744|niece_of|529",
+      "744|niece_of|590",
+      "744|niece_of|2913",
+      "720|niece_of|744",
+      "714|niece_of|744"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1940",
+    "question": "Who is the niece of 1267?",
+    "q_entity": [
+      "1267"
+    ],
+    "prediction": [
+      "1287",
+      "1286",
+      "1289",
+      "1239",
+      "1233",
+      "1240",
+      "1238",
+      "1269"
+    ],
+    "ground_truth": [
+      "1272",
+      "1263",
+      "1266",
+      "2464",
+      "1276",
+      "1270",
+      "1274",
+      "1271",
+      "2465",
+      "1273",
+      "1268",
+      "1743",
+      "1258"
+    ],
+    "ground_truth_entities": [
+      "1272",
+      "1263",
+      "1266",
+      "2464",
+      "1276",
+      "1270",
+      "1274",
+      "1271",
+      "2465",
+      "1273",
+      "1268",
+      "1743",
+      "1258"
+    ],
+    "input": "Who is the niece of 1267?",
+    "final_message": "The nieces of entity 1267 are:\n\n- 1287\n- 1286\n- 1289\n- 1239\n- 1233\n- 1240\n- 1238\n- 1269\n\nThese entities are connected to 1267 through the relation \"niece_of\" and also through the relation \"aunt_of\" leading to their respective nieces.",
+    "supporting_evidence": [
+      "1267|niece_of|1287",
+      "1267|niece_of|1286",
+      "1267|niece_of|1289",
+      "1267|aunt_of|1256",
+      "1239|niece_of|1256",
+      "1267|aunt_of|1256",
+      "1233|niece_of|1256",
+      "1267|aunt_of|1256",
+      "1240|niece_of|1256",
+      "1267|aunt_of|1256",
+      "1238|niece_of|1256",
+      "1267|aunt_of|1257",
+      "1257|niece_of|1269"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1956",
+    "question": "Who is 225 the son of?",
+    "q_entity": [
+      "225"
+    ],
+    "prediction": [
+      "604",
+      "345",
+      "227"
+    ],
+    "ground_truth": [
+      "345",
+      "346"
+    ],
+    "ground_truth_entities": [
+      "345",
+      "346"
+    ],
+    "input": "Who is 225 the son of?",
+    "final_message": "The entity 225 is the son of the following entities: 604, 345, and 227.",
+    "supporting_evidence": [
+      "225|father_of|604",
+      "225|son_of|345",
+      "227|son_of|225",
+      "604|son_of|225"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1966",
+    "question": "Who is 1309 the son of?",
+    "q_entity": [
+      "1309"
+    ],
+    "prediction": [
+      "1312",
+      "1301",
+      "1324",
+      "1311"
+    ],
+    "ground_truth": [
+      "1312",
+      "1313"
+    ],
+    "ground_truth_entities": [
+      "1312",
+      "1313"
+    ],
+    "input": "Who is 1309 the son of?",
+    "final_message": "The entity 1309 is the son of the following entities: 1312, 1301, 1324, and 1311.",
+    "supporting_evidence": [
+      "1309|son_of|1312",
+      "1301|son_of|1309",
+      "1309|father_of|1301",
+      "1309|father_of|1324",
+      "1309|father_of|1311",
+      "1312|father_of|1309"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1970",
+    "question": "Who is 717 the son of?",
+    "q_entity": [
+      "717"
+    ],
+    "prediction": [
+      "706",
+      "715"
+    ],
+    "ground_truth": [
+      "715",
+      "706"
+    ],
+    "ground_truth_entities": [
+      "715",
+      "706"
+    ],
+    "input": "Who is 717 the son of?",
+    "final_message": "The entity 717 is the son of 715 and also has a father, who is 706.",
+    "supporting_evidence": [
+      "706|father_of|717",
+      "717|son_of|715"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "1973",
+    "question": "Who is 1289 the son of?",
+    "q_entity": [
+      "1289"
+    ],
+    "prediction": [
+      "1281",
+      "1282"
+    ],
+    "ground_truth": [
+      "1282",
+      "1281"
+    ],
+    "ground_truth_entities": [
+      "1282",
+      "1281"
+    ],
+    "input": "Who is 1289 the son of?",
+    "final_message": "The entity 1289 is the son of two entities: 1281 and 1282.",
+    "supporting_evidence": [
+      "1281|father_of|1289",
+      "1289|son_of|1282"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2003",
+    "question": "Who is 203's brother?",
+    "q_entity": [
+      "203"
+    ],
+    "prediction": [
+      "214",
+      "217",
+      "218",
+      "210",
+      "202"
+    ],
+    "ground_truth": [
+      "202",
+      "214",
+      "132",
+      "210",
+      "141",
+      "133",
+      "217",
+      "212",
+      "218",
+      "216"
+    ],
+    "ground_truth_entities": [
+      "202",
+      "214",
+      "132",
+      "210",
+      "141",
+      "133",
+      "217",
+      "212",
+      "218",
+      "216"
+    ],
+    "input": "Who is 203's brother?",
+    "final_message": "The brothers of entity 203 are 214, 217, 218, 210, and 202.",
+    "supporting_evidence": [
+      "203|brother_of|214",
+      "203|brother_of|217",
+      "203|brother_of|218",
+      "203|brother_of|210",
+      "203|brother_of|202"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2022",
+    "question": "Who is 334's brother?",
+    "q_entity": [
+      "334"
+    ],
+    "prediction": [
+      "340",
+      "336",
+      "337"
+    ],
+    "ground_truth": [
+      "340",
+      "336",
+      "130",
+      "333",
+      "339"
+    ],
+    "ground_truth_entities": [
+      "340",
+      "336",
+      "130",
+      "333",
+      "339"
+    ],
+    "input": "Who is 334's brother?",
+    "final_message": "334 has three brothers: 340, 336, and 337.",
+    "supporting_evidence": [
+      "334|brother_of|340",
+      "334|brother_of|336",
+      "336|brother_of|334",
+      "337|brother_of|334"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2023",
+    "question": "Who is 708's brother?",
+    "q_entity": [
+      "708"
+    ],
+    "prediction": [
+      "711",
+      "712",
+      "710"
+    ],
+    "ground_truth": [
+      "711",
+      "710",
+      "693"
+    ],
+    "ground_truth_entities": [
+      "711",
+      "710",
+      "693"
+    ],
+    "input": "Who is 708's brother?",
+    "final_message": "The brothers of entity 708 are 711, 712, and 710.",
+    "supporting_evidence": [
+      "708|brother_of|711",
+      "712|brother_of|708",
+      "710|brother_of|708"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2024",
+    "question": "Who is 984's brother?",
+    "q_entity": [
+      "984"
+    ],
+    "prediction": [
+      "996",
+      "997"
+    ],
+    "ground_truth": [
+      "996",
+      "997",
+      "992",
+      "993",
+      "994",
+      "995"
+    ],
+    "ground_truth_entities": [
+      "996",
+      "997",
+      "992",
+      "993",
+      "994",
+      "995"
+    ],
+    "input": "Who is 984's brother?",
+    "final_message": "The brothers of entity 984 are 996 and 997.",
+    "supporting_evidence": [
+      "984|brother_of|996",
+      "984|brother_of|997"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2027",
+    "question": "Who is 591's brother?",
+    "q_entity": [
+      "591"
+    ],
+    "prediction": [
+      "430",
+      "432"
+    ],
+    "ground_truth": [
+      "430",
+      "431",
+      "432",
+      "2643"
+    ],
+    "ground_truth_entities": [
+      "430",
+      "431",
+      "432",
+      "2643"
+    ],
+    "input": "Who is 591's brother?",
+    "final_message": "591 has two brothers: 430 and 432.",
+    "supporting_evidence": [
+      "591|brother_of|430",
+      "432|brother_of|591"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2036",
+    "question": "Who is 203's brother?",
+    "q_entity": [
+      "203"
+    ],
+    "prediction": [
+      "214",
+      "217",
+      "218",
+      "210",
+      "202"
+    ],
+    "ground_truth": [
+      "202",
+      "214",
+      "132",
+      "210",
+      "141",
+      "133",
+      "217",
+      "212",
+      "218",
+      "216"
+    ],
+    "ground_truth_entities": [
+      "202",
+      "214",
+      "132",
+      "210",
+      "141",
+      "133",
+      "217",
+      "212",
+      "218",
+      "216"
+    ],
+    "input": "Who is 203's brother?",
+    "final_message": "The brothers of entity 203 are identified as entities 214, 217, 218, 210, and 202.",
+    "supporting_evidence": [
+      "203|brother_of|214",
+      "203|brother_of|217",
+      "203|brother_of|218",
+      "203|brother_of|210",
+      "203|brother_of|202"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2046",
+    "question": "Who is 286's brother?",
+    "q_entity": [
+      "286"
+    ],
+    "prediction": [
+      "1276",
+      "1265",
+      "1275",
+      "1264",
+      "1274"
+    ],
+    "ground_truth": [
+      "1274",
+      "1264",
+      "1266",
+      "1276",
+      "1271",
+      "1275",
+      "1265",
+      "1270",
+      "1267",
+      "1273"
+    ],
+    "ground_truth_entities": [
+      "1274",
+      "1264",
+      "1266",
+      "1276",
+      "1271",
+      "1275",
+      "1265",
+      "1270",
+      "1267",
+      "1273"
+    ],
+    "input": "Who is 286's brother?",
+    "final_message": "The brothers of entity 286 are 1276, 1265, 1275, 1264, and 1274.",
+    "supporting_evidence": [
+      "286|brother_of|1276",
+      "286|brother_of|1265",
+      "286|brother_of|1275",
+      "286|brother_of|1264",
+      "286|brother_of|1274"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2053",
+    "question": "Who is 698's brother?",
+    "q_entity": [
+      "698"
+    ],
+    "prediction": [
+      "702",
+      "699",
+      "695",
+      "700",
+      "705"
+    ],
+    "ground_truth": [
+      "702",
+      "700",
+      "701",
+      "695",
+      "694",
+      "699",
+      "705",
+      "704"
+    ],
+    "ground_truth_entities": [
+      "702",
+      "700",
+      "701",
+      "695",
+      "694",
+      "699",
+      "705",
+      "704"
+    ],
+    "input": "Who is 698's brother?",
+    "final_message": "The entity 698 has several brothers: 702, 699, 695, 700, and 705.",
+    "supporting_evidence": [
+      "698|brother_of|702",
+      "698|brother_of|699",
+      "698|brother_of|695",
+      "698|brother_of|700",
+      "698|brother_of|705"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2059",
+    "question": "Who is 1290's brother?",
+    "q_entity": [
+      "1290"
+    ],
+    "prediction": [
+      "1287",
+      "1285",
+      "1289",
+      "1286",
+      "1288"
+    ],
+    "ground_truth": [
+      "1286",
+      "1284",
+      "1261",
+      "1285",
+      "1287",
+      "1289",
+      "1288"
+    ],
+    "ground_truth_entities": [
+      "1286",
+      "1284",
+      "1261",
+      "1285",
+      "1287",
+      "1289",
+      "1288"
+    ],
+    "input": "Who is 1290's brother?",
+    "final_message": "The brothers of 1290 are 1287, 1285, 1289, 1286, and 1288.",
+    "supporting_evidence": [
+      "1290|brother_of|1287",
+      "1290|brother_of|1285",
+      "1290|brother_of|1289",
+      "1290|brother_of|1286",
+      "1290|brother_of|1288",
+      "1290|brother_of|1287",
+      "1287|brother_of|1284",
+      "1290|brother_of|1287",
+      "1287|brother_of|1288",
+      "1290|brother_of|1287",
+      "1287|brother_of|1261",
+      "1290|brother_of|1287",
+      "1285|brother_of|1287",
+      "1290|brother_of|1287",
+      "1289|brother_of|1287"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2080",
+    "question": "Who is 984's brother?",
+    "q_entity": [
+      "984"
+    ],
+    "prediction": [
+      "996",
+      "997"
+    ],
+    "ground_truth": [
+      "996",
+      "997",
+      "992",
+      "993",
+      "994",
+      "995"
+    ],
+    "ground_truth_entities": [
+      "996",
+      "997",
+      "992",
+      "993",
+      "994",
+      "995"
+    ],
+    "input": "Who is 984's brother?",
+    "final_message": "The brothers of entity 984 are entities 996 and 997.",
+    "supporting_evidence": [
+      "984|brother_of|996",
+      "984|brother_of|997"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2096",
+    "question": "Who is 655's brother?",
+    "q_entity": [
+      "655"
+    ],
+    "prediction": [
+      "1691",
+      "1692"
+    ],
+    "ground_truth": [
+      "1691",
+      "1690",
+      "1692"
+    ],
+    "ground_truth_entities": [
+      "1691",
+      "1690",
+      "1692"
+    ],
+    "input": "Who is 655's brother?",
+    "final_message": "The brothers of entity 655 are 1691 and 1692.",
+    "supporting_evidence": [
+      "655|brother_of|1692",
+      "655|brother_of|1691",
+      "1691|brother_of|655",
+      "655|brother_of|1692",
+      "1690|brother_of|1692",
+      "655|brother_of|1692",
+      "1689|brother_of|1692",
+      "655|brother_of|1692",
+      "1691|brother_of|1692",
+      "655|brother_of|1691",
+      "1691|brother_of|1689",
+      "655|brother_of|1691",
+      "1691|brother_of|1692"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2102",
+    "question": "Who is 2464's brother?",
+    "q_entity": [
+      "2464"
+    ],
+    "prediction": [
+      "127",
+      "1739",
+      "1743"
+    ],
+    "ground_truth": [
+      "2465",
+      "1743"
+    ],
+    "ground_truth_entities": [
+      "2465",
+      "1743"
+    ],
+    "input": "Who is 2464's brother?",
+    "final_message": "2464 has a sister with the ID 127, and two brothers with the IDs 1739 and 1743.",
+    "supporting_evidence": [
+      "127|sister_of|2464",
+      "1903|father_of|2464",
+      "1903|son_of|1739",
+      "1903|father_of|2464",
+      "1743|son_of|1903"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2107",
+    "question": "Who is 100's brother?",
+    "q_entity": [
+      "100"
+    ],
+    "prediction": [
+      "224",
+      "486",
+      "25",
+      "487"
+    ],
+    "ground_truth": [
+      "25",
+      "487",
+      "224"
+    ],
+    "ground_truth_entities": [
+      "25",
+      "487",
+      "224"
+    ],
+    "input": "Who is 100's brother?",
+    "final_message": "100 has several brothers, specifically identified as entities 224, 486, 25, and 487.",
+    "supporting_evidence": [
+      "100|brother_of|224",
+      "486|brother_of|100",
+      "100|brother_of|224",
+      "486|brother_of|224",
+      "100|brother_of|224",
+      "25|brother_of|224",
+      "486|brother_of|100",
+      "486|brother_of|224",
+      "486|brother_of|100",
+      "486|brother_of|25",
+      "486|brother_of|100",
+      "487|brother_of|486"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2108",
+    "question": "Who is 100's brother?",
+    "q_entity": [
+      "100"
+    ],
+    "prediction": [
+      "224",
+      "486",
+      "25",
+      "487"
+    ],
+    "ground_truth": [
+      "25",
+      "487",
+      "224"
+    ],
+    "ground_truth_entities": [
+      "25",
+      "487",
+      "224"
+    ],
+    "input": "Who is 100's brother?",
+    "final_message": "100 has several brothers, specifically identified as entities 224, 486, 25, and 487.",
+    "supporting_evidence": [
+      "100|brother_of|224",
+      "486|brother_of|100",
+      "100|brother_of|224",
+      "486|brother_of|224",
+      "100|brother_of|224",
+      "25|brother_of|224",
+      "486|brother_of|100",
+      "486|brother_of|224",
+      "486|brother_of|100",
+      "486|brother_of|25",
+      "486|brother_of|100",
+      "487|brother_of|486"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2113",
+    "question": "Who is 139's brother?",
+    "q_entity": [
+      "139"
+    ],
+    "prediction": [
+      "138"
+    ],
+    "ground_truth": [
+      "138",
+      "205",
+      "2974",
+      "2973"
+    ],
+    "ground_truth_entities": [
+      "138",
+      "205",
+      "2974",
+      "2973"
+    ],
+    "input": "Who is 139's brother?",
+    "final_message": "139's brother is 138.",
+    "supporting_evidence": [
+      "139|brother_of|138"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2120",
+    "question": "Who is 227's brother?",
+    "q_entity": [
+      "227"
+    ],
+    "prediction": [
+      "254",
+      "41"
+    ],
+    "ground_truth": [
+      "41",
+      "254",
+      "604"
+    ],
+    "ground_truth_entities": [
+      "41",
+      "254",
+      "604"
+    ],
+    "input": "Who is 227's brother?",
+    "final_message": "227 has two brothers: 254 and 41.",
+    "supporting_evidence": [
+      "227|brother_of|254",
+      "227|brother_of|41",
+      "227|brother_of|254",
+      "254|sister_of|12",
+      "227|brother_of|254",
+      "254|sister_of|604",
+      "227|brother_of|254",
+      "254|sister_of|41",
+      "227|brother_of|254",
+      "255|daughter_of|254",
+      "227|brother_of|254",
+      "254|mother_of|258"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2130",
+    "question": "Who is 2822's brother?",
+    "q_entity": [
+      "2822"
+    ],
+    "prediction": [
+      "2823"
+    ],
+    "ground_truth": [
+      "2823",
+      "2821"
+    ],
+    "ground_truth_entities": [
+      "2823",
+      "2821"
+    ],
+    "input": "Who is 2822's brother?",
+    "final_message": "2822's brother is 2823.",
+    "supporting_evidence": [
+      "2822|brother_of|2823",
+      "2823|brother_of|2822"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2135",
+    "question": "Who is 875's brother?",
+    "q_entity": [
+      "875"
+    ],
+    "prediction": [
+      "475"
+    ],
+    "ground_truth": [
+      "475",
+      "874"
+    ],
+    "ground_truth_entities": [
+      "475",
+      "874"
+    ],
+    "input": "Who is 875's brother?",
+    "final_message": "875's brother is 475.",
+    "supporting_evidence": [
+      "875|brother_of|475",
+      "475|brother_of|875"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2163",
+    "question": "Who is 130's brother?",
+    "q_entity": [
+      "130"
+    ],
+    "prediction": [
+      "337",
+      "336",
+      "340",
+      "339",
+      "338"
+    ],
+    "ground_truth": [
+      "340",
+      "336",
+      "337",
+      "333",
+      "339",
+      "338",
+      "335"
+    ],
+    "ground_truth_entities": [
+      "340",
+      "336",
+      "337",
+      "333",
+      "339",
+      "338",
+      "335"
+    ],
+    "input": "Who is 130's brother?",
+    "final_message": "The brothers of entity 130 are entities 337, 336, 340, 339, and 338.",
+    "supporting_evidence": [
+      "130|brother_of|337",
+      "130|brother_of|336",
+      "130|brother_of|340",
+      "130|brother_of|339",
+      "130|brother_of|338"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2168",
+    "question": "Who is 409's brother?",
+    "q_entity": [
+      "409"
+    ],
+    "prediction": [
+      "432",
+      "433",
+      "430",
+      "431",
+      "2642"
+    ],
+    "ground_truth": [
+      "2634"
+    ],
+    "ground_truth_entities": [
+      "2634"
+    ],
+    "input": "Who is 409's brother?",
+    "final_message": "The brothers of entity 409 are identified as entities 432, 433, 430, 431, and 2642.",
+    "supporting_evidence": [
+      "433|daughter_of|409",
+      "432|brother_of|433",
+      "433|daughter_of|409",
+      "2643|brother_of|433",
+      "433|daughter_of|409",
+      "430|brother_of|433",
+      "409|father_of|2643",
+      "2643|brother_of|433",
+      "409|father_of|2643",
+      "2643|brother_of|431",
+      "409|father_of|2643",
+      "2643|brother_of|430",
+      "409|father_of|2643",
+      "2643|brother_of|432",
+      "409|father_of|2643",
+      "2643|brother_of|2642"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2174",
+    "question": "Who is 40's brother?",
+    "q_entity": [
+      "40"
+    ],
+    "prediction": [
+      "151",
+      "149",
+      "492",
+      "150",
+      "152",
+      "491",
+      "94"
+    ],
+    "ground_truth": [
+      "492",
+      "150",
+      "149",
+      "151",
+      "94"
+    ],
+    "ground_truth_entities": [
+      "492",
+      "150",
+      "149",
+      "151",
+      "94"
+    ],
+    "input": "Who is 40's brother?",
+    "final_message": "The brothers of entity 40 are identified as follows: \n\n- 151\n- 149\n- 492\n- 150\n- 152\n- 491\n- 94\n\nThese entities are connected to 40 through the relation \"brother_of.\"",
+    "supporting_evidence": [
+      "40|brother_of|151",
+      "40|brother_of|149",
+      "40|brother_of|492",
+      "40|brother_of|150",
+      "40|brother_of|151",
+      "151|brother_of|152",
+      "40|brother_of|151",
+      "151|brother_of|491",
+      "40|brother_of|151",
+      "151|brother_of|492",
+      "40|brother_of|151",
+      "151|brother_of|94",
+      "40|brother_of|151",
+      "151|brother_of|150"
+    ],
+    "agent_status": "SUCCESS"
+  },
+  {
+    "id": "2183",
+    "question": "Who is 600 the father of?",
+    "q_entity": [
+      "600"
+    ],
+    "prediction": [
+      "1123",
+      "1124",
+      "1118",
+      "1134",
+      "1135"
+    ],
+    "ground_truth": [
+      "1133",
+      "1135",
+      "1123",
+      "1124"
+    ],
+    "ground_truth_entities": [
+      "1133",
+      "1135",
+      "1123",
+      "1124"
+    ],
+    "input": "Who is 600 the father of?",
+    "final_message": "Entity 600 is the father of the following entities:\n\n- 1123\n- 1124\n- 1118 (who is also a son of 600)\n- 1134 (daughter of 600)\n- 1135 (daughter of 600)",
+    "supporting_evidence": [
+      "600|father_of|1123",
+      "600|father_of|1124",
+      "1118|father_of|600",
+      "600|son_of|1118",
+      "1134|daughter_of|600",
+      "1135|daughter_of|600"
+    ],
+    "agent_status": "SUCCESS"
+  }
+]

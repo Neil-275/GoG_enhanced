@@ -1,7 +1,7 @@
 brink_dataset/
 data_for_LP/
 NBFNet_weight/
-results/
+# results/
 *.zip
 *.ipynb
 *.sample
@@ -14,3 +14,4 @@ test
 corrupt_queries/
 .vscode/
 /LOCAL_SCORING_PLAN.md
+one_shot_subgraph/results/

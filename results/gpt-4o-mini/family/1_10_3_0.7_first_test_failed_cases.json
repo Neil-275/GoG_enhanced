@@ -1,0 +1,4819 @@
+[
+    {
+        "index": 67,
+        "question": "Who is 504's husband?",
+        "prediction": [
+            "2156"
+        ],
+        "answers": [
+            "2157"
+        ],
+        "hard_answer": [
+            "2157"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 504 to find out who they are, and then determine who their husband is based on the relationships tied to them.  ",
+                "action": "Search[504]",
+                "triples": [
+                    "2157, wife_of, 504"
+                ],
+                "entity_names": [
+                    "504"
+                ],
+                "one_hop_relations": [
+                    "wife_of"
+                ],
+                "new_entities": [
+                    "504",
+                    "2157"
+                ],
+                "observation": "2157, wife_of, 504"
+            },
+            {
+                "i": 2,
+                "thought": "To determine who is married to entity 504, I see that there is a relationship indicating that 2157 is the wife of 504. Therefore, I need to find out who 504 is married to by looking for the husband entity related to the wife relationship. ",
+                "action": "Search[2157]",
+                "triples": [
+                    "2157, wife_of, 504"
+                ],
+                "entity_names": [
+                    "2157"
+                ],
+                "one_hop_relations": [
+                    "wife_of"
+                ],
+                "new_entities": [],
+                "observation": "2157, wife_of, 504"
+            },
+            {
+                "i": 3,
+                "thought": "The observations show that 2157 is identified as the wife of 504, but I need to find the corresponding husband entity for 504. Since the relationship indicates that 504 is the husband of 2157, I should look for that connection explicitly. However, I currently have no direct information linking 504 to a husband. Thus, I need to generate a link to find the husband of 504, as the relationship I have only points back to the wife.  ",
+                "action": "Generate[who is the husband of 504]",
+                "verified_candidates": [
+                    2156
+                ],
+                "generated_triples": "504, husband_of, 2156",
+                "observation": "504, husband_of, 2156"
+            },
+            {
+                "i": 4,
+                "thought": "The observations indicate that 504 is the husband of 2156. I now have the information needed to answer the question about who 504's husband is, which is 2156.  ",
+                "action": "Finish[2156]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 91,
+        "question": "Who is 1869's son?",
+        "prediction": [
+            "2453"
+        ],
+        "answers": [
+            "2476",
+            "2451"
+        ],
+        "hard_answer": [
+            "2451"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1869 to find information about its son and any relevant relationships.  ",
+                "action": "Search[1869]",
+                "triples": [
+                    "1510, daughter_of, 1869",
+                    "1869, father_of, 1510",
+                    "1869, father_of, 2451",
+                    "1869, son_of, 2453"
+                ],
+                "entity_names": [
+                    "1869"
+                ],
+                "one_hop_relations": [
+                    "son_of",
+                    "father_of",
+                    "daughter_of"
+                ],
+                "new_entities": [
+                    "1510",
+                    "2451",
+                    "2453",
+                    "1869"
+                ],
+                "observation": "1510, daughter_of, 1869\n1869, father_of, 1510\n1869, father_of, 2451\n1869, son_of, 2453"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the relationships I found, entity 1869 has two children (1510 and 2451) and one son (2453). Since the question specifically asks for the son of 1869, I need to identify entity 2453 as the correct answer. ",
+                "action": "Finish[2453]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 94,
+        "question": "Who is 1632 the son of?",
+        "prediction": [
+            "737"
+        ],
+        "answers": [
+            "1634"
+        ],
+        "hard_answer": [
+            "1634"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for the entity 1632 to find out what relation it has that could indicate its parent or family connections. This will help me identify who 1632 is the son of.  ",
+                "action": "Search[1632]",
+                "triples": [
+                    "1632, father_of, 737",
+                    "1634, father_of, 1632",
+                    "1635, mother_of, 1632",
+                    "737, son_of, 1632"
+                ],
+                "entity_names": [
+                    "1632"
+                ],
+                "one_hop_relations": [
+                    "father_of",
+                    "son_of",
+                    "mother_of"
+                ],
+                "new_entities": [
+                    "737",
+                    "1632",
+                    "1635",
+                    "1634"
+                ],
+                "observation": "1632, father_of, 737\n1634, father_of, 1632\n1635, mother_of, 1632\n737, son_of, 1632"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the relationships observed, 1632 has a father (737) and a mother (1635). The entity 737 is the father of 1632, and since there is also a mother, I need to consider both parents as possible answers. However, since the question specifically asks for \"who is 1632 the son of,\" I will focus on the father relationship first. ",
+                "action": "Finish[737]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 130,
+        "question": "Who is 84's nephew?",
+        "prediction": [
+            "461",
+            "80",
+            "81",
+            "50"
+        ],
+        "answers": [
+            "102",
+            "85",
+            "79",
+            "25",
+            "83",
+            "86",
+            "39"
+        ],
+        "hard_answer": [
+            "102"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 84 to find any relationships that indicate who their nephew is. Action 1: Search[84]",
+                "action": "Search[84]",
+                "triples": [
+                    "101, niece_of, 84",
+                    "238, niece_of, 84",
+                    "461, nephew_of, 84",
+                    "48, niece_of, 84",
+                    "50, nephew_of, 84",
+                    "6, uncle_of, 84",
+                    "80, nephew_of, 84",
+                    "81, nephew_of, 84",
+                    "84, niece_of, 497",
+                    "84, niece_of, 6",
+                    "9, uncle_of, 84"
+                ],
+                "entity_names": [
+                    "84"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "uncle_of",
+                    "niece_of"
+                ],
+                "new_entities": [
+                    "84",
+                    "9",
+                    "497",
+                    "461",
+                    "48",
+                    "81",
+                    "101",
+                    "50",
+                    "238",
+                    "6",
+                    "80"
+                ],
+                "observation": "101, niece_of, 84\n238, niece_of, 84\n461, nephew_of, 84\n48, niece_of, 84\n50, nephew_of, 84\n6, uncle_of, 84\n80, nephew_of, 84\n81, nephew_of, 84\n84, niece_of, 497\n84, niece_of, 6\n9, uncle_of, 84"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, there are several entities related to 84 as their uncle or aunt, and multiple entities are identified as nephews. Specifically, the following entities are identified as nephews of 84: 461, 50, 80, and 81. I need to finalize my answer with these entities.  ",
+                "action": "Finish[461 | 50 | 80 | 81]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 151,
+        "question": "Who is 708's nephew?",
+        "prediction": [
+            "697",
+            "700",
+            "698"
+        ],
+        "answers": [
+            "746",
+            "748",
+            "749",
+            "744",
+            "743"
+        ],
+        "hard_answer": [
+            "748"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 708 to uncover information about its relationships, specifically focusing on whether it has any family connections or a nephew. ",
+                "action": "Search[708]",
+                "triples": [
+                    "697, nephew_of, 708",
+                    "698, nephew_of, 708",
+                    "700, nephew_of, 708",
+                    "707, mother_of, 708",
+                    "708, nephew_of, 749",
+                    "709, sister_of, 708",
+                    "713, sister_of, 708"
+                ],
+                "entity_names": [
+                    "708"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "sister_of",
+                    "mother_of"
+                ],
+                "new_entities": [
+                    "749",
+                    "713",
+                    "700",
+                    "697",
+                    "698",
+                    "709",
+                    "707",
+                    "708"
+                ],
+                "observation": "697, nephew_of, 708\n698, nephew_of, 708\n700, nephew_of, 708\n707, mother_of, 708\n708, nephew_of, 749\n709, sister_of, 708\n713, sister_of, 708"
+            },
+            {
+                "i": 2,
+                "thought": "The observations show that 708 has multiple nephews: 697, 698, and 700, which directly answer the question about who is 708's nephew. There is no need for further searching or generating as the relationships are clearly established. ",
+                "action": "Finish[697 | 698 | 700]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 168,
+        "question": "Who is 336's nephew?",
+        "prediction": [
+            "212",
+            "133",
+            "1617"
+        ],
+        "answers": [
+            "334",
+            "339",
+            "337",
+            "335",
+            "333",
+            "340",
+            "203"
+        ],
+        "hard_answer": [
+            "203"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 336 to find out if there are any relations that indicate who their nephew is.  ",
+                "action": "Search[336]",
+                "triples": [
+                    "133, nephew_of, 336",
+                    "1617, nephew_of, 336",
+                    "212, nephew_of, 336",
+                    "324, aunt_of, 336",
+                    "325, aunt_of, 336",
+                    "326, aunt_of, 336",
+                    "329, uncle_of, 336",
+                    "330, aunt_of, 336",
+                    "336, nephew_of, 328",
+                    "336, nephew_of, 329",
+                    "336, uncle_of, 143",
+                    "336, uncle_of, 203",
+                    "336, uncle_of, 213",
+                    "336, uncle_of, 216"
+                ],
+                "entity_names": [
+                    "336"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "uncle_of",
+                    "aunt_of"
+                ],
+                "new_entities": [
+                    "213",
+                    "1617",
+                    "133",
+                    "326",
+                    "212",
+                    "328",
+                    "336",
+                    "203",
+                    "143",
+                    "329",
+                    "216",
+                    "324",
+                    "330",
+                    "325"
+                ],
+                "observation": "133, nephew_of, 336\n1617, nephew_of, 336\n212, nephew_of, 336\n324, aunt_of, 336\n325, aunt_of, 336\n326, aunt_of, 336\n329, uncle_of, 336\n330, aunt_of, 336\n336, nephew_of, 328\n336, nephew_of, 329\n336, uncle_of, 143\n336, uncle_of, 203\n336, uncle_of, 213\n336, uncle_of, 216"
+            },
+            {
+                "i": 2,
+                "thought": "There are several entities that are listed as the nephew of 336, namely 133, 1617, and 212. However, I also see that 336 is listed as a nephew to 328 and 329, indicating that these entities could also be considered as uncles or aunts related to 336. I need to focus on the entities that are specifically identified as nephews of 336 to finalize my answer. ",
+                "action": "Finish[133 | 1617 | 212]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 180,
+        "question": "Who is 895's nephew?",
+        "prediction": [
+            "921",
+            "925"
+        ],
+        "answers": [
+            "519",
+            "924",
+            "521",
+            "522",
+            "523"
+        ],
+        "hard_answer": [
+            "924"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 895 to find any relations that may indicate who their nephew is. This will help me understand the family connections associated with 895.  ",
+                "action": "Search[895]",
+                "triples": [
+                    "159, uncle_of, 895",
+                    "895, aunt_of, 534",
+                    "895, aunt_of, 535",
+                    "895, aunt_of, 899",
+                    "895, aunt_of, 924",
+                    "921, nephew_of, 895",
+                    "925, nephew_of, 895",
+                    "98, aunt_of, 895"
+                ],
+                "entity_names": [
+                    "895"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "uncle_of",
+                    "aunt_of"
+                ],
+                "new_entities": [
+                    "159",
+                    "924",
+                    "925",
+                    "534",
+                    "98",
+                    "921",
+                    "895",
+                    "535",
+                    "899"
+                ],
+                "observation": "159, uncle_of, 895\n895, aunt_of, 534\n895, aunt_of, 535\n895, aunt_of, 899\n895, aunt_of, 924\n921, nephew_of, 895\n925, nephew_of, 895\n98, aunt_of, 895"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the relationships observed, entity 921 and entity 925 are both labeled as nephews of 895. I can conclude that these entities are the answer to the question regarding who is 895's nephew.  ",
+                "action": "Finish[921 | 925]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 189,
+        "question": "Who is 324's nephew?",
+        "prediction": [
+            "336",
+            "301"
+        ],
+        "answers": [
+            "337",
+            "327",
+            "328",
+            "329",
+            "325"
+        ],
+        "hard_answer": [
+            "337"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 324 to find any relationships that indicate who their nephew might be. This could involve looking for family relationships or connections to siblings or parents. ",
+                "action": "Search[324]",
+                "triples": [
+                    "301, nephew_of, 324",
+                    "324, sister_of, 325",
+                    "324, sister_of, 326",
+                    "324, sister_of, 328",
+                    "324, sister_of, 329",
+                    "329, brother_of, 324",
+                    "336, nephew_of, 324"
+                ],
+                "entity_names": [
+                    "324"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "sister_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "301",
+                    "326",
+                    "328",
+                    "336",
+                    "329",
+                    "324",
+                    "325"
+                ],
+                "observation": "301, nephew_of, 324\n324, sister_of, 325\n324, sister_of, 326\n324, sister_of, 328\n324, sister_of, 329\n329, brother_of, 324\n336, nephew_of, 324"
+            },
+            {
+                "i": 2,
+                "thought": "Observation 1 indicates that 324 has several siblings (325, 326, 328, and 329) and also specifies that there are two individuals (301 and 336) identified as nephews of 324. Therefore, I need to identify the specific entities associated with these relationships to confirm their identities. ",
+                "action": "Finish[301 | 336]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 197,
+        "question": "Who is 831's nephew?",
+        "prediction": [
+            "843",
+            "845",
+            "850",
+            "835"
+        ],
+        "answers": [
+            "832",
+            "830",
+            "844",
+            "2100",
+            "2889",
+            "775",
+            "2888"
+        ],
+        "hard_answer": [
+            "844"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 831 to find any relationships that indicate who their nephew might be. This will help me understand the family connections involving 831.  ",
+                "action": "Search[831]",
+                "triples": [
+                    "1000, aunt_of, 831",
+                    "1004, aunt_of, 831",
+                    "1005, uncle_of, 831",
+                    "831, nephew_of, 1004",
+                    "831, uncle_of, 835",
+                    "831, uncle_of, 842",
+                    "831, uncle_of, 846",
+                    "831, uncle_of, 850",
+                    "835, nephew_of, 831",
+                    "843, nephew_of, 831",
+                    "845, nephew_of, 831",
+                    "850, nephew_of, 831",
+                    "999, aunt_of, 831"
+                ],
+                "entity_names": [
+                    "831"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "uncle_of",
+                    "aunt_of"
+                ],
+                "new_entities": [
+                    "846",
+                    "1000",
+                    "1004",
+                    "843",
+                    "1005",
+                    "845",
+                    "850",
+                    "999",
+                    "831",
+                    "842",
+                    "835"
+                ],
+                "observation": "1000, aunt_of, 831\n1004, aunt_of, 831\n1005, uncle_of, 831\n831, nephew_of, 1004\n831, uncle_of, 835\n831, uncle_of, 842\n831, uncle_of, 846\n831, uncle_of, 850\n835, nephew_of, 831\n843, nephew_of, 831\n845, nephew_of, 831\n850, nephew_of, 831\n999, aunt_of, 831"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 831 has several relationships indicating both aunts and uncles, as well as multiple nephews. Specifically, the triples indicate that 831 is the nephew of 1004 and is also an uncle to several entities. To answer the question about who is 831's nephew, I need to identify the entities that are directly linked as nephews to 831.  ",
+                "action": "Finish[835 | 843 | 845 | 850]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 207,
+        "question": "Who is 2083's aunt?",
+        "prediction": [
+            "1465"
+        ],
+        "answers": [
+            "2086",
+            "2079",
+            "2087",
+            "2085",
+            "1490",
+            "2088",
+            "2090"
+        ],
+        "hard_answer": [
+            "2079"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 2083 to find any relationships that can help identify who their aunt is. This will likely involve looking for family relationships connected to 2083.  ",
+                "action": "Search[2083]",
+                "triples": [
+                    "1334, uncle_of, 2083",
+                    "2083, nephew_of, 1333",
+                    "2083, nephew_of, 1334",
+                    "2083, nephew_of, 1465",
+                    "2086, sister_of, 2083",
+                    "2087, sister_of, 2083"
+                ],
+                "entity_names": [
+                    "2083"
+                ],
+                "one_hop_relations": [
+                    "uncle_of",
+                    "nephew_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "2083",
+                    "2086",
+                    "1333",
+                    "2087",
+                    "1334",
+                    "1465"
+                ],
+                "observation": "1334, uncle_of, 2083\n2083, nephew_of, 1333\n2083, nephew_of, 1334\n2083, nephew_of, 1465\n2086, sister_of, 2083\n2087, sister_of, 2083"
+            },
+            {
+                "i": 2,
+                "thought": "From the observations, it appears that 2083 has multiple relationships indicating they are a nephew to entities 1333, 1334, and 1465. Since an aunt is typically a sibling of one's parent, it can be inferred that the sisters of 2083 (entities 2086 and 2087) may have a connection to the broader family structure that could lead to identifying an aunt. However, I need to explore the parents of 2083 to establish if either of the sisters has children, which would confirm their connection as an aunt. ",
+                "action": "Search[1333 | 1334 | 1465]",
+                "triples": [
+                    "1329, father_of, 1334",
+                    "1333, brother_of, 1465",
+                    "1333, nephew_of, 1330",
+                    "1333, nephew_of, 1437",
+                    "1334, brother_of, 1465",
+                    "1465, aunt_of, 2089",
+                    "1465, aunt_of, 2090",
+                    "1465, sister_of, 1333",
+                    "1465, sister_of, 1334",
+                    "1488, nephew_of, 1333",
+                    "1490, nephew_of, 1333",
+                    "1595, mother_of, 1333",
+                    "1595, mother_of, 1334",
+                    "2079, sister_of, 1333",
+                    "2083, nephew_of, 1333",
+                    "2083, nephew_of, 1465"
+                ],
+                "entity_names": [
+                    "1333",
+                    "1334",
+                    "1465"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "nephew_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "1488",
+                    "1595",
+                    "2079",
+                    "1329",
+                    "2090",
+                    "1330",
+                    "2089",
+                    "1490",
+                    "1437"
+                ],
+                "observation": "1329, father_of, 1334\n1333, brother_of, 1465\n1333, nephew_of, 1330\n1333, nephew_of, 1437\n1334, brother_of, 1465\n1465, aunt_of, 2089\n1465, aunt_of, 2090\n1465, sister_of, 1333\n1465, sister_of, 1334\n1488, nephew_of, 1333\n1490, nephew_of, 1333\n1595, mother_of, 1333\n1595, mother_of, 1334\n2079, sister_of, 1333\n2083, nephew_of, 1333\n2083, nephew_of, 1465"
+            },
+            {
+                "i": 3,
+                "thought": "The relationship data indicates that entities 1333 and 1465 are siblings of each other and also related to 2083 as a nephew. This means that one of them might be a parent of 2083, which would imply that their respective sisters could be aunts of 2083. However, I need to further explore the family connections of 1333 and 1465 to identify specific aunts. I should also check the sisters of the parent entities to determine their relationships to 2083. ",
+                "action": "Search[1333 | 1465]",
+                "triples": [
+                    "1333, uncle_of, 1255",
+                    "1333, uncle_of, 1466",
+                    "1333, uncle_of, 1488",
+                    "1333, uncle_of, 2088",
+                    "1333, uncle_of, 2089",
+                    "1465, aunt_of, 2089",
+                    "1465, aunt_of, 2090",
+                    "1465, mother_of, 1466",
+                    "1465, mother_of, 1488",
+                    "1465, mother_of, 1489",
+                    "1465, sister_of, 1333",
+                    "1465, sister_of, 1333",
+                    "1465, sister_of, 1334",
+                    "1465, sister_of, 1335",
+                    "1465, sister_of, 2079",
+                    "1595, mother_of, 1333",
+                    "2079, sister_of, 1333",
+                    "2079, sister_of, 1465"
+                ],
+                "entity_names": [
+                    "1333",
+                    "1465"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "sister_of",
+                    "mother_of"
+                ],
+                "new_entities": [
+                    "1335",
+                    "2088",
+                    "1255",
+                    "1489",
+                    "1466"
+                ],
+                "observation": "1333, uncle_of, 1255\n1333, uncle_of, 1466\n1333, uncle_of, 1488\n1333, uncle_of, 2088\n1333, uncle_of, 2089\n1465, aunt_of, 2089\n1465, aunt_of, 2090\n1465, mother_of, 1466\n1465, mother_of, 1488\n1465, mother_of, 1489\n1465, sister_of, 1333\n1465, sister_of, 1333\n1465, sister_of, 1334\n1465, sister_of, 1335\n1465, sister_of, 2079\n1595, mother_of, 1333\n2079, sister_of, 1333\n2079, sister_of, 1465"
+            },
+            {
+                "i": 4,
+                "thought": "The relationships indicate that 1465 is an aunt to entities 2089 and 2090. Since 2083 is a nephew to 1465, this suggests that 1465 is indeed an aunt of 2083. I need to confirm if there are any additional aunts identified in the relationships explored. However, based on the evidence gathered so far, 1465 is the clear candidate for 2083's aunt. ",
+                "action": "Finish[1465]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 209,
+        "question": "Who is 1042's aunt?",
+        "prediction": [
+            "1050",
+            "1047"
+        ],
+        "answers": [
+            "2706",
+            "1040",
+            "1039",
+            "1035",
+            "1044",
+            "1041",
+            "2712",
+            "1043"
+        ],
+        "hard_answer": [
+            "1035"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1042 to find information about their familial relationships, specifically focusing on identifying their aunt.  ",
+                "action": "Search[1042]",
+                "triples": [
+                    "1030, father_of, 1042",
+                    "1039, sister_of, 1042",
+                    "1042, aunt_of, 1047",
+                    "1042, aunt_of, 1050",
+                    "1042, sister_of, 1039",
+                    "1042, sister_of, 1040",
+                    "1042, sister_of, 1041",
+                    "1043, sister_of, 1042"
+                ],
+                "entity_names": [
+                    "1042"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "sister_of",
+                    "father_of"
+                ],
+                "new_entities": [
+                    "1040",
+                    "1047",
+                    "1030",
+                    "1050",
+                    "1041",
+                    "1039",
+                    "1042",
+                    "1043"
+                ],
+                "observation": "1030, father_of, 1042\n1039, sister_of, 1042\n1042, aunt_of, 1047\n1042, aunt_of, 1050\n1042, sister_of, 1039\n1042, sister_of, 1040\n1042, sister_of, 1041\n1043, sister_of, 1042"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 1042 has multiple aunts, specifically 1047 and 1050. I need to finalize the answer by listing both aunts.  ",
+                "action": "Finish[1047 | 1050]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 232,
+        "question": "Who is 1630's aunt?",
+        "prediction": [
+            "2861"
+        ],
+        "answers": [
+            "729",
+            "730",
+            "727",
+            "732",
+            "728",
+            "2862"
+        ],
+        "hard_answer": [
+            "2862"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to find out the relationships associated with entity 1630 to determine who their aunt is. This requires searching for the family relations of 1630.  ",
+                "action": "Search[1630]",
+                "triples": [
+                    "1627, father_of, 1630",
+                    "1630, father_of, 1625",
+                    "1630, father_of, 2857",
+                    "1630, father_of, 2858",
+                    "1630, nephew_of, 2860",
+                    "1630, nephew_of, 2861",
+                    "1630, nephew_of, 2862",
+                    "1630, nephew_of, 726",
+                    "2861, aunt_of, 1630"
+                ],
+                "entity_names": [
+                    "1630"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "nephew_of",
+                    "father_of"
+                ],
+                "new_entities": [
+                    "2858",
+                    "2860",
+                    "726",
+                    "2857",
+                    "1630",
+                    "1625",
+                    "1627",
+                    "2862",
+                    "2861"
+                ],
+                "observation": "1627, father_of, 1630\n1630, father_of, 1625\n1630, father_of, 2857\n1630, father_of, 2858\n1630, nephew_of, 2860\n1630, nephew_of, 2861\n1630, nephew_of, 2862\n1630, nephew_of, 726\n2861, aunt_of, 1630"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, I see that 2861 is directly identified as the aunt of 1630. Therefore, I can conclude that 2861 is the answer to the question.  ",
+                "action": "Finish[2861]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 275,
+        "question": "Who is 744's aunt?",
+        "prediction": [
+            "709",
+            "712",
+            "2128",
+            "708",
+            "719"
+        ],
+        "answers": [
+            "748",
+            "751",
+            "747",
+            "749",
+            "2915",
+            "706",
+            "2913",
+            "742",
+            "743",
+            "745"
+        ],
+        "hard_answer": [
+            "2913"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 744 to find out more information about it, including any relationships that may indicate who its aunt is.  ",
+                "action": "Search[744]",
+                "triples": [
+                    "744, aunt_of, 2128",
+                    "744, aunt_of, 708",
+                    "744, aunt_of, 709",
+                    "744, aunt_of, 712",
+                    "744, aunt_of, 719",
+                    "744, mother_of, 757",
+                    "744, sister_of, 706",
+                    "744, sister_of, 745",
+                    "744, sister_of, 747",
+                    "744, sister_of, 748",
+                    "744, sister_of, 749"
+                ],
+                "entity_names": [
+                    "744"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "sister_of",
+                    "mother_of"
+                ],
+                "new_entities": [
+                    "749",
+                    "712",
+                    "2128",
+                    "744",
+                    "719",
+                    "747",
+                    "757",
+                    "709",
+                    "745",
+                    "748",
+                    "706",
+                    "708"
+                ],
+                "observation": "744, aunt_of, 2128\n744, aunt_of, 708\n744, aunt_of, 709\n744, aunt_of, 712\n744, aunt_of, 719\n744, mother_of, 757\n744, sister_of, 706\n744, sister_of, 745\n744, sister_of, 747\n744, sister_of, 748\n744, sister_of, 749"
+            },
+            {
+                "i": 2,
+                "thought": "The observations indicate that entity 744 has multiple aunts: 2128, 708, 709, 712, and 719. Since these relationships are explicitly stated, I can directly conclude which entities are aunts of 744 without needing further exploration. ",
+                "action": "Finish[2128 | 708 | 709 | 712 | 719]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 290,
+        "question": "Who is 713's aunt?",
+        "prediction": [
+            "747"
+        ],
+        "answers": [
+            "694",
+            "698",
+            "703",
+            "700",
+            "704"
+        ],
+        "hard_answer": [
+            "703"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 713 to find information regarding its family relations, specifically to identify its aunt. ",
+                "action": "Search[713]",
+                "triples": [
+                    "709, sister_of, 713",
+                    "710, brother_of, 713",
+                    "713, sister_of, 693",
+                    "713, sister_of, 709",
+                    "713, sister_of, 711",
+                    "713, sister_of, 712",
+                    "747, aunt_of, 713"
+                ],
+                "entity_names": [
+                    "713"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "sister_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "712",
+                    "713",
+                    "709",
+                    "711",
+                    "693",
+                    "747",
+                    "710"
+                ],
+                "observation": "709, sister_of, 713\n710, brother_of, 713\n713, sister_of, 693\n713, sister_of, 709\n713, sister_of, 711\n713, sister_of, 712\n747, aunt_of, 713"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 747 is indicated as the aunt of 713, which directly answers my query. I can finalize my findings now. ",
+                "action": "Finish[747]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 324,
+        "question": "Who is 102's aunt?",
+        "prediction": [
+            "79",
+            "39"
+        ],
+        "answers": [
+            "29",
+            "238",
+            "28",
+            "27",
+            "26",
+            "224",
+            "101"
+        ],
+        "hard_answer": [
+            "224"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 102 to find out who their aunt is by examining the relationships connected to 102.  ",
+                "action": "Search[102]",
+                "triples": [
+                    "102, nephew_of, 25",
+                    "102, nephew_of, 39",
+                    "102, nephew_of, 79",
+                    "102, nephew_of, 83",
+                    "39, aunt_of, 102",
+                    "463, niece_of, 102",
+                    "501, niece_of, 102",
+                    "79, aunt_of, 102"
+                ],
+                "entity_names": [
+                    "102"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "niece_of",
+                    "nephew_of"
+                ],
+                "new_entities": [
+                    "463",
+                    "39",
+                    "79",
+                    "102",
+                    "83",
+                    "25",
+                    "501"
+                ],
+                "observation": "102, nephew_of, 25\n102, nephew_of, 39\n102, nephew_of, 79\n102, nephew_of, 83\n39, aunt_of, 102\n463, niece_of, 102\n501, niece_of, 102\n79, aunt_of, 102"
+            },
+            {
+                "i": 2,
+                "thought": "I can see that entity 102 has multiple aunts based on the relationships found: 39 and 79 are both identified as aunts of 102. I need to ensure I capture the correct identifiers for these aunts. ",
+                "action": "Finish[39 | 79]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 388,
+        "question": "Who is 338's daughter?",
+        "prediction": [
+            "337",
+            "335",
+            "333",
+            "336",
+            "130"
+        ],
+        "answers": [
+            "332",
+            "323"
+        ],
+        "hard_answer": [
+            "332"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 338 to find out if there are any relationships indicating who their daughter is.  ",
+                "action": "Search[338]",
+                "triples": [],
+                "entity_names": [
+                    "338"
+                ],
+                "one_hop_relations": [
+                    ""
+                ],
+                "new_entities": [],
+                "observation": "  No triples found."
+            },
+            {
+                "i": 2,
+                "thought": "Since there are no explicit triples found for entity 338, I need to explore related entities or properties that might lead to discovering information about 338's daughter. Given the absence of direct data, I should consider generating predictions based on the lack of information.  ",
+                "action": "Generate[who is 338's daughter]",
+                "verified_candidates": [
+                    332
+                ],
+                "generated_triples": "338, daughter_of, 332",
+                "observation": "338, daughter_of, 332"
+            },
+            {
+                "i": 3,
+                "thought": "I found that entity 338 has a relationship indicating it is the daughter of entity 332. Now, I need to find out who entity 332 is to determine if they have a daughter or if there are any other relevant relationships.  ",
+                "action": "Search[332]",
+                "triples": [
+                    "332, daughter_of, 2143",
+                    "332, mother_of, 130",
+                    "332, mother_of, 334",
+                    "332, mother_of, 335",
+                    "332, mother_of, 336",
+                    "332, mother_of, 337",
+                    "333, daughter_of, 332",
+                    "334, son_of, 332",
+                    "335, daughter_of, 332",
+                    "337, son_of, 332"
+                ],
+                "entity_names": [
+                    "332"
+                ],
+                "one_hop_relations": [
+                    "daughter_of",
+                    "son_of",
+                    "mother_of"
+                ],
+                "new_entities": [
+                    "335",
+                    "130",
+                    "332",
+                    "336",
+                    "333",
+                    "334",
+                    "2143",
+                    "337"
+                ],
+                "observation": "332, daughter_of, 2143\n332, mother_of, 130\n332, mother_of, 334\n332, mother_of, 335\n332, mother_of, 336\n332, mother_of, 337\n333, daughter_of, 332\n334, son_of, 332\n335, daughter_of, 332\n337, son_of, 332"
+            },
+            {
+                "i": 4,
+                "thought": "Entity 332 has multiple relationships indicating it has several children, specifically 130, 334, 335, 336, and 337, as well as another daughter 333. Given that entity 338 is identified as a daughter of 332, I need to determine if any of these children have a direct relationship to 338 to clarify the question fully. However, since the query is specifically about 338's daughter and I already established 338's parentage, I should check for any daughters among the children of 332.  ",
+                "action": "Finish[335 | 130 | 336 | 337 | 333]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 525,
+        "question": "Who is 535's uncle?",
+        "prediction": [
+            "519",
+            "522",
+            "588"
+        ],
+        "answers": [
+            "545",
+            "541",
+            "924",
+            "923",
+            "922",
+            "526",
+            "921",
+            "521",
+            "534",
+            "542",
+            "925"
+        ],
+        "hard_answer": [
+            "521"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 535 to find out if there are any direct relations indicating who their uncle is. Action 1: Search[535]",
+                "action": "Search[535]",
+                "triples": [
+                    "519, uncle_of, 535",
+                    "522, uncle_of, 535",
+                    "524, aunt_of, 535",
+                    "535, aunt_of, 935",
+                    "535, aunt_of, 937",
+                    "588, uncle_of, 535",
+                    "895, aunt_of, 535",
+                    "929, nephew_of, 535",
+                    "937, nephew_of, 535",
+                    "939, nephew_of, 535"
+                ],
+                "entity_names": [
+                    "535"
+                ],
+                "one_hop_relations": [
+                    "uncle_of",
+                    "nephew_of",
+                    "aunt_of"
+                ],
+                "new_entities": [
+                    "929",
+                    "524",
+                    "588",
+                    "937",
+                    "522",
+                    "895",
+                    "535",
+                    "519",
+                    "939",
+                    "935"
+                ],
+                "observation": "519, uncle_of, 535\n522, uncle_of, 535\n524, aunt_of, 535\n535, aunt_of, 935\n535, aunt_of, 937\n588, uncle_of, 535\n895, aunt_of, 535\n929, nephew_of, 535\n937, nephew_of, 535\n939, nephew_of, 535"
+            },
+            {
+                "i": 2,
+                "thought": "I have found multiple entities that are uncles to 535: 519, 522, and 588. Now I need to conclude the task and present the final answer comprising all uncles identified.  ",
+                "action": "Finish[519 | 522 | 588]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 537,
+        "question": "Who is 36's uncle?",
+        "prediction": [
+            "52",
+            "107",
+            "53",
+            "88"
+        ],
+        "answers": [
+            "13",
+            "34",
+            "31",
+            "32",
+            "952",
+            "450",
+            "125"
+        ],
+        "hard_answer": [
+            "13"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 36 to find out who its uncle is, which may involve examining familial relationships associated with this entity.  ",
+                "action": "Search[36]",
+                "triples": [
+                    "279, uncle_of, 36",
+                    "32, brother_of, 36",
+                    "35, brother_of, 36",
+                    "36, brother_of, 31",
+                    "36, brother_of, 34",
+                    "36, brother_of, 35",
+                    "36, nephew_of, 15",
+                    "36, nephew_of, 279",
+                    "36, nephew_of, 280",
+                    "36, uncle_of, 107",
+                    "36, uncle_of, 52",
+                    "36, uncle_of, 53",
+                    "36, uncle_of, 88",
+                    "87, nephew_of, 36",
+                    "88, nephew_of, 36"
+                ],
+                "entity_names": [
+                    "36"
+                ],
+                "one_hop_relations": [
+                    "uncle_of",
+                    "nephew_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "34",
+                    "107",
+                    "53",
+                    "31",
+                    "15",
+                    "88",
+                    "35",
+                    "280",
+                    "32",
+                    "36",
+                    "52",
+                    "87",
+                    "279"
+                ],
+                "observation": "279, uncle_of, 36\n32, brother_of, 36\n35, brother_of, 36\n36, brother_of, 31\n36, brother_of, 34\n36, brother_of, 35\n36, nephew_of, 15\n36, nephew_of, 279\n36, nephew_of, 280\n36, uncle_of, 107\n36, uncle_of, 52\n36, uncle_of, 53\n36, uncle_of, 88\n87, nephew_of, 36\n88, nephew_of, 36"
+            },
+            {
+                "i": 2,
+                "thought": "The search revealed that 36 has several uncles, specifically 107, 52, 53, and 88. Since I am looking for who 36's uncle is, I can directly conclude the answer based on the retrieved information. ",
+                "action": "Finish[107 | 52 | 53 | 88]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 663,
+        "question": "Who is 2829 the niece of?",
+        "prediction": [
+            "458"
+        ],
+        "answers": [
+            "1664",
+            "1665",
+            "1667",
+            "606"
+        ],
+        "hard_answer": [
+            "1664"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to determine the relationships associated with entity 2829 in order to find out who they are the niece of. I will start by searching for entity 2829 to gather information about its relationships.  ",
+                "action": "Search[2829]",
+                "triples": [
+                    "2770, uncle_of, 2829",
+                    "2771, uncle_of, 2829",
+                    "2829, aunt_of, 1123",
+                    "2829, aunt_of, 1124",
+                    "2829, aunt_of, 2832",
+                    "2829, aunt_of, 452",
+                    "2829, aunt_of, 601",
+                    "456, uncle_of, 2829",
+                    "606, uncle_of, 2829",
+                    "71, uncle_of, 2829",
+                    "958, niece_of, 2829"
+                ],
+                "entity_names": [
+                    "2829"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "aunt_of",
+                    "uncle_of"
+                ],
+                "new_entities": [
+                    "1124",
+                    "452",
+                    "606",
+                    "2832",
+                    "2771",
+                    "456",
+                    "71",
+                    "2829",
+                    "2770",
+                    "601",
+                    "958",
+                    "1123"
+                ],
+                "observation": "2770, uncle_of, 2829\n2771, uncle_of, 2829\n2829, aunt_of, 1123\n2829, aunt_of, 1124\n2829, aunt_of, 2832\n2829, aunt_of, 452\n2829, aunt_of, 601\n456, uncle_of, 2829\n606, uncle_of, 2829\n71, uncle_of, 2829\n958, niece_of, 2829"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 2829 has several relationships indicating it is both an aunt and a niece, which suggests it is connected to other entities through familial ties. Specifically, I see multiple entities listed as uncles of 2829 and one entity, 958, listed as a niece of 2829. To determine who 2829 is the niece of, I should explore the uncles' relationships further, as they are likely siblings of 2829's parents. Thus, I will now search for the relationships associated with one of the uncles, as they may provide insight into 2829's parents. ",
+                "action": "Search[2770]",
+                "triples": [
+                    "1027, uncle_of, 2770",
+                    "2770, brother_of, 2771",
+                    "2770, uncle_of, 2738",
+                    "2770, uncle_of, 2829",
+                    "2770, uncle_of, 451",
+                    "599, niece_of, 2770"
+                ],
+                "entity_names": [
+                    "2770"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "uncle_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "2738",
+                    "451",
+                    "599",
+                    "1027"
+                ],
+                "observation": "1027, uncle_of, 2770\n2770, brother_of, 2771\n2770, uncle_of, 2738\n2770, uncle_of, 2829\n2770, uncle_of, 451\n599, niece_of, 2770"
+            },
+            {
+                "i": 3,
+                "thought": "The observations show that 2770 has relationships indicating it is an uncle to multiple entities, including 2829. However, there is no direct information about 2770's parents or siblings, which could clarify 2829's familial connections further. Since 2770 has a brother (2771) and one of them must be a parent of 2829, I will now explore the relationships of the other uncle, 2771, to see if any further connections can be established regarding 2829\u2019s family.  ",
+                "action": "Search[2771]",
+                "triples": [
+                    "1027, uncle_of, 2771",
+                    "1408, nephew_of, 2771",
+                    "2738, nephew_of, 2771",
+                    "2770, brother_of, 2771",
+                    "2771, brother_of, 597",
+                    "2771, nephew_of, 1027",
+                    "2771, nephew_of, 580",
+                    "2771, uncle_of, 1408",
+                    "2771, uncle_of, 2774",
+                    "2771, uncle_of, 2777",
+                    "2771, uncle_of, 2829",
+                    "446, nephew_of, 2771",
+                    "456, brother_of, 2771",
+                    "597, brother_of, 2771"
+                ],
+                "entity_names": [
+                    "2771"
+                ],
+                "one_hop_relations": [
+                    "brother_of",
+                    "uncle_of",
+                    "nephew_of"
+                ],
+                "new_entities": [
+                    "2774",
+                    "446",
+                    "597",
+                    "1408",
+                    "2777",
+                    "580"
+                ],
+                "observation": "1027, uncle_of, 2771\n1408, nephew_of, 2771\n2738, nephew_of, 2771\n2770, brother_of, 2771\n2771, brother_of, 597\n2771, nephew_of, 1027\n2771, nephew_of, 580\n2771, uncle_of, 1408\n2771, uncle_of, 2774\n2771, uncle_of, 2777\n2771, uncle_of, 2829\n446, nephew_of, 2771\n456, brother_of, 2771\n597, brother_of, 2771"
+            },
+            {
+                "i": 4,
+                "thought": "Entity 2771 also has a complex relationship structure, primarily indicating it is an uncle to several entities, including 2829. However, there is still no clear indication of who the parents of 2829 are, which is essential for determining who 2829 is a niece to. Since both 2770 and 2771 are uncles to 2829, they likely have a sibling who is a parent of 2829. I will now search for the relationships of 1027, as it has appeared in both uncle connections and may be a potential parent or provide relevant information about the family structure.  ",
+                "action": "Search[1027]",
+                "triples": [
+                    "1027, father_of, 605",
+                    "1027, uncle_of, 2770",
+                    "1027, uncle_of, 2771",
+                    "1027, uncle_of, 456",
+                    "1613, father_of, 1027",
+                    "458, brother_of, 1027"
+                ],
+                "entity_names": [
+                    "1027"
+                ],
+                "one_hop_relations": [
+                    "father_of",
+                    "uncle_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "605",
+                    "1613",
+                    "458"
+                ],
+                "observation": "1027, father_of, 605\n1027, uncle_of, 2770\n1027, uncle_of, 2771\n1027, uncle_of, 456\n1613, father_of, 1027\n458, brother_of, 1027"
+            },
+            {
+                "i": 5,
+                "thought": "The observations indicate that entity 1027 is the father of 605 and also an uncle to entities 2770, 2771, and 456. Since 2770 and 2771 are uncles to 2829, it implies that one of them must be a sibling of 1027, suggesting that the parent of 2829 might be a sibling of 1027. However, without additional information about the siblings or the parent of 2829, I need to explore further. Since 1027 has a father (1613), I will search for the relationships of this entity to see if there is any direct connection that clarifies the familial structure further.  ",
+                "action": "Search[1613]",
+                "triples": [
+                    "1613, father_of, 1027",
+                    "1613, father_of, 458",
+                    "1613, son_of, 1615",
+                    "1613, son_of, 1616",
+                    "1614, wife_of, 1613",
+                    "458, son_of, 1613"
+                ],
+                "entity_names": [
+                    "1613"
+                ],
+                "one_hop_relations": [
+                    "father_of",
+                    "son_of",
+                    "wife_of"
+                ],
+                "new_entities": [
+                    "1615",
+                    "1616",
+                    "1614"
+                ],
+                "observation": "1613, father_of, 1027\n1613, father_of, 458\n1613, son_of, 1615\n1613, son_of, 1616\n1614, wife_of, 1613\n458, son_of, 1613"
+            },
+            {
+                "i": 6,
+                "thought": "The observations indicate that entity 1613 is the father of 1027 and 458, and there is no direct information about the sibling relationships that would clarify who the parent of 2829 is. However, since both 2770 and 2771 are uncles to 2829, it is likely that one of them is a sibling of 1027, making 1027 a potential grandparent figure rather than a direct parent. I need to explore if there are any other connections or relationships related to 1027 or its siblings that could further clarify who 2829 is a niece of. I will check for more relationships associated with 458, as it is also a child of 1613, which might give insight into the family tree.  ",
+                "action": "Search[458]",
+                "triples": [
+                    "1613, father_of, 458",
+                    "458, brother_of, 1027",
+                    "458, father_of, 597",
+                    "605, niece_of, 458"
+                ],
+                "entity_names": [
+                    "458"
+                ],
+                "one_hop_relations": [
+                    "father_of",
+                    "brother_of",
+                    "niece_of"
+                ],
+                "new_entities": [],
+                "observation": "1613, father_of, 458\n458, brother_of, 1027\n458, father_of, 597\n605, niece_of, 458"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 714,
+        "question": "Who is 571's niece?",
+        "prediction": [
+            "1170",
+            "1163",
+            "1169",
+            "1164"
+        ],
+        "answers": [
+            "561",
+            "572"
+        ],
+        "hard_answer": [
+            "561"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search 571 to find out who is related to them, specifically looking for information about their niece.  ",
+                "action": "Search[571]",
+                "triples": [
+                    "555, niece_of, 571",
+                    "571, niece_of, 1163",
+                    "571, niece_of, 1164",
+                    "571, niece_of, 1169",
+                    "571, niece_of, 1170"
+                ],
+                "entity_names": [
+                    "571"
+                ],
+                "one_hop_relations": [
+                    "niece_of"
+                ],
+                "new_entities": [
+                    "1164",
+                    "1170",
+                    "555",
+                    "1163",
+                    "1169",
+                    "571"
+                ],
+                "observation": "555, niece_of, 571\n571, niece_of, 1163\n571, niece_of, 1164\n571, niece_of, 1169\n571, niece_of, 1170"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, 1163, 1164, 1169, and 1170 are all identified as nieces of 571. I can conclude that these are the individuals I need to list as the answer to the question.  ",
+                "action": "Finish[1163 | 1164 | 1169 | 1170]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 730,
+        "question": "Who is 1286's niece?",
+        "prediction": [
+            "1267",
+            "1264",
+            "1273"
+        ],
+        "answers": [
+            "1274",
+            "1288",
+            "1287",
+            "1283",
+            "1749",
+            "1284",
+            "1289"
+        ],
+        "hard_answer": [
+            "1274"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1286 to find out more about its relationships and determine if there is any information regarding its niece. Action 1: Search[1286]",
+                "action": "Search[1286]",
+                "triples": [
+                    "1261, brother_of, 1286",
+                    "1264, niece_of, 1286",
+                    "1267, niece_of, 1286",
+                    "1273, niece_of, 1286",
+                    "1284, sister_of, 1286",
+                    "1285, brother_of, 1286",
+                    "1286, brother_of, 1288",
+                    "1286, brother_of, 1289",
+                    "1288, sister_of, 1286",
+                    "1289, brother_of, 1286"
+                ],
+                "entity_names": [
+                    "1286"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "sister_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "1289",
+                    "1273",
+                    "1267",
+                    "1264",
+                    "1285",
+                    "1288",
+                    "1261",
+                    "1284",
+                    "1286"
+                ],
+                "observation": "1261, brother_of, 1286\n1264, niece_of, 1286\n1267, niece_of, 1286\n1273, niece_of, 1286\n1284, sister_of, 1286\n1285, brother_of, 1286\n1286, brother_of, 1288\n1286, brother_of, 1289\n1288, sister_of, 1286\n1289, brother_of, 1286"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 1286 has three distinct individuals listed as its nieces: 1264, 1267, and 1273. Since this relationship is explicitly provided in the observations, I can conclude that these entities are the answer to the question. ",
+                "action": "Finish[1264 | 1267 | 1273]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 755,
+        "question": "Who is 1263's niece?",
+        "prediction": [
+            "1288",
+            "1283",
+            "1290",
+            "1284",
+            "1289"
+        ],
+        "answers": [
+            "1271",
+            "1274",
+            "1268",
+            "1272",
+            "1267",
+            "1743",
+            "2465",
+            "1258",
+            "1276",
+            "1266",
+            "1270",
+            "2464",
+            "1273"
+        ],
+        "hard_answer": [
+            "1258"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for the entity 1263 to find information about their familial relationships, specifically to identify their niece.  ",
+                "action": "Search[1263]",
+                "triples": [
+                    "1263, niece_of, 1283",
+                    "1263, niece_of, 1284",
+                    "1263, niece_of, 1288",
+                    "1263, niece_of, 1289",
+                    "1263, niece_of, 1290"
+                ],
+                "entity_names": [
+                    "1263"
+                ],
+                "one_hop_relations": [
+                    "niece_of"
+                ],
+                "new_entities": [
+                    "1289",
+                    "1263",
+                    "1288",
+                    "1290",
+                    "1284",
+                    "1283"
+                ],
+                "observation": "1263, niece_of, 1283\n1263, niece_of, 1284\n1263, niece_of, 1288\n1263, niece_of, 1289\n1263, niece_of, 1290"
+            },
+            {
+                "i": 2,
+                "thought": "I have found multiple entities (1283, 1284, 1288, 1289, 1290) that are identified as nieces of 1263. Since these entities are directly related to 1263 through the \"niece_of\" relationship, I can conclude that they are indeed the nieces I am looking for.  ",
+                "action": "Finish[1283 | 1284 | 1288 | 1289 | 1290]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 756,
+        "question": "Who is 1268's niece?",
+        "prediction": [
+            "1288",
+            "1289",
+            "1283"
+        ],
+        "answers": [
+            "1271",
+            "1274",
+            "1272",
+            "1267",
+            "1743",
+            "2465",
+            "1263",
+            "1258",
+            "1276",
+            "1266",
+            "1270",
+            "2464",
+            "1273"
+        ],
+        "hard_answer": [
+            "1258"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1268 to uncover any relationships that might indicate who their niece is. This will help me determine the family connections related to 1268.  ",
+                "action": "Search[1268]",
+                "triples": [
+                    "1257, niece_of, 1268",
+                    "1268, aunt_of, 1229",
+                    "1268, niece_of, 1283",
+                    "1268, niece_of, 1288",
+                    "1268, niece_of, 1289",
+                    "1268, sister_of, 1265",
+                    "1268, sister_of, 1266",
+                    "1268, sister_of, 1269",
+                    "1272, sister_of, 1268",
+                    "1273, sister_of, 1268",
+                    "1283, aunt_of, 1268",
+                    "1284, aunt_of, 1268"
+                ],
+                "entity_names": [
+                    "1268"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "sister_of",
+                    "aunt_of"
+                ],
+                "new_entities": [
+                    "1266",
+                    "1289",
+                    "1272",
+                    "1273",
+                    "1268",
+                    "1229",
+                    "1269",
+                    "1257",
+                    "1288",
+                    "1284",
+                    "1283",
+                    "1265"
+                ],
+                "observation": "1257, niece_of, 1268\n1268, aunt_of, 1229\n1268, niece_of, 1283\n1268, niece_of, 1288\n1268, niece_of, 1289\n1268, sister_of, 1265\n1268, sister_of, 1266\n1268, sister_of, 1269\n1272, sister_of, 1268\n1273, sister_of, 1268\n1283, aunt_of, 1268\n1284, aunt_of, 1268"
+            },
+            {
+                "i": 2,
+                "thought": "The search revealed that 1268 has multiple nieces: 1283, 1288, and 1289. Therefore, these are the entities that represent 1268's nieces. I can conclude the task now that I have the necessary information.  ",
+                "action": "Finish[1283 | 1288 | 1289]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 865,
+        "question": "Who is 1869's brother?",
+        "prediction": [
+            "2473"
+        ],
+        "answers": [
+            "2470",
+            "2471",
+            "2472",
+            "2474"
+        ],
+        "hard_answer": [
+            "2471"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1869 to find out if there is any information regarding its brother or any related familial relationships. ",
+                "action": "Search[1869]",
+                "triples": [
+                    "1869, father_of, 1510",
+                    "1869, father_of, 2451",
+                    "1869, son_of, 2453",
+                    "2473, brother_of, 1869"
+                ],
+                "entity_names": [
+                    "1869"
+                ],
+                "one_hop_relations": [
+                    "brother_of",
+                    "father_of",
+                    "son_of"
+                ],
+                "new_entities": [
+                    "2451",
+                    "2453",
+                    "1510",
+                    "1869",
+                    "2473"
+                ],
+                "observation": "1869, father_of, 1510\n1869, father_of, 2451\n1869, son_of, 2453\n2473, brother_of, 1869"
+            },
+            {
+                "i": 2,
+                "thought": "The observation reveals that 1869 has a direct relationship with 2473, identified as its brother. Therefore, I can conclude that 2473 is the brother of 1869. There's no need for further exploration as the relationship is clear.",
+                "action": "Finish[2473]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1022,
+        "question": "Who is the nephew of 2529?",
+        "prediction": [
+            "2716",
+            "2722"
+        ],
+        "answers": [
+            "603",
+            "2715"
+        ],
+        "hard_answer": [
+            "2715"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 2529 to determine its relationships and see if it has a nephew mentioned in the graph. Action 1: Search[2529]",
+                "action": "Search[2529]",
+                "triples": [
+                    "2446, niece_of, 2529",
+                    "2529, niece_of, 1059",
+                    "2529, niece_of, 447",
+                    "2714, niece_of, 2529",
+                    "2716, nephew_of, 2529",
+                    "2719, niece_of, 2529",
+                    "2722, nephew_of, 2529",
+                    "447, uncle_of, 2529",
+                    "449, uncle_of, 2529"
+                ],
+                "entity_names": [
+                    "2529"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "uncle_of",
+                    "niece_of"
+                ],
+                "new_entities": [
+                    "1059",
+                    "449",
+                    "2529",
+                    "447",
+                    "2722",
+                    "2446",
+                    "2714",
+                    "2716",
+                    "2719"
+                ],
+                "observation": "2446, niece_of, 2529\n2529, niece_of, 1059\n2529, niece_of, 447\n2714, niece_of, 2529\n2716, nephew_of, 2529\n2719, niece_of, 2529\n2722, nephew_of, 2529\n447, uncle_of, 2529\n449, uncle_of, 2529"
+            },
+            {
+                "i": 2,
+                "thought": "The search for entity 2529 reveals several relationships, including that 2716 and 2722 are both identified as nephews of 2529. Since I have found specific entities that are explicitly stated as nephews, I can conclude my search here. ",
+                "action": "Finish[2716 | 2722]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1033,
+        "question": "Who is 890's nephew?",
+        "prediction": [
+            "911",
+            "910"
+        ],
+        "answers": [
+            "917",
+            "907",
+            "903"
+        ],
+        "hard_answer": [
+            "917"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 890 to find out if there are any direct relations that indicate who their nephew is. This will help me understand the family connections related to 890.  ",
+                "action": "Search[890]",
+                "triples": [
+                    "890, sister_of, 903",
+                    "890, sister_of, 904",
+                    "890, sister_of, 906",
+                    "890, sister_of, 907",
+                    "903, brother_of, 890",
+                    "904, brother_of, 890",
+                    "906, sister_of, 890",
+                    "910, nephew_of, 890",
+                    "911, nephew_of, 890"
+                ],
+                "entity_names": [
+                    "890"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "brother_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "903",
+                    "910",
+                    "890",
+                    "904",
+                    "911",
+                    "906",
+                    "907"
+                ],
+                "observation": "890, sister_of, 903\n890, sister_of, 904\n890, sister_of, 906\n890, sister_of, 907\n903, brother_of, 890\n904, brother_of, 890\n906, sister_of, 890\n910, nephew_of, 890\n911, nephew_of, 890"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 890 has several siblings and has been identified as having two nephews: 910 and 911. This suggests that these two individuals are directly related as the children of 890's siblings. Since I now have the names of the nephews, I can provide the answer directly.  ",
+                "action": "Finish[910 | 911]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1167,
+        "question": "Who is 259's nephew?",
+        "prediction": [
+            "604",
+            "41",
+            "12"
+        ],
+        "answers": [
+            "420",
+            "256",
+            "257",
+            "258",
+            "425",
+            "1030"
+        ],
+        "hard_answer": [
+            "1030"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for 259 to find any relationships that indicate familial connections, particularly to identify a nephew. Action 1: Search[259]",
+                "action": "Search[259]",
+                "triples": [
+                    "12, aunt_of, 259",
+                    "1663, uncle_of, 259",
+                    "227, uncle_of, 259",
+                    "252, aunt_of, 259",
+                    "253, aunt_of, 259",
+                    "259, nephew_of, 12",
+                    "259, nephew_of, 41",
+                    "259, nephew_of, 604",
+                    "41, aunt_of, 259",
+                    "604, uncle_of, 259"
+                ],
+                "entity_names": [
+                    "259"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "uncle_of",
+                    "aunt_of"
+                ],
+                "new_entities": [
+                    "41",
+                    "227",
+                    "12",
+                    "1663",
+                    "252",
+                    "259",
+                    "253",
+                    "604"
+                ],
+                "observation": "12, aunt_of, 259\n1663, uncle_of, 259\n227, uncle_of, 259\n252, aunt_of, 259\n253, aunt_of, 259\n259, nephew_of, 12\n259, nephew_of, 41\n259, nephew_of, 604\n41, aunt_of, 259\n604, uncle_of, 259"
+            },
+            {
+                "i": 2,
+                "thought": "259 has multiple familial connections, specifically indicating that it has three nephews: 12, 41, and 604. I need to find out who these individuals are and confirm their identities as nephews. ",
+                "action": "Finish[12 | 41 | 604]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1172,
+        "question": "Who is 563 the nephew of?",
+        "prediction": [
+            "414",
+            "412"
+        ],
+        "answers": [
+            "572"
+        ],
+        "hard_answer": [
+            "572"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 563 to determine its relationships and identify who it may be related to as a nephew. This will help me find the individual that 563 is a nephew of.  ",
+                "action": "Search[563]",
+                "triples": [
+                    "162, brother_of, 563",
+                    "412, nephew_of, 563",
+                    "414, nephew_of, 563",
+                    "416, nephew_of, 563",
+                    "563, brother_of, 558",
+                    "563, brother_of, 559",
+                    "563, brother_of, 560",
+                    "563, brother_of, 561",
+                    "563, uncle_of, 1029",
+                    "563, uncle_of, 1681",
+                    "563, uncle_of, 416",
+                    "563, uncle_of, 511",
+                    "570, uncle_of, 563",
+                    "653, nephew_of, 563"
+                ],
+                "entity_names": [
+                    "563"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "uncle_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "570",
+                    "561",
+                    "560",
+                    "162",
+                    "1681",
+                    "653",
+                    "412",
+                    "559",
+                    "414",
+                    "416",
+                    "511",
+                    "558",
+                    "563",
+                    "1029"
+                ],
+                "observation": "162, brother_of, 563\n412, nephew_of, 563\n414, nephew_of, 563\n416, nephew_of, 563\n563, brother_of, 558\n563, brother_of, 559\n563, brother_of, 560\n563, brother_of, 561\n563, uncle_of, 1029\n563, uncle_of, 1681\n563, uncle_of, 416\n563, uncle_of, 511\n570, uncle_of, 563\n653, nephew_of, 563"
+            },
+            {
+                "i": 2,
+                "thought": "The observations show that entity 563 has several relationships indicating it is a nephew of entities 412, 414, and also has an indirect relationship through being a brother of several other entities. I need to gather the specific entities that 563 is a nephew of in order to address the question. ",
+                "action": "Finish[412 | 414]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1176,
+        "question": "Who is 1178's nephew?",
+        "prediction": [
+            "2126",
+            "770"
+        ],
+        "answers": [
+            "1160",
+            "1177"
+        ],
+        "hard_answer": [
+            "1160"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1178 to identify any relationships that might indicate who their nephew is. This will likely involve looking for familial relationships such as siblings or children, as nephews are typically the children of one's siblings. ",
+                "action": "Search[1178]",
+                "triples": [
+                    "1162, nephew_of, 1178",
+                    "1177, brother_of, 1178",
+                    "1178, brother_of, 1177",
+                    "1178, brother_of, 761",
+                    "1178, nephew_of, 2126",
+                    "1178, nephew_of, 770",
+                    "1178, son_of, 771",
+                    "761, brother_of, 1178"
+                ],
+                "entity_names": [
+                    "1178"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "brother_of",
+                    "son_of"
+                ],
+                "new_entities": [
+                    "1178",
+                    "761",
+                    "1162",
+                    "2126",
+                    "770",
+                    "1177",
+                    "771"
+                ],
+                "observation": "1162, nephew_of, 1178\n1177, brother_of, 1178\n1178, brother_of, 1177\n1178, brother_of, 761\n1178, nephew_of, 2126\n1178, nephew_of, 770\n1178, son_of, 771\n761, brother_of, 1178"
+            },
+            {
+                "i": 2,
+                "thought": "From the observations, it appears that 1178 has multiple nephews: 2126 and 770. I need to finalize my answer by listing both individuals as they are directly indicated as nephews of 1178. ",
+                "action": "Finish[2126 | 770]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1198,
+        "question": "Who is 1368's nephew?",
+        "prediction": [
+            "1287",
+            "1888",
+            "1261",
+            "1887",
+            "1286"
+        ],
+        "answers": [
+            "1367",
+            "1370",
+            "1290"
+        ],
+        "hard_answer": [
+            "1290"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1368 to find information about its relationships, specifically focusing on any relation that indicates who its nephew might be.  ",
+                "action": "Search[1368]",
+                "triples": [
+                    "1261, nephew_of, 1368",
+                    "1286, nephew_of, 1368",
+                    "1287, nephew_of, 1368",
+                    "1368, aunt_of, 1286",
+                    "1368, aunt_of, 1287",
+                    "1368, aunt_of, 1882",
+                    "1368, aunt_of, 1887",
+                    "1377, uncle_of, 1368",
+                    "1378, aunt_of, 1368",
+                    "1887, nephew_of, 1368",
+                    "1888, nephew_of, 1368"
+                ],
+                "entity_names": [
+                    "1368"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "uncle_of",
+                    "aunt_of"
+                ],
+                "new_entities": [
+                    "1368",
+                    "1287",
+                    "1888",
+                    "1261",
+                    "1887",
+                    "1882",
+                    "1377",
+                    "1378",
+                    "1286"
+                ],
+                "observation": "1261, nephew_of, 1368\n1286, nephew_of, 1368\n1287, nephew_of, 1368\n1368, aunt_of, 1286\n1368, aunt_of, 1287\n1368, aunt_of, 1882\n1368, aunt_of, 1887\n1377, uncle_of, 1368\n1378, aunt_of, 1368\n1887, nephew_of, 1368\n1888, nephew_of, 1368"
+            },
+            {
+                "i": 2,
+                "thought": "I see that there are several entities related to 1368 that are identified as its nephews: 1261, 1286, and 1287, along with additional entities like 1887 and 1888 also being listed as its nephews. Now, I can finalize the answer with these entities.  ",
+                "action": "Finish[1261 | 1286 | 1287 | 1887 | 1888]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1206,
+        "question": "Who is 2084 the nephew of?",
+        "prediction": [
+            "unknown"
+        ],
+        "answers": [
+            "2079"
+        ],
+        "hard_answer": [
+            "2079"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 2084 to determine its relationships and find out who they are a nephew of. This will help me identify the relevant familial connections.  ",
+                "action": "Search[2084]",
+                "triples": [
+                    "2081, mother_of, 2084",
+                    "2084, brother_of, 2086",
+                    "2084, brother_of, 2087",
+                    "2084, brother_of, 2089",
+                    "2086, sister_of, 2084",
+                    "2087, sister_of, 2084",
+                    "2088, sister_of, 2084",
+                    "2090, sister_of, 2084"
+                ],
+                "entity_names": [
+                    "2084"
+                ],
+                "one_hop_relations": [
+                    "brother_of",
+                    "sister_of",
+                    "mother_of"
+                ],
+                "new_entities": [
+                    "2086",
+                    "2081",
+                    "2088",
+                    "2090",
+                    "2084",
+                    "2087",
+                    "2089"
+                ],
+                "observation": "2081, mother_of, 2084\n2084, brother_of, 2086\n2084, brother_of, 2087\n2084, brother_of, 2089\n2086, sister_of, 2084\n2087, sister_of, 2084\n2088, sister_of, 2084\n2090, sister_of, 2084"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 2084 has a mother (entity 2081) and several siblings (entities 2086, 2087, 2088, and 2089). To determine who 2084 is a nephew of, I need to establish the relationship between 2081 and their siblings or partners, as those would be the aunts and uncles of 2084. I will look for any relationships involving 2081 to find out who their siblings or partners are.  ",
+                "action": "Search[2081]",
+                "triples": [
+                    "1335, husband_of, 2081",
+                    "2081, wife_of, 1335",
+                    "2082, father_of, 2081"
+                ],
+                "entity_names": [
+                    "2081"
+                ],
+                "one_hop_relations": [
+                    "husband_of",
+                    "wife_of",
+                    "father_of"
+                ],
+                "new_entities": [
+                    "2082",
+                    "1335"
+                ],
+                "observation": "1335, husband_of, 2081\n2081, wife_of, 1335\n2082, father_of, 2081"
+            },
+            {
+                "i": 3,
+                "thought": "Entity 2081 has a husband (entity 1335) and a father (entity 2082). To identify who 2084 is a nephew of, I need to check if 2081 has any siblings, as they would be the aunts and uncles of 2084. If 2081 has siblings, they will provide the necessary relationships to determine 2084's aunts and uncles.  ",
+                "action": "Search[2082]",
+                "triples": [],
+                "entity_names": [
+                    "2082"
+                ],
+                "one_hop_relations": [
+                    ""
+                ],
+                "new_entities": [],
+                "observation": "  No triples found."
+            },
+            {
+                "i": 4,
+                "thought": "Entity 2082, the father of 2081, does not have any explicit relationships indicating siblings or partners in the retrieved data. Therefore, I need to explore relationships associated with 2081 and 1335 (the husband of 2081) to see if they reveal any siblings or familial connections that could lead to identifying aunts or uncles of 2084.  ",
+                "action": "Search[1335]",
+                "triples": [
+                    "1335, father_of, 2083",
+                    "1335, father_of, 2086",
+                    "1335, father_of, 2087",
+                    "1335, father_of, 2088",
+                    "1335, father_of, 2090",
+                    "1335, husband_of, 2081",
+                    "1335, uncle_of, 1490",
+                    "1437, uncle_of, 1335"
+                ],
+                "entity_names": [
+                    "1335"
+                ],
+                "one_hop_relations": [
+                    "husband_of",
+                    "father_of",
+                    "uncle_of"
+                ],
+                "new_entities": [
+                    "2083",
+                    "1490",
+                    "1437"
+                ],
+                "observation": "1335, father_of, 2083\n1335, father_of, 2086\n1335, father_of, 2087\n1335, father_of, 2088\n1335, father_of, 2090\n1335, husband_of, 2081\n1335, uncle_of, 1490\n1437, uncle_of, 1335"
+            },
+            {
+                "i": 5,
+                "thought": "Entity 1335 has children who are siblings of 2084, and since 1335 is the husband of 2081, it indicates that 1335 is the father of 2084's siblings. However, there is also an uncle relation mentioned, which means 1335 could have siblings of his own who would be uncles or aunts to 2084. To identify these siblings, I'll need to find out if 1335 has any siblings.  ",
+                "action": "Search[1437]",
+                "triples": [
+                    "1231, uncle_of, 1437",
+                    "1235, uncle_of, 1437",
+                    "1237, uncle_of, 1437",
+                    "1242, uncle_of, 1437",
+                    "1437, brother_of, 1329",
+                    "1437, brother_of, 1330",
+                    "1437, brother_of, 1331",
+                    "1437, son_of, 1236",
+                    "1437, son_of, 1328",
+                    "1437, uncle_of, 1335"
+                ],
+                "entity_names": [
+                    "1437"
+                ],
+                "one_hop_relations": [
+                    "brother_of",
+                    "uncle_of",
+                    "son_of"
+                ],
+                "new_entities": [
+                    "1237",
+                    "1236",
+                    "1235",
+                    "1242",
+                    "1329",
+                    "1328",
+                    "1331",
+                    "1330",
+                    "1231"
+                ],
+                "observation": "1231, uncle_of, 1437\n1235, uncle_of, 1437\n1237, uncle_of, 1437\n1242, uncle_of, 1437\n1437, brother_of, 1329\n1437, brother_of, 1330\n1437, brother_of, 1331\n1437, son_of, 1236\n1437, son_of, 1328\n1437, uncle_of, 1335"
+            },
+            {
+                "i": 6,
+                "thought": "Entity 1437 has multiple siblings and also has an uncle relationship with 1335, which indicates that 1437's siblings could be aunts or uncles to 2084. I need to connect these relationships to find if any of them are directly related to 2084 as aunts or uncles. The next step is to determine the potential sibling relationships of 1437 to identify the relevant familial connections.  ",
+                "action": "Generate[who are the siblings of 1437]",
+                "verified_candidates": [
+                    2065
+                ],
+                "generated_triples": "1437, sister_of, 2065",
+                "observation": "1437, sister_of, 2065"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1207,
+        "question": "Who is 896's nephew?",
+        "prediction": [
+            "751",
+            "1341"
+        ],
+        "answers": [
+            "729",
+            "748",
+            "590",
+            "2913",
+            "732",
+            "728"
+        ],
+        "hard_answer": [
+            "748"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 896 to find information that connects it to its nephew. This will help me identify the relationships and determine who the nephew is.  ",
+                "action": "Search[896]",
+                "triples": [
+                    "1341, nephew_of, 896",
+                    "529, brother_of, 896",
+                    "751, nephew_of, 896",
+                    "896, aunt_of, 2915",
+                    "896, aunt_of, 742",
+                    "896, aunt_of, 751"
+                ],
+                "entity_names": [
+                    "896"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "aunt_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "751",
+                    "896",
+                    "742",
+                    "2915",
+                    "529",
+                    "1341"
+                ],
+                "observation": "1341, nephew_of, 896\n529, brother_of, 896\n751, nephew_of, 896\n896, aunt_of, 2915\n896, aunt_of, 742\n896, aunt_of, 751"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the relationships found, 896 has multiple connections indicating its role as an aunt to several entities, including 751. Additionally, 1341 and 751 are noted as nephews of 896. Since 751 is explicitly mentioned as a nephew, I can conclude 751 is one of 896's nephews. However, I need to check if there are any other nephews besides 751. ",
+                "action": "Finish[1341 | 751]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1304,
+        "question": "Who is 892's aunt?",
+        "prediction": [
+            "905"
+        ],
+        "answers": [
+            "891",
+            "909",
+            "912",
+            "910",
+            "906",
+            "911"
+        ],
+        "hard_answer": [
+            "906"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to find information about entity 892 to determine who their aunt is, starting with the relationships that could lead to identifying familial connections.  ",
+                "action": "Search[892]",
+                "triples": [
+                    "475, uncle_of, 892",
+                    "874, uncle_of, 892",
+                    "892, nephew_of, 475",
+                    "892, nephew_of, 904",
+                    "892, nephew_of, 905",
+                    "903, uncle_of, 892",
+                    "904, uncle_of, 892",
+                    "905, aunt_of, 892",
+                    "907, uncle_of, 892"
+                ],
+                "entity_names": [
+                    "892"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "nephew_of",
+                    "uncle_of"
+                ],
+                "new_entities": [
+                    "903",
+                    "905",
+                    "904",
+                    "892",
+                    "874",
+                    "907",
+                    "475"
+                ],
+                "observation": "475, uncle_of, 892\n874, uncle_of, 892\n892, nephew_of, 475\n892, nephew_of, 904\n892, nephew_of, 905\n903, uncle_of, 892\n904, uncle_of, 892\n905, aunt_of, 892\n907, uncle_of, 892"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the relationships retrieved, I can see that 905 is identified as the aunt of 892. There are no additional relationships that need to be explored, as this directly answers the question.  ",
+                "action": "Finish[905]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1316,
+        "question": "Who is 831's aunt?",
+        "prediction": [
+            "1000",
+            "999",
+            "1004"
+        ],
+        "answers": [
+            "830",
+            "776",
+            "775",
+            "1007"
+        ],
+        "hard_answer": [
+            "1007"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 831 to find information regarding its familial relationships, particularly focusing on any connections that indicate an aunt. Action 1: Search[831]",
+                "action": "Search[831]",
+                "triples": [
+                    "1000, aunt_of, 831",
+                    "1004, aunt_of, 831",
+                    "1431, niece_of, 831",
+                    "830, sister_of, 831",
+                    "832, sister_of, 831",
+                    "842, niece_of, 831",
+                    "846, niece_of, 831",
+                    "849, niece_of, 831",
+                    "999, aunt_of, 831"
+                ],
+                "entity_names": [
+                    "831"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "niece_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "830",
+                    "846",
+                    "1000",
+                    "1004",
+                    "849",
+                    "832",
+                    "999",
+                    "831",
+                    "1431",
+                    "842"
+                ],
+                "observation": "1000, aunt_of, 831\n1004, aunt_of, 831\n1431, niece_of, 831\n830, sister_of, 831\n832, sister_of, 831\n842, niece_of, 831\n846, niece_of, 831\n849, niece_of, 831\n999, aunt_of, 831"
+            },
+            {
+                "i": 2,
+                "thought": "The observations indicate multiple entities that are aunts of 831, specifically 1000, 1004, and 999. I can conclude that these entities are directly related to 831 as aunts. There's no need for further exploration since I have found multiple aunts. ",
+                "action": "Finish[1000 | 1004 | 999]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1329,
+        "question": "Who is 1762's nephew?",
+        "prediction": [
+            "1545"
+        ],
+        "answers": [
+            "1760",
+            "1758",
+            "1764",
+            "1761"
+        ],
+        "hard_answer": [
+            "1764"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1762 to find out who is associated with it in terms of family relations, specifically looking for the nephew.  ",
+                "action": "Search[1762]",
+                "triples": [
+                    "1545, nephew_of, 1762"
+                ],
+                "entity_names": [
+                    "1762"
+                ],
+                "one_hop_relations": [
+                    "nephew_of"
+                ],
+                "new_entities": [
+                    "1762",
+                    "1545"
+                ],
+                "observation": "1545, nephew_of, 1762"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observation, I can see that the entity 1545 is identified as the nephew of 1762. Since I have directly found the answer through this relationship, I do not need to search further.  ",
+                "action": "Finish[1545]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1352,
+        "question": "Who is 79's aunt?",
+        "prediction": [
+            "11",
+            "499"
+        ],
+        "answers": [
+            "13",
+            "29",
+            "17",
+            "26",
+            "311",
+            "97",
+            "76",
+            "74",
+            "121",
+            "310",
+            "27",
+            "95",
+            "86",
+            "39",
+            "38",
+            "24",
+            "75",
+            "14",
+            "83",
+            "77",
+            "129",
+            "8",
+            "21",
+            "98",
+            "73"
+        ],
+        "hard_answer": [
+            "8"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 79 to find out more about its relationships, specifically looking for information regarding its family connections to identify its aunt.  ",
+                "action": "Search[79]",
+                "triples": [
+                    "11, aunt_of, 79",
+                    "499, aunt_of, 79",
+                    "79, aunt_of, 102",
+                    "79, aunt_of, 46",
+                    "79, aunt_of, 48",
+                    "79, sister_of, 38",
+                    "79, sister_of, 84",
+                    "83, brother_of, 79",
+                    "84, sister_of, 79",
+                    "85, sister_of, 79"
+                ],
+                "entity_names": [
+                    "79"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "brother_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "84",
+                    "79",
+                    "499",
+                    "11",
+                    "48",
+                    "102",
+                    "85",
+                    "83",
+                    "46",
+                    "38"
+                ],
+                "observation": "11, aunt_of, 79\n499, aunt_of, 79\n79, aunt_of, 102\n79, aunt_of, 46\n79, aunt_of, 48\n79, sister_of, 38\n79, sister_of, 84\n83, brother_of, 79\n84, sister_of, 79\n85, sister_of, 79"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, there are multiple individuals identified as aunts of entity 79: 11, 499, and also 79 has other family relations such as siblings and a brother. I will conclude by listing the aunts identified.  ",
+                "action": "Finish[11 | 499]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1392,
+        "question": "Who is 999's aunt?",
+        "prediction": [
+            "830",
+            "831",
+            "775",
+            "829"
+        ],
+        "answers": [
+            "1001",
+            "995",
+            "774",
+            "986",
+            "1005",
+            "1003",
+            "1018",
+            "1007",
+            "1000",
+            "1006",
+            "1019"
+        ],
+        "hard_answer": [
+            "995"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 999 to find out who their aunt is by looking for any relationships that indicate family connections.  ",
+                "action": "Search[999]",
+                "triples": [
+                    "1000, sister_of, 999",
+                    "1007, sister_of, 999",
+                    "774, sister_of, 999",
+                    "776, niece_of, 999",
+                    "994, aunt_of, 999",
+                    "999, aunt_of, 775",
+                    "999, aunt_of, 829",
+                    "999, aunt_of, 830",
+                    "999, aunt_of, 831",
+                    "999, niece_of, 984",
+                    "999, niece_of, 992",
+                    "999, niece_of, 993",
+                    "999, sister_of, 1001",
+                    "999, sister_of, 1003"
+                ],
+                "entity_names": [
+                    "999"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "niece_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "994",
+                    "830",
+                    "1000",
+                    "999",
+                    "829",
+                    "775",
+                    "1001",
+                    "1007",
+                    "1003",
+                    "776",
+                    "774",
+                    "992",
+                    "984",
+                    "993",
+                    "831"
+                ],
+                "observation": "1000, sister_of, 999\n1007, sister_of, 999\n774, sister_of, 999\n776, niece_of, 999\n994, aunt_of, 999\n999, aunt_of, 775\n999, aunt_of, 829\n999, aunt_of, 830\n999, aunt_of, 831\n999, niece_of, 984\n999, niece_of, 992\n999, niece_of, 993\n999, sister_of, 1001\n999, sister_of, 1003"
+            },
+            {
+                "i": 2,
+                "thought": "I see that entity 999 has multiple relationships indicating aunts, specifically with entities 775, 829, 830, and 831. To answer the question, I can directly provide these entities as they are clearly identified as aunts. ",
+                "action": "Finish[775 | 829 | 830 | 831]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1395,
+        "question": "Who is 699's aunt?",
+        "prediction": [
+            "714",
+            "709"
+        ],
+        "answers": [
+            "696",
+            "694",
+            "697",
+            "705",
+            "2854",
+            "2856",
+            "1622",
+            "701",
+            "695",
+            "703",
+            "704"
+        ],
+        "hard_answer": [
+            "2856"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to find the relationships associated with entity 699 to determine who their aunt is. This requires searching for the entity first to see what direct relationships are available.  ",
+                "action": "Search[699]",
+                "triples": [
+                    "699, niece_of, 1625",
+                    "699, niece_of, 710",
+                    "699, niece_of, 711",
+                    "699, niece_of, 712",
+                    "699, niece_of, 714",
+                    "699, sister_of, 700",
+                    "699, sister_of, 701",
+                    "699, sister_of, 702",
+                    "699, sister_of, 703",
+                    "699, sister_of, 704",
+                    "709, aunt_of, 699",
+                    "714, aunt_of, 699"
+                ],
+                "entity_names": [
+                    "699"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "niece_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "712",
+                    "714",
+                    "703",
+                    "700",
+                    "1625",
+                    "699",
+                    "709",
+                    "711",
+                    "704",
+                    "701",
+                    "702",
+                    "710"
+                ],
+                "observation": "699, niece_of, 1625\n699, niece_of, 710\n699, niece_of, 711\n699, niece_of, 712\n699, niece_of, 714\n699, sister_of, 700\n699, sister_of, 701\n699, sister_of, 702\n699, sister_of, 703\n699, sister_of, 704\n709, aunt_of, 699\n714, aunt_of, 699"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 699 has multiple aunts according to the relationships found: 709 and 714. Since the question asks for \"who\" is 699's aunt, I can conclude that both 709 and 714 qualify as aunts. I will finalize my answer now.  ",
+                "action": "Finish[709 | 714]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1400,
+        "question": "Who is 2963's aunt?",
+        "prediction": [
+            "241"
+        ],
+        "answers": [
+            "808",
+            "65"
+        ],
+        "hard_answer": [
+            "65"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 2963 to find any relationships that might indicate who their aunt is. Action 1: Search[2963]",
+                "action": "Search[2963]",
+                "triples": [
+                    "241, aunt_of, 2963",
+                    "2962, mother_of, 2963",
+                    "2963, niece_of, 1712"
+                ],
+                "entity_names": [
+                    "2963"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "niece_of",
+                    "mother_of"
+                ],
+                "new_entities": [
+                    "2963",
+                    "2962",
+                    "1712",
+                    "241"
+                ],
+                "observation": "241, aunt_of, 2963\n2962, mother_of, 2963\n2963, niece_of, 1712"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, it appears that 241 is identified as the aunt of 2963. Now I can conclude my reasoning since I have the direct relationship linking 241 as the aunt. ",
+                "action": "Finish[241]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1418,
+        "question": "Who is 745's aunt?",
+        "prediction": [
+            "693",
+            "712",
+            "720",
+            "719",
+            "951"
+        ],
+        "answers": [
+            "746",
+            "747",
+            "749",
+            "742",
+            "744",
+            "743",
+            "728"
+        ],
+        "hard_answer": [
+            "728"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 745 to find its familial relationships, particularly focusing on identifying who its aunt is.  ",
+                "action": "Search[745]",
+                "triples": [
+                    "742, brother_of, 745",
+                    "743, brother_of, 745",
+                    "745, aunt_of, 693",
+                    "745, aunt_of, 712",
+                    "745, aunt_of, 719",
+                    "745, aunt_of, 720",
+                    "745, aunt_of, 951",
+                    "745, sister_of, 706",
+                    "745, sister_of, 743",
+                    "745, sister_of, 744",
+                    "745, sister_of, 746",
+                    "745, sister_of, 748",
+                    "748, brother_of, 745"
+                ],
+                "entity_names": [
+                    "745"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "sister_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "712",
+                    "951",
+                    "744",
+                    "719",
+                    "742",
+                    "746",
+                    "743",
+                    "720",
+                    "745",
+                    "693",
+                    "706",
+                    "748"
+                ],
+                "observation": "742, brother_of, 745\n743, brother_of, 745\n745, aunt_of, 693\n745, aunt_of, 712\n745, aunt_of, 719\n745, aunt_of, 720\n745, aunt_of, 951\n745, sister_of, 706\n745, sister_of, 743\n745, sister_of, 744\n745, sister_of, 746\n745, sister_of, 748\n748, brother_of, 745"
+            },
+            {
+                "i": 2,
+                "thought": "The search revealed that entity 745 has multiple aunts, specifically 693, 712, 719, 720, and 951. Since I have the names of all the aunts, I can now conclude the task by listing them.",
+                "action": "Finish[693 | 712 | 719 | 720 | 951]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1434,
+        "question": "Who is 746's aunt?",
+        "prediction": [
+            "712",
+            "720",
+            "718",
+            "951"
+        ],
+        "answers": [
+            "748",
+            "751",
+            "747",
+            "706",
+            "2915",
+            "896",
+            "742",
+            "744",
+            "743"
+        ],
+        "hard_answer": [
+            "896"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 746 to determine any familial relationships that could indicate who their aunt is. Action 1: Search[746]",
+                "action": "Search[746]",
+                "triples": [
+                    "2128, niece_of, 746",
+                    "693, niece_of, 746",
+                    "718, niece_of, 746",
+                    "728, aunt_of, 746",
+                    "746, aunt_of, 712",
+                    "746, aunt_of, 718",
+                    "746, aunt_of, 720",
+                    "746, aunt_of, 951",
+                    "746, niece_of, 2913",
+                    "746, sister_of, 706",
+                    "746, sister_of, 742",
+                    "746, sister_of, 745",
+                    "746, sister_of, 747",
+                    "746, sister_of, 748",
+                    "951, niece_of, 746"
+                ],
+                "entity_names": [
+                    "746"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "niece_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "712",
+                    "2128",
+                    "951",
+                    "748",
+                    "742",
+                    "746",
+                    "720",
+                    "745",
+                    "718",
+                    "693",
+                    "2913",
+                    "706",
+                    "747",
+                    "728"
+                ],
+                "observation": "2128, niece_of, 746\n693, niece_of, 746\n718, niece_of, 746\n728, aunt_of, 746\n746, aunt_of, 712\n746, aunt_of, 718\n746, aunt_of, 720\n746, aunt_of, 951\n746, niece_of, 2913\n746, sister_of, 706\n746, sister_of, 742\n746, sister_of, 745\n746, sister_of, 747\n746, sister_of, 748\n951, niece_of, 746"
+            },
+            {
+                "i": 2,
+                "thought": "The observations show that 746 has multiple aunts, specifically 712, 718, 720, and 951, as indicated by the relationships. Since I have identified these entities, I can conclude the answer. ",
+                "action": "Finish[712 | 718 | 720 | 951]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1445,
+        "question": "Who is 1764's aunt?",
+        "prediction": [
+            "1762"
+        ],
+        "answers": [
+            "1760"
+        ],
+        "hard_answer": [
+            "1760"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1764 to find out if there are any relations indicating family members, specifically an aunt. This will help me identify the aunt of 1764.  ",
+                "action": "Search[1764]",
+                "triples": [
+                    "1547, nephew_of, 1764",
+                    "1758, uncle_of, 1764",
+                    "1764, nephew_of, 1758",
+                    "1764, nephew_of, 1761",
+                    "1764, uncle_of, 1766",
+                    "1766, niece_of, 1764"
+                ],
+                "entity_names": [
+                    "1764"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "nephew_of",
+                    "uncle_of"
+                ],
+                "new_entities": [
+                    "1764",
+                    "1766",
+                    "1761",
+                    "1758",
+                    "1547"
+                ],
+                "observation": "1547, nephew_of, 1764\n1758, uncle_of, 1764\n1764, nephew_of, 1758\n1764, nephew_of, 1761\n1764, uncle_of, 1766\n1766, niece_of, 1764"
+            },
+            {
+                "i": 2,
+                "thought": "The observations indicate that 1764 has a relationship with 1758 as their uncle and with 1761 as their nephew. However, there is no direct information about an aunt in the observed relationships. I need to explore further to find if there is an entity related to 1764 that could be identified as an aunt, potentially through the uncle's relationships or siblings. ",
+                "action": "Generate[who is the aunt of 1764]",
+                "verified_candidates": [
+                    1762
+                ],
+                "generated_triples": "1764, aunt_of, 1762",
+                "observation": "1764, aunt_of, 1762"
+            },
+            {
+                "i": 3,
+                "thought": "The observations now indicate that 1764 has a direct relationship with 1762, identifying 1762 as their aunt. This resolves the inquiry about who 1764's aunt is.  ",
+                "action": "Finish[1762]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1589,
+        "question": "Who is 935's uncle?",
+        "prediction": [
+            "922",
+            "925"
+        ],
+        "answers": [
+            "938",
+            "932",
+            "927",
+            "924"
+        ],
+        "hard_answer": [
+            "924"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for 935 to find out more about them and their family relationships, specifically to identify their uncle. Action 1: Search[935]",
+                "action": "Search[935]",
+                "triples": [
+                    "921, father_of, 935",
+                    "922, uncle_of, 935",
+                    "925, uncle_of, 935",
+                    "935, nephew_of, 534",
+                    "935, nephew_of, 924"
+                ],
+                "entity_names": [
+                    "935"
+                ],
+                "one_hop_relations": [
+                    "uncle_of",
+                    "nephew_of",
+                    "father_of"
+                ],
+                "new_entities": [
+                    "922",
+                    "924",
+                    "925",
+                    "534",
+                    "921",
+                    "935"
+                ],
+                "observation": "921, father_of, 935\n922, uncle_of, 935\n925, uncle_of, 935\n935, nephew_of, 534\n935, nephew_of, 924"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, 922 and 925 are identified as uncles of 935. Now I need to clarify if there are any additional relationships or details that might help in understanding who these uncles are. However, since I already have the information directly identifying them as uncles, I can proceed to finalize the answer. ",
+                "action": "Finish[922 | 925]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1603,
+        "question": "Who is 418 the uncle of?",
+        "prediction": [
+            "43",
+            "653",
+            "511",
+            "413",
+            "412",
+            "1682",
+            "416",
+            "1681"
+        ],
+        "answers": [
+            "44",
+            "1028",
+            "2666",
+            "512",
+            "1213",
+            "428",
+            "20",
+            "1683"
+        ],
+        "hard_answer": [
+            "1213"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to find out who 418 is related to by the relation of being an uncle. This requires searching for entities that have a relationship with 418 that specifies familial connections.  ",
+                "action": "Search[418]",
+                "triples": [
+                    "411, brother_of, 418",
+                    "412, brother_of, 418",
+                    "416, brother_of, 418",
+                    "418, brother_of, 412",
+                    "418, brother_of, 414",
+                    "557, aunt_of, 418",
+                    "558, uncle_of, 418",
+                    "559, aunt_of, 418",
+                    "562, uncle_of, 418"
+                ],
+                "entity_names": [
+                    "418"
+                ],
+                "one_hop_relations": [
+                    "uncle_of",
+                    "aunt_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "557",
+                    "411",
+                    "412",
+                    "559",
+                    "414",
+                    "416",
+                    "418",
+                    "562",
+                    "558"
+                ],
+                "observation": "411, brother_of, 418\n412, brother_of, 418\n416, brother_of, 418\n418, brother_of, 412\n418, brother_of, 414\n557, aunt_of, 418\n558, uncle_of, 418\n559, aunt_of, 418\n562, uncle_of, 418"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the relationships retrieved, 418 has multiple familial connections, including being a brother to 411, 412, and 416, and also having uncles, specifically 558 and 562. However, to identify who 418 is the uncle of, I need to look for entities related to 418 with the relationship of being an uncle. I should search for entities that are specifically connected to 418 in a way that indicates they are his nieces or nephews. ",
+                "action": "Search[558 | 562]",
+                "triples": [
+                    "1681, niece_of, 558",
+                    "1682, niece_of, 558",
+                    "1682, niece_of, 562",
+                    "2654, niece_of, 558",
+                    "2654, niece_of, 562",
+                    "412, nephew_of, 558",
+                    "412, nephew_of, 562",
+                    "413, niece_of, 558",
+                    "416, nephew_of, 558",
+                    "416, nephew_of, 562",
+                    "43, niece_of, 558",
+                    "558, nephew_of, 570",
+                    "558, nephew_of, 571",
+                    "558, uncle_of, 1681",
+                    "558, uncle_of, 411",
+                    "558, uncle_of, 414",
+                    "558, uncle_of, 43",
+                    "558, uncle_of, 653",
+                    "562, nephew_of, 570",
+                    "562, uncle_of, 1681",
+                    "562, uncle_of, 416",
+                    "562, uncle_of, 43",
+                    "562, uncle_of, 511",
+                    "562, uncle_of, 653",
+                    "653, nephew_of, 562"
+                ],
+                "entity_names": [
+                    "558",
+                    "562"
+                ],
+                "one_hop_relations": [
+                    "nephew_of",
+                    "niece_of",
+                    "uncle_of"
+                ],
+                "new_entities": [
+                    "570",
+                    "43",
+                    "413",
+                    "1681",
+                    "1682",
+                    "653",
+                    "2654",
+                    "511",
+                    "571"
+                ],
+                "observation": "1681, niece_of, 558\n1682, niece_of, 558\n1682, niece_of, 562\n2654, niece_of, 558\n2654, niece_of, 562\n412, nephew_of, 558\n412, nephew_of, 562\n413, niece_of, 558\n416, nephew_of, 558\n416, nephew_of, 562\n43, niece_of, 558\n558, nephew_of, 570\n558, nephew_of, 571\n558, uncle_of, 1681\n558, uncle_of, 411\n558, uncle_of, 414\n558, uncle_of, 43\n558, uncle_of, 653\n562, nephew_of, 570\n562, uncle_of, 1681\n562, uncle_of, 416\n562, uncle_of, 43\n562, uncle_of, 511\n562, uncle_of, 653\n653, nephew_of, 562"
+            },
+            {
+                "i": 3,
+                "thought": "The observations reveal that both uncles, 558 and 562, have multiple nieces and nephews. Specifically, 418 is connected to the familial relationships of 558 and 562, indicating they are both uncles to several entities. However, to find out specifically who is 418 the uncle of, I need to extract the unique identifiers of the nieces and nephews associated with 418. Based on the previous observations, I can focus on the relationship patterns that lead to identifying those who are directly related to 418. ",
+                "action": "Finish[1681 | 1682 | 412 | 413 | 416 | 43 | 653 | 511]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1645,
+        "question": "Who is 64's uncle?",
+        "prediction": [
+            "60",
+            "61"
+        ],
+        "answers": [
+            "58",
+            "63"
+        ],
+        "hard_answer": [
+            "58"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 64 to find information about its family relations, specifically looking for any indication of an uncle.  ",
+                "action": "Search[64]",
+                "triples": [
+                    "60, uncle_of, 64",
+                    "61, uncle_of, 64"
+                ],
+                "entity_names": [
+                    "64"
+                ],
+                "one_hop_relations": [
+                    "uncle_of"
+                ],
+                "new_entities": [
+                    "61",
+                    "64",
+                    "60"
+                ],
+                "observation": "60, uncle_of, 64\n61, uncle_of, 64"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, entities 60 and 61 are identified as uncles of entity 64. I can conclude that these two individuals are the answer to the question.  ",
+                "action": "Finish[60 | 61]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1653,
+        "question": "Who is 2997 the uncle of?",
+        "prediction": [
+            "2989"
+        ],
+        "answers": [
+            "243",
+            "3010"
+        ],
+        "hard_answer": [
+            "243"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 2997 to understand its relationships, particularly to identify any relevant familial connections that could indicate who it is an uncle of.  ",
+                "action": "Search[2997]",
+                "triples": [
+                    "2989, nephew_of, 2997",
+                    "3003, aunt_of, 2997",
+                    "3006, uncle_of, 2997"
+                ],
+                "entity_names": [
+                    "2997"
+                ],
+                "one_hop_relations": [
+                    "uncle_of",
+                    "nephew_of",
+                    "aunt_of"
+                ],
+                "new_entities": [
+                    "2989",
+                    "3003",
+                    "3006",
+                    "2997"
+                ],
+                "observation": "2989, nephew_of, 2997\n3003, aunt_of, 2997\n3006, uncle_of, 2997"
+            },
+            {
+                "i": 2,
+                "thought": "From the observations, I see that 2997 is related to 2989 through the relation \"nephew_of,\" which implies that 2997 is the uncle of 2989. I should confirm this by checking if there are any additional relations that provide further context or connections regarding 2989.  ",
+                "action": "Search[2989]",
+                "triples": [
+                    "2986, father_of, 2989",
+                    "2989, son_of, 2986",
+                    "2989, son_of, 806",
+                    "3009, aunt_of, 2989"
+                ],
+                "entity_names": [
+                    "2989"
+                ],
+                "one_hop_relations": [
+                    "aunt_of",
+                    "son_of",
+                    "father_of"
+                ],
+                "new_entities": [
+                    "3009",
+                    "2986",
+                    "806"
+                ],
+                "observation": "2986, father_of, 2989\n2989, son_of, 2986\n2989, son_of, 806\n3009, aunt_of, 2989"
+            },
+            {
+                "i": 3,
+                "thought": "From the observations, it is clear that 2989 is the nephew of 2997. However, there are additional relationships indicating that 2989 has a father (2986) and possibly a mother (806). This reinforces that 2997 is indeed the uncle of 2989. Since I already have the answer regarding who 2997 is the uncle of, I can conclude my search.  ",
+                "action": "Finish[2989]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1661,
+        "question": "Who is 204's uncle?",
+        "prediction": [
+            "334",
+            "336",
+            "339"
+        ],
+        "answers": [
+            "133",
+            "217",
+            "216",
+            "290",
+            "210",
+            "337",
+            "1617",
+            "143",
+            "209",
+            "214",
+            "213",
+            "212",
+            "215",
+            "203"
+        ],
+        "hard_answer": [
+            "337"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 204 to find information about their family relations, specifically to identify their uncle.  ",
+                "action": "Search[204]",
+                "triples": [
+                    "334, uncle_of, 204",
+                    "336, uncle_of, 204",
+                    "339, uncle_of, 204"
+                ],
+                "entity_names": [
+                    "204"
+                ],
+                "one_hop_relations": [
+                    "uncle_of"
+                ],
+                "new_entities": [
+                    "336",
+                    "204",
+                    "334",
+                    "339"
+                ],
+                "observation": "334, uncle_of, 204\n336, uncle_of, 204\n339, uncle_of, 204"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, entities 334, 336, and 339 are identified as the uncles of entity 204. I can conclude that these entities are the answer to the question.  ",
+                "action": "Finish[334 | 336 | 339]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1692,
+        "question": "Who is the mother of 1265?",
+        "prediction": [
+            "1282"
+        ],
+        "answers": [
+            "1268",
+            "1274",
+            "1271",
+            "1275",
+            "286",
+            "1276",
+            "1262",
+            "1270"
+        ],
+        "hard_answer": [
+            "1262"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1265 to find information regarding its mother. This will help me identify the relationships associated with 1265 and specifically look for maternal connections.  ",
+                "action": "Search[1265]",
+                "triples": [],
+                "entity_names": [
+                    "1265"
+                ],
+                "one_hop_relations": [
+                    "mother_of",
+                    "parent_of",
+                    "family_relationship"
+                ],
+                "new_entities": [],
+                "observation": "  No triples found."
+            },
+            {
+                "i": 2,
+                "thought": "It appears that there are no explicit connections or relationships directly associated with entity 1265 in the knowledge graph. To proceed, I need to explore further by looking for related entities or other associations that might lead to discovering maternal information about 1265. ",
+                "action": "Generate[which entity is the mother of 1265]",
+                "verified_candidates": [
+                    1264
+                ],
+                "generated_triples": "1265, mother_of, 1264",
+                "observation": "1265, mother_of, 1264"
+            },
+            {
+                "i": 3,
+                "thought": "Based on the relationship discovered, 1265 has a maternal connection to entity 1264. Now, I need to determine the identity of entity 1264 to provide a complete answer regarding who the mother of 1265 is.  ",
+                "action": "Search[1264]",
+                "triples": [
+                    "1264, aunt_of, 1229",
+                    "1264, aunt_of, 1256",
+                    "1264, daughter_of, 1261",
+                    "1264, daughter_of, 1262",
+                    "1264, sister_of, 1268",
+                    "1264, sister_of, 1270",
+                    "1270, sister_of, 1264",
+                    "1273, sister_of, 1264",
+                    "1276, sister_of, 1264",
+                    "1283, aunt_of, 1264",
+                    "1284, aunt_of, 1264"
+                ],
+                "entity_names": [
+                    "1264"
+                ],
+                "one_hop_relations": [
+                    "daughter_of",
+                    "sister_of",
+                    "aunt_of"
+                ],
+                "new_entities": [
+                    "1276",
+                    "1273",
+                    "1256",
+                    "1268",
+                    "1229",
+                    "1264",
+                    "1262",
+                    "1270",
+                    "1261",
+                    "1284",
+                    "1283"
+                ],
+                "observation": "1264, aunt_of, 1229\n1264, aunt_of, 1256\n1264, daughter_of, 1261\n1264, daughter_of, 1262\n1264, sister_of, 1268\n1264, sister_of, 1270\n1270, sister_of, 1264\n1273, sister_of, 1264\n1276, sister_of, 1264\n1283, aunt_of, 1264\n1284, aunt_of, 1264"
+            },
+            {
+                "i": 4,
+                "thought": "I have found that entity 1264 has connections to other entities, but none of these provide a direct identification of who the mother of 1264 is. The relationships indicate familial connections such as \"daughter_of\" but do not specify which entity is the mother. I need to explore the \"daughter_of\" relationships found in the previous search to identify the mother of 1264. ",
+                "action": "Generate[who is the mother of 1264]",
+                "verified_candidates": [
+                    1266
+                ],
+                "generated_triples": "1264, father_of, 1266",
+                "observation": "1264, father_of, 1266"
+            },
+            {
+                "i": 5,
+                "thought": "It seems that I still do not have any direct information regarding the mother of entity 1264, as the current observations do not reveal a maternal relationship. I need to look at the connections of the entities identified as \"daughter_of\" (1261 and 1262) to find their mothers, which might help me trace back to the mother of 1264.  ",
+                "action": "Search[1261 | 1262]",
+                "triples": [
+                    "1261, son_of, 1281",
+                    "1261, son_of, 1282",
+                    "1262, daughter_of, 1746",
+                    "1262, mother_of, 1268",
+                    "1262, mother_of, 1270",
+                    "1262, mother_of, 1271",
+                    "1262, mother_of, 1275",
+                    "1262, mother_of, 1276",
+                    "1262, wife_of, 1261",
+                    "1263, daughter_of, 1261",
+                    "1264, daughter_of, 1261",
+                    "1268, daughter_of, 1262",
+                    "1269, son_of, 1261",
+                    "1270, daughter_of, 1262",
+                    "1271, daughter_of, 1261",
+                    "1271, daughter_of, 1262",
+                    "1272, daughter_of, 1262",
+                    "1273, daughter_of, 1261",
+                    "1276, daughter_of, 1261",
+                    "1278, son_of, 1261",
+                    "1279, son_of, 1261",
+                    "1282, mother_of, 1261"
+                ],
+                "entity_names": [
+                    "1261",
+                    "1262"
+                ],
+                "one_hop_relations": [
+                    "mother_of",
+                    "daughter_of",
+                    "wife_of"
+                ],
+                "new_entities": [
+                    "1272",
+                    "1281",
+                    "1263",
+                    "1282",
+                    "1279",
+                    "1269",
+                    "1278",
+                    "1275",
+                    "1271",
+                    "1746"
+                ],
+                "observation": "1261, son_of, 1281\n1261, son_of, 1282\n1262, daughter_of, 1746\n1262, mother_of, 1268\n1262, mother_of, 1270\n1262, mother_of, 1271\n1262, mother_of, 1275\n1262, mother_of, 1276\n1262, wife_of, 1261\n1263, daughter_of, 1261\n1264, daughter_of, 1261\n1268, daughter_of, 1262\n1269, son_of, 1261\n1270, daughter_of, 1262\n1271, daughter_of, 1261\n1271, daughter_of, 1262\n1272, daughter_of, 1262\n1273, daughter_of, 1261\n1276, daughter_of, 1261\n1278, son_of, 1261\n1279, son_of, 1261\n1282, mother_of, 1261"
+            },
+            {
+                "i": 6,
+                "thought": "I have discovered that entity 1261 has relationships indicating it is a son of entities 1281 and 1282. However, the entity 1262 has a more complex relationship with multiple offspring and is listed as a mother for several entities, including 1268 and 1270. Since 1264 is the daughter of 1261, I need to focus on identifying the mother of 1261, which is entity 1282, to establish the maternal link I need. ",
+                "action": "Finish[1282]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1723,
+        "question": "Who is the mother of 324?",
+        "prediction": [
+            "650"
+        ],
+        "answers": [
+            "327",
+            "322",
+            "330",
+            "328",
+            "323",
+            "331"
+        ],
+        "hard_answer": [
+            "322"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 324 to find information about its relationships and see if there is a direct connection to its mother. Action 1: Search[324]",
+                "action": "Search[324]",
+                "triples": [
+                    "324, mother_of, 650",
+                    "324, sister_of, 325",
+                    "324, sister_of, 326",
+                    "324, sister_of, 328",
+                    "324, sister_of, 329",
+                    "650, son_of, 324"
+                ],
+                "entity_names": [
+                    "324"
+                ],
+                "one_hop_relations": [
+                    "mother_of",
+                    "son_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "650",
+                    "326",
+                    "328",
+                    "329",
+                    "324",
+                    "325"
+                ],
+                "observation": "324, mother_of, 650\n324, sister_of, 325\n324, sister_of, 326\n324, sister_of, 328\n324, sister_of, 329\n650, son_of, 324"
+            },
+            {
+                "i": 2,
+                "thought": "The observation shows that 324 has a direct relationship indicating that 650 is its mother. Therefore, I can conclude that 650 is the answer to the question. ",
+                "action": "Finish[650]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1823,
+        "question": "Who is the niece of 1287?",
+        "prediction": [
+            "1271",
+            "1267",
+            "1275",
+            "2234",
+            "1273"
+        ],
+        "answers": [
+            "1274",
+            "1288",
+            "1283",
+            "1749",
+            "1284",
+            "1289",
+            "1286"
+        ],
+        "hard_answer": [
+            "1274"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1287 to discover any relationships that might indicate who their niece is. ",
+                "action": "Search[1287]",
+                "triples": [
+                    "1267, niece_of, 1287",
+                    "1271, niece_of, 1287",
+                    "1273, niece_of, 1287",
+                    "1275, niece_of, 1287",
+                    "1287, uncle_of, 1269",
+                    "1287, uncle_of, 1270",
+                    "1287, uncle_of, 1278",
+                    "1287, uncle_of, 1280",
+                    "1287, uncle_of, 1496",
+                    "1368, aunt_of, 1287",
+                    "2234, niece_of, 1287"
+                ],
+                "entity_names": [
+                    "1287"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "aunt_of",
+                    "uncle_of"
+                ],
+                "new_entities": [
+                    "1496",
+                    "1368",
+                    "1287",
+                    "2234",
+                    "1273",
+                    "1267",
+                    "1269",
+                    "1278",
+                    "1275",
+                    "1270",
+                    "1280",
+                    "1271"
+                ],
+                "observation": "1267, niece_of, 1287\n1271, niece_of, 1287\n1273, niece_of, 1287\n1275, niece_of, 1287\n1287, uncle_of, 1269\n1287, uncle_of, 1270\n1287, uncle_of, 1278\n1287, uncle_of, 1280\n1287, uncle_of, 1496\n1368, aunt_of, 1287\n2234, niece_of, 1287"
+            },
+            {
+                "i": 2,
+                "thought": "The observations show that the entity 1287 has several nieces, specifically entities 1267, 1271, 1273, 1275, and 2234. I need to finalize the answer by listing these entities as they all represent the nieces of 1287. ",
+                "action": "Finish[1267 | 1271 | 1273 | 1275 | 2234]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1828,
+        "question": "Who is 993's niece?",
+        "prediction": [
+            "1000",
+            "999",
+            "1006"
+        ],
+        "answers": [
+            "1007",
+            "992",
+            "994",
+            "996"
+        ],
+        "hard_answer": [
+            "1007"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to find information about the entity 993 to determine if there are any family relations, particularly focusing on identifying any niece associated with this entity. ",
+                "action": "Search[993]",
+                "triples": [
+                    "1000, niece_of, 993",
+                    "1006, niece_of, 993",
+                    "999, niece_of, 993"
+                ],
+                "entity_names": [
+                    "993"
+                ],
+                "one_hop_relations": [
+                    "niece_of"
+                ],
+                "new_entities": [
+                    "1000",
+                    "993",
+                    "1006",
+                    "999"
+                ],
+                "observation": "1000, niece_of, 993\n1006, niece_of, 993\n999, niece_of, 993"
+            },
+            {
+                "i": 2,
+                "thought": "The observations indicate that entities 1000, 1006, and 999 are all identified as nieces of entity 993. Therefore, I can directly conclude the answer based on the available information. ",
+                "action": "Finish[1000 | 1006 | 999]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1838,
+        "question": "Who is 447's niece?",
+        "prediction": [
+            "472",
+            "2529",
+            "610"
+        ],
+        "answers": [
+            "2526",
+            "449"
+        ],
+        "hard_answer": [
+            "2526"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 447 to find out if there are any relations that indicate who their niece is.  ",
+                "action": "Search[447]",
+                "triples": [
+                    "2529, niece_of, 447",
+                    "472, niece_of, 447",
+                    "610, niece_of, 447"
+                ],
+                "entity_names": [
+                    "447"
+                ],
+                "one_hop_relations": [
+                    "niece_of"
+                ],
+                "new_entities": [
+                    "472",
+                    "610",
+                    "2529",
+                    "447"
+                ],
+                "observation": "2529, niece_of, 447\n472, niece_of, 447\n610, niece_of, 447"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, 2529, 472, and 610 are identified as the nieces of entity 447. Since these entities are connected through the relationship \"niece_of,\" they directly answer the question.  ",
+                "action": "Finish[2529 | 472 | 610]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1863,
+        "question": "Who is 2079's niece?",
+        "prediction": [
+            "2087"
+        ],
+        "answers": [
+            "1333",
+            "1465",
+            "2086"
+        ],
+        "hard_answer": [
+            "2086"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 2079 to find any relations that specify familial connections, particularly focusing on potential niece relationships.  ",
+                "action": "Search[2079]",
+                "triples": [
+                    "1489, nephew_of, 2079",
+                    "1490, nephew_of, 2079",
+                    "2079, aunt_of, 2085",
+                    "2079, aunt_of, 2087",
+                    "2085, nephew_of, 2079",
+                    "2087, niece_of, 2079"
+                ],
+                "entity_names": [
+                    "2079"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "aunt_of",
+                    "nephew_of"
+                ],
+                "new_entities": [
+                    "2079",
+                    "2085",
+                    "2087",
+                    "1489",
+                    "1490"
+                ],
+                "observation": "1489, nephew_of, 2079\n1490, nephew_of, 2079\n2079, aunt_of, 2085\n2079, aunt_of, 2087\n2085, nephew_of, 2079\n2087, niece_of, 2079"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 2079 has a direct relationship indicating it is the aunt of entities 2085 and 2087. Furthermore, it appears that entity 2087 is specifically noted as a niece of 2079. Therefore, I can conclude that 2087 is the answer to the question about who is 2079's niece.  ",
+                "action": "Finish[2087]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1877,
+        "question": "Who is 555's niece?",
+        "prediction": [
+            "558",
+            "560",
+            "162",
+            "559",
+            "563"
+        ],
+        "answers": [
+            "572",
+            "571"
+        ],
+        "hard_answer": [
+            "572"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 555 to find any relationships that indicate who their niece might be. This will help me identify familial connections to determine the niece.  ",
+                "action": "Search[555]",
+                "triples": [
+                    "555, niece_of, 571"
+                ],
+                "entity_names": [
+                    "555"
+                ],
+                "one_hop_relations": [
+                    "niece_of"
+                ],
+                "new_entities": [
+                    "571",
+                    "555"
+                ],
+                "observation": "555, niece_of, 571"
+            },
+            {
+                "i": 2,
+                "thought": "I have found that entity 555 has a relationship indicating that they are the niece of entity 571. To identify who 571 is, I need to search for this entity to see if there are any additional relationships that clarify their identity.  ",
+                "action": "Search[571]",
+                "triples": [
+                    "553, brother_of, 571",
+                    "568, father_of, 571",
+                    "571, sister_of, 553",
+                    "571, sister_of, 572",
+                    "572, brother_of, 571"
+                ],
+                "entity_names": [
+                    "571"
+                ],
+                "one_hop_relations": [
+                    "brother_of",
+                    "sister_of",
+                    "father_of"
+                ],
+                "new_entities": [
+                    "572",
+                    "568",
+                    "553"
+                ],
+                "observation": "553, brother_of, 571\n568, father_of, 571\n571, sister_of, 553\n571, sister_of, 572\n572, brother_of, 571"
+            },
+            {
+                "i": 3,
+                "thought": "Entity 571 has several familial relationships, including being the brother of 553 and the sister of both 553 and 572. To determine who 555's niece is, I need to see if either 553 or 572 has any children, as they would be the potential parents of 555's niece. Therefore, I should search for both 553 and 572 to uncover any relevant relationships.  ",
+                "action": "Search[553 | 572]",
+                "triples": [
+                    "553, father_of, 162",
+                    "553, father_of, 558",
+                    "553, father_of, 559",
+                    "553, father_of, 560",
+                    "553, father_of, 563",
+                    "559, niece_of, 572",
+                    "569, mother_of, 553",
+                    "569, mother_of, 572",
+                    "571, sister_of, 553",
+                    "571, sister_of, 572"
+                ],
+                "entity_names": [
+                    "553",
+                    "572"
+                ],
+                "one_hop_relations": [
+                    "mother_of",
+                    "sister_of",
+                    "niece_of"
+                ],
+                "new_entities": [
+                    "560",
+                    "162",
+                    "569",
+                    "559",
+                    "558",
+                    "563"
+                ],
+                "observation": "553, father_of, 162\n553, father_of, 558\n553, father_of, 559\n553, father_of, 560\n553, father_of, 563\n559, niece_of, 572\n569, mother_of, 553\n569, mother_of, 572\n571, sister_of, 553\n571, sister_of, 572"
+            },
+            {
+                "i": 4,
+                "thought": "Entity 553 has multiple children: 162, 558, 559, 560, and 563. Since 555 is a niece of 571, and 571 is the sibling of 553, the niece of 555 must be the child of 553. I will identify the children of 553 to confirm who is 555's niece from this list.  ",
+                "action": "Finish[162 | 558 | 559 | 560 | 563]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1899,
+        "question": "Who is 728's niece?",
+        "prediction": [
+            "2861"
+        ],
+        "answers": [
+            "729",
+            "733",
+            "749",
+            "590",
+            "2913",
+            "896",
+            "727",
+            "732",
+            "529"
+        ],
+        "hard_answer": [
+            "749"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to find information about entity 728 to determine who their niece is. This will likely involve searching for relationships that indicate familial connections, specifically any mention of children or siblings of 728. ",
+                "action": "Search[728]",
+                "triples": [
+                    "2862, aunt_of, 728",
+                    "728, aunt_of, 743",
+                    "728, aunt_of, 746",
+                    "728, aunt_of, 747",
+                    "728, niece_of, 2861",
+                    "728, sister_of, 730",
+                    "728, sister_of, 733",
+                    "729, sister_of, 728",
+                    "733, sister_of, 728",
+                    "734, sister_of, 728"
+                ],
+                "entity_names": [
+                    "728"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "aunt_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "733",
+                    "729",
+                    "730",
+                    "746",
+                    "743",
+                    "2862",
+                    "2861",
+                    "734",
+                    "747",
+                    "728"
+                ],
+                "observation": "2862, aunt_of, 728\n728, aunt_of, 743\n728, aunt_of, 746\n728, aunt_of, 747\n728, niece_of, 2861\n728, sister_of, 730\n728, sister_of, 733\n729, sister_of, 728\n733, sister_of, 728\n734, sister_of, 728"
+            },
+            {
+                "i": 2,
+                "thought": "Since 728 is mentioned as the \"aunt_of\" 743, 746, and 747, and also as the \"niece_of\" 2861, I can conclude that 2861 is the niece of 728. The other entities listed (743, 746, 747) do not directly help me determine who 728's niece is, as they are described as nephews. ",
+                "action": "Finish[2861]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1905,
+        "question": "Who is 1200's niece?",
+        "prediction": [
+            "690",
+            "1440"
+        ],
+        "answers": [
+            "1201",
+            "1119",
+            "1195",
+            "1199",
+            "1196",
+            "1198"
+        ],
+        "hard_answer": [
+            "1119"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1200 to determine its relationships and see if there is any information regarding a niece. This will help me establish a connection to identify who 1200's niece might be.  ",
+                "action": "Search[1200]",
+                "triples": [
+                    "1154, uncle_of, 1200",
+                    "1196, sister_of, 1200",
+                    "1199, sister_of, 1200",
+                    "1200, sister_of, 1194",
+                    "1200, sister_of, 1196",
+                    "1200, sister_of, 1201"
+                ],
+                "entity_names": [
+                    "1200"
+                ],
+                "one_hop_relations": [
+                    "nice_of",
+                    "uncle_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "1200",
+                    "1201",
+                    "1199",
+                    "1196",
+                    "1194",
+                    "1154"
+                ],
+                "observation": "1154, uncle_of, 1200\n1196, sister_of, 1200\n1199, sister_of, 1200\n1200, sister_of, 1194\n1200, sister_of, 1196\n1200, sister_of, 1201"
+            },
+            {
+                "i": 2,
+                "thought": "The observations show that 1200 has multiple sisters (1194, 1196, and 1201), and it is important to determine if any of these sisters have children, as a niece would be the daughter of one of 1200's siblings. I need to search for the relationships of 1200's sisters to see if any of them have children.  ",
+                "action": "Search[1194 | 1196 | 1201]",
+                "triples": [
+                    "1119, niece_of, 1201",
+                    "1158, mother_of, 1194",
+                    "1158, mother_of, 1196",
+                    "1193, father_of, 1201",
+                    "1196, daughter_of, 1158",
+                    "1196, mother_of, 1439",
+                    "1196, sister_of, 1194",
+                    "1196, sister_of, 1194",
+                    "1196, sister_of, 1198",
+                    "1196, sister_of, 1199",
+                    "1196, sister_of, 1201",
+                    "1196, sister_of, 1201",
+                    "1198, sister_of, 1194",
+                    "1198, sister_of, 1201",
+                    "1199, sister_of, 1201",
+                    "1200, sister_of, 1194",
+                    "1200, sister_of, 1196",
+                    "1200, sister_of, 1201",
+                    "1440, daughter_of, 1196",
+                    "1440, niece_of, 1194",
+                    "690, niece_of, 1201"
+                ],
+                "entity_names": [
+                    "1194",
+                    "1196",
+                    "1201"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "sister_of",
+                    "father_of"
+                ],
+                "new_entities": [
+                    "1158",
+                    "1198",
+                    "1440",
+                    "690",
+                    "1439",
+                    "1193",
+                    "1119"
+                ],
+                "observation": "1119, niece_of, 1201\n1158, mother_of, 1194\n1158, mother_of, 1196\n1193, father_of, 1201\n1196, daughter_of, 1158\n1196, mother_of, 1439\n1196, sister_of, 1194\n1196, sister_of, 1194\n1196, sister_of, 1198\n1196, sister_of, 1199\n1196, sister_of, 1201\n1196, sister_of, 1201\n1198, sister_of, 1194\n1198, sister_of, 1201\n1199, sister_of, 1201\n1200, sister_of, 1194\n1200, sister_of, 1196\n1200, sister_of, 1201\n1440, daughter_of, 1196\n1440, niece_of, 1194\n690, niece_of, 1201"
+            },
+            {
+                "i": 3,
+                "thought": "Observations indicate that 1200's sister, 1196, has a daughter (1440), making her the niece of 1200. Additionally, 1201 has a child (690), who is also a niece of 1200. I will conclude that 1440 and 690 are the nieces of 1200 based on these relationships.  ",
+                "action": "Finish[1440 | 690]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1910,
+        "question": "Who is 1392's niece?",
+        "prediction": [
+            "1547",
+            "1395",
+            "2241",
+            "1766"
+        ],
+        "answers": [
+            "1398"
+        ],
+        "hard_answer": [
+            "1398"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1392 to find any relationships that indicate who their niece might be. Since \"niece\" is a familial relationship, I will look for any connections to siblings or children of 1392 that could lead to identifying a niece.  ",
+                "action": "Search[1392]",
+                "triples": [
+                    "1392, niece_of, 1766",
+                    "1392, sister_of, 1513",
+                    "1392, sister_of, 1514",
+                    "1392, sister_of, 1515",
+                    "1392, sister_of, 1516",
+                    "1513, brother_of, 1392",
+                    "1514, brother_of, 1392",
+                    "1515, brother_of, 1392",
+                    "1516, sister_of, 1392"
+                ],
+                "entity_names": [
+                    "1392"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "sister_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "1513",
+                    "1514",
+                    "1515",
+                    "1766",
+                    "1516",
+                    "1392"
+                ],
+                "observation": "1392, niece_of, 1766\n1392, sister_of, 1513\n1392, sister_of, 1514\n1392, sister_of, 1515\n1392, sister_of, 1516\n1513, brother_of, 1392\n1514, brother_of, 1392\n1515, brother_of, 1392\n1516, sister_of, 1392"
+            },
+            {
+                "i": 2,
+                "thought": "To determine who 1392's niece is, I can see that 1392 has multiple siblings (1513, 1514, 1515, and 1516). To identify the niece, I need to find the children of these siblings, as the children of 1392's siblings would be 1392's nieces or nephews. I will start by searching for the children of one of these siblings to see if any of them are explicitly mentioned.  ",
+                "action": "Search[1513 | 1514 | 1515 | 1516]",
+                "triples": [
+                    "1392, sister_of, 1513",
+                    "1392, sister_of, 1515",
+                    "1395, niece_of, 1513",
+                    "1395, niece_of, 1514",
+                    "1395, niece_of, 1516",
+                    "1398, daughter_of, 1516",
+                    "1511, father_of, 1515",
+                    "1512, mother_of, 1513",
+                    "1512, mother_of, 1516",
+                    "1513, brother_of, 1515",
+                    "1514, son_of, 1511",
+                    "1514, son_of, 1512",
+                    "1515, brother_of, 1392",
+                    "1515, father_of, 2228",
+                    "1516, niece_of, 1547",
+                    "1516, niece_of, 1766",
+                    "1516, niece_of, 2241",
+                    "1516, sister_of, 1513",
+                    "1516, sister_of, 1515",
+                    "2224, niece_of, 1516",
+                    "2228, nephew_of, 1514"
+                ],
+                "entity_names": [
+                    "1513",
+                    "1514",
+                    "1515",
+                    "1516"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "daughter_of",
+                    "mother_of"
+                ],
+                "new_entities": [
+                    "1512",
+                    "2241",
+                    "2224",
+                    "1398",
+                    "1395",
+                    "2228",
+                    "1511",
+                    "1547"
+                ],
+                "observation": "1392, sister_of, 1513\n1392, sister_of, 1515\n1395, niece_of, 1513\n1395, niece_of, 1514\n1395, niece_of, 1516\n1398, daughter_of, 1516\n1511, father_of, 1515\n1512, mother_of, 1513\n1512, mother_of, 1516\n1513, brother_of, 1515\n1514, son_of, 1511\n1514, son_of, 1512\n1515, brother_of, 1392\n1515, father_of, 2228\n1516, niece_of, 1547\n1516, niece_of, 1766\n1516, niece_of, 2241\n1516, sister_of, 1513\n1516, sister_of, 1515\n2224, niece_of, 1516\n2228, nephew_of, 1514"
+            },
+            {
+                "i": 3,
+                "thought": "To identify 1392's niece, I need to focus on the children of 1392's siblings (1513, 1514, 1515, and 1516). From the previous search, I see that 1395 is mentioned as a niece of siblings 1513 and 1514, while 1516 has multiple nieces (1547, 1766, and 2241). I will extract and confirm the identities of these nieces to ensure they are indeed related to 1392.  ",
+                "action": "Finish[1395 | 1547 | 1766 | 2241]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1913,
+        "question": "Who is the niece of 2856?",
+        "prediction": [
+            "695",
+            "694",
+            "702",
+            "696"
+        ],
+        "answers": [
+            "1625",
+            "699",
+            "2857",
+            "710",
+            "712",
+            "708",
+            "711",
+            "714",
+            "2858"
+        ],
+        "hard_answer": [
+            "699"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 2856 to find out who its niece is. This will help me identify the relationships connected to 2856, particularly focusing on familial ties.  ",
+                "action": "Search[2856]",
+                "triples": [
+                    "2856, aunt_of, 2854",
+                    "2856, aunt_of, 696",
+                    "2856, aunt_of, 697",
+                    "2856, aunt_of, 703",
+                    "2856, aunt_of, 705",
+                    "2856, sister_of, 1625",
+                    "2856, sister_of, 692",
+                    "2858, sister_of, 2856",
+                    "694, niece_of, 2856",
+                    "695, niece_of, 2856",
+                    "696, niece_of, 2856",
+                    "702, niece_of, 2856"
+                ],
+                "entity_names": [
+                    "2856"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "aunt_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "2858",
+                    "703",
+                    "2854",
+                    "697",
+                    "2856",
+                    "1625",
+                    "692",
+                    "694",
+                    "695",
+                    "702",
+                    "696",
+                    "705"
+                ],
+                "observation": "2856, aunt_of, 2854\n2856, aunt_of, 696\n2856, aunt_of, 697\n2856, aunt_of, 703\n2856, aunt_of, 705\n2856, sister_of, 1625\n2856, sister_of, 692\n2858, sister_of, 2856\n694, niece_of, 2856\n695, niece_of, 2856\n696, niece_of, 2856\n702, niece_of, 2856"
+            },
+            {
+                "i": 2,
+                "thought": "The search on entity 2856 reveals multiple relationships indicating that it has several nieces: 694, 695, 696, and 702. These entities are all connected to 2856 through the \"niece_of\" relationship. I need to finalize the answer by listing these nieces clearly.  ",
+                "action": "Finish[694 | 695 | 696 | 702]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1920,
+        "question": "Who is 1006's niece?",
+        "prediction": [
+            "994",
+            "995",
+            "993"
+        ],
+        "answers": [
+            "1001",
+            "830",
+            "1005",
+            "1003",
+            "1000"
+        ],
+        "hard_answer": [
+            "830"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1006 to find any relationships that indicate who their niece might be. This will help identify familial connections related to 1006.  ",
+                "action": "Search[1006]",
+                "triples": [
+                    "1003, brother_of, 1006",
+                    "1006, aunt_of, 828",
+                    "1006, aunt_of, 829",
+                    "1006, niece_of, 993",
+                    "1006, niece_of, 994",
+                    "1006, niece_of, 995",
+                    "832, niece_of, 1006",
+                    "994, aunt_of, 1006",
+                    "995, aunt_of, 1006"
+                ],
+                "entity_names": [
+                    "1006"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "aunt_of",
+                    "brother_of"
+                ],
+                "new_entities": [
+                    "994",
+                    "1006",
+                    "829",
+                    "828",
+                    "832",
+                    "1003",
+                    "995",
+                    "993"
+                ],
+                "observation": "1003, brother_of, 1006\n1006, aunt_of, 828\n1006, aunt_of, 829\n1006, niece_of, 993\n1006, niece_of, 994\n1006, niece_of, 995\n832, niece_of, 1006\n994, aunt_of, 1006\n995, aunt_of, 1006"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 1006 is identified as having multiple nieces, specifically entities 993, 994, and 995. The relationship \"niece_of\" indicates a direct familial connection, which confirms that these entities are indeed related to 1006 as their uncle or aunt. Therefore, I can now conclude who 1006's nieces are.  ",
+                "action": "Finish[993 | 994 | 995]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1923,
+        "question": "Who is the niece of 1155?",
+        "prediction": [
+            "1200",
+            "1198"
+        ],
+        "answers": [
+            "1196",
+            "1159",
+            "1156",
+            "1154"
+        ],
+        "hard_answer": [
+            "1196"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1155 to determine any relationships that indicate who their niece might be. Action 1: Search[1155]",
+                "action": "Search[1155]",
+                "triples": [
+                    "1155, aunt_of, 1194",
+                    "1155, aunt_of, 1198",
+                    "1155, aunt_of, 1199",
+                    "1155, aunt_of, 1200",
+                    "1155, aunt_of, 1201",
+                    "1155, sister_of, 1156",
+                    "1155, sister_of, 1157",
+                    "1155, sister_of, 1159",
+                    "1155, sister_of, 638",
+                    "1156, sister_of, 1155",
+                    "1198, niece_of, 1155",
+                    "1200, niece_of, 1155"
+                ],
+                "entity_names": [
+                    "1155"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "aunt_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "1159",
+                    "1156",
+                    "1200",
+                    "1157",
+                    "1198",
+                    "638",
+                    "1155",
+                    "1201",
+                    "1199",
+                    "1194"
+                ],
+                "observation": "1155, aunt_of, 1194\n1155, aunt_of, 1198\n1155, aunt_of, 1199\n1155, aunt_of, 1200\n1155, aunt_of, 1201\n1155, sister_of, 1156\n1155, sister_of, 1157\n1155, sister_of, 1159\n1155, sister_of, 638\n1156, sister_of, 1155\n1198, niece_of, 1155\n1200, niece_of, 1155"
+            },
+            {
+                "i": 2,
+                "thought": "Entity 1155 has several relationships indicating that it is an aunt to multiple entities (1194, 1198, 1199, 1200, 1201) and a sister to several others (1156, 1157, 1159, 638). Notably, entities 1198 and 1200 are explicitly stated as nieces of 1155. I can conclude that I have identified the nieces of 1155. ",
+                "action": "Finish[1198 | 1200]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1925,
+        "question": "Who is the niece of 559?",
+        "prediction": [
+            "572"
+        ],
+        "answers": [
+            "563",
+            "558",
+            "560",
+            "562",
+            "2654",
+            "557"
+        ],
+        "hard_answer": [
+            "2654"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 559 to find out about its relationships and determine if there is a direct connection to a niece. This will help identify any family ties or related entities.  ",
+                "action": "Search[559]",
+                "triples": [
+                    "559, aunt_of, 2654",
+                    "559, aunt_of, 412",
+                    "559, aunt_of, 416",
+                    "559, aunt_of, 418",
+                    "559, niece_of, 572",
+                    "559, sister_of, 162",
+                    "559, sister_of, 557",
+                    "559, sister_of, 560",
+                    "559, sister_of, 562",
+                    "561, sister_of, 559",
+                    "571, aunt_of, 559"
+                ],
+                "entity_names": [
+                    "559"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "aunt_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "561",
+                    "560",
+                    "162",
+                    "557",
+                    "412",
+                    "559",
+                    "2654",
+                    "416",
+                    "418",
+                    "562",
+                    "572",
+                    "571"
+                ],
+                "observation": "559, aunt_of, 2654\n559, aunt_of, 412\n559, aunt_of, 416\n559, aunt_of, 418\n559, niece_of, 572\n559, sister_of, 162\n559, sister_of, 557\n559, sister_of, 560\n559, sister_of, 562\n561, sister_of, 559\n571, aunt_of, 559"
+            },
+            {
+                "i": 2,
+                "thought": "The search for entity 559 provided several relationships, including a direct indication of who the niece of 559 is, specifically 572. I can conclude that I have the necessary information to answer the question.  ",
+                "action": "Finish[572]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1930,
+        "question": "Who is 744's niece?",
+        "prediction": [
+            "2128",
+            "720",
+            "718",
+            "716"
+        ],
+        "answers": [
+            "743",
+            "713",
+            "749",
+            "747"
+        ],
+        "hard_answer": [
+            "713"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 744 to find out if there are any known relationships that can help identify who their niece is. This will involve looking for familial relationships or connections that explicitly mention a niece.  ",
+                "action": "Search[744]",
+                "triples": [
+                    "2128, niece_of, 744",
+                    "716, niece_of, 744",
+                    "718, niece_of, 744",
+                    "720, niece_of, 744",
+                    "744, aunt_of, 2128",
+                    "744, aunt_of, 708",
+                    "744, aunt_of, 712",
+                    "744, aunt_of, 718",
+                    "744, aunt_of, 951",
+                    "744, niece_of, 529",
+                    "744, sister_of, 706",
+                    "744, sister_of, 742",
+                    "744, sister_of, 745",
+                    "744, sister_of, 747",
+                    "745, sister_of, 744"
+                ],
+                "entity_names": [
+                    "744"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "aunt_of",
+                    "sister_of"
+                ],
+                "new_entities": [
+                    "712",
+                    "2128",
+                    "951",
+                    "744",
+                    "747",
+                    "742",
+                    "720",
+                    "745",
+                    "718",
+                    "529",
+                    "706",
+                    "708",
+                    "716"
+                ],
+                "observation": "2128, niece_of, 744\n716, niece_of, 744\n718, niece_of, 744\n720, niece_of, 744\n744, aunt_of, 2128\n744, aunt_of, 708\n744, aunt_of, 712\n744, aunt_of, 718\n744, aunt_of, 951\n744, niece_of, 529\n744, sister_of, 706\n744, sister_of, 742\n744, sister_of, 745\n744, sister_of, 747\n745, sister_of, 744"
+            },
+            {
+                "i": 2,
+                "thought": "The search results indicate that 744 has multiple nieces: 2128, 716, 718, 720, and 529. I need to confirm the identities of these individuals to provide a clear answer. Since there are multiple entities, I will first focus on the first few nieces mentioned. I will search for the first niece, 2128, to see if I can gather more information about her.  ",
+                "action": "Search[2128]",
+                "triples": [
+                    "2128, daughter_of, 751",
+                    "2128, niece_of, 1341",
+                    "2128, niece_of, 706",
+                    "2128, niece_of, 744",
+                    "2128, niece_of, 746",
+                    "2128, niece_of, 747",
+                    "951, sister_of, 2128"
+                ],
+                "entity_names": [
+                    "2128"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "sister_of",
+                    "daughter_of"
+                ],
+                "new_entities": [
+                    "751",
+                    "746",
+                    "1341"
+                ],
+                "observation": "2128, daughter_of, 751\n2128, niece_of, 1341\n2128, niece_of, 706\n2128, niece_of, 744\n2128, niece_of, 746\n2128, niece_of, 747\n951, sister_of, 2128"
+            },
+            {
+                "i": 3,
+                "thought": "The search results for 2128 show that she is the daughter of 751 and has multiple niece relationships, including one with 744. However, there isn't new information about her being 744's niece. I need to continue exploring the other nieces mentioned to see if they provide additional context. Next, I will search for the second niece, 716.  ",
+                "action": "Search[716]",
+                "triples": [
+                    "716, daughter_of, 715",
+                    "716, niece_of, 743",
+                    "716, niece_of, 744",
+                    "716, niece_of, 745",
+                    "716, niece_of, 748",
+                    "716, niece_of, 749",
+                    "716, sister_of, 717",
+                    "716, sister_of, 719",
+                    "718, sister_of, 716"
+                ],
+                "entity_names": [
+                    "716"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "sister_of",
+                    "daughter_of"
+                ],
+                "new_entities": [
+                    "749",
+                    "715",
+                    "719",
+                    "717",
+                    "743",
+                    "748"
+                ],
+                "observation": "716, daughter_of, 715\n716, niece_of, 743\n716, niece_of, 744\n716, niece_of, 745\n716, niece_of, 748\n716, niece_of, 749\n716, sister_of, 717\n716, sister_of, 719\n718, sister_of, 716"
+            },
+            {
+                "i": 4,
+                "thought": "The search results for 716 indicate that she is also a niece of 744, along with having multiple other familial connections. Since 716 does not provide additional insights about other relationships, I will proceed to search for the next niece, 718, to gather more information.  ",
+                "action": "Search[718]",
+                "triples": [
+                    "718, daughter_of, 715",
+                    "718, niece_of, 744",
+                    "718, niece_of, 746",
+                    "718, niece_of, 747",
+                    "718, niece_of, 749",
+                    "718, sister_of, 716",
+                    "718, sister_of, 717",
+                    "718, sister_of, 720",
+                    "720, sister_of, 718"
+                ],
+                "entity_names": [
+                    "718"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "daughter_of",
+                    "sister_of"
+                ],
+                "new_entities": [],
+                "observation": "718, daughter_of, 715\n718, niece_of, 744\n718, niece_of, 746\n718, niece_of, 747\n718, niece_of, 749\n718, sister_of, 716\n718, sister_of, 717\n718, sister_of, 720\n720, sister_of, 718"
+            },
+            {
+                "i": 5,
+                "thought": "The search results for 718 confirm that she is also a niece of 744. There is consistency among the nieces identified so far. Next, to gather a complete picture, I will search for the last niece mentioned, 720, to see if she provides any additional context or information.  ",
+                "action": "Search[720]",
+                "triples": [
+                    "718, sister_of, 720",
+                    "720, daughter_of, 706",
+                    "720, niece_of, 742",
+                    "720, niece_of, 743",
+                    "720, niece_of, 744",
+                    "720, niece_of, 747",
+                    "720, niece_of, 748",
+                    "720, sister_of, 718",
+                    "720, sister_of, 719"
+                ],
+                "entity_names": [
+                    "720"
+                ],
+                "one_hop_relations": [
+                    "niece_of",
+                    "sister_of",
+                    "daughter_of"
+                ],
+                "new_entities": [],
+                "observation": "718, sister_of, 720\n720, daughter_of, 706\n720, niece_of, 742\n720, niece_of, 743\n720, niece_of, 744\n720, niece_of, 747\n720, niece_of, 748\n720, sister_of, 718\n720, sister_of, 719"
+            },
+            {
+                "i": 6,
+                "thought": "The search results for 720 confirm that she is also a niece of 744, further supporting the previous findings about the familial relationships. Now, I have gathered the names of 744's nieces: 2128, 716, 718, and 720. Since I have sufficient information about multiple nieces, I can finalize the answer.  ",
+                "action": "Finish[2128 | 716 | 718 | 720]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 1940,
+        "question": "Who is the niece of 1267?",
+        "prediction": [
+            "1287",
+            "1289",
+            "1286"
+        ],
+        "answers": [
+            "1271",
+            "1274",
+            "1268",
+            "1272",
+            "1743",
+            "2465",
+            "1263",
+            "1258",
+            "1276",
+            "1266",
+            "1270",
+            "2464",
+            "1273"
+        ],
+        "hard_answer": [
+            "1258"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 1267 to find out who is related to it as a niece. This will help me identify the specific relationships associated with 1267.  ",
+                "action": "Search[1267]",
+                "triples": [
+                    "1267, niece_of, 1286",
+                    "1267, niece_of, 1287",
+                    "1267, niece_of, 1289"
+                ],
+                "entity_names": [
+                    "1267"
+                ],
+                "one_hop_relations": [
+                    "niece_of"
+                ],
+                "new_entities": [
+                    "1267",
+                    "1286",
+                    "1289",
+                    "1287"
+                ],
+                "observation": "1267, niece_of, 1286\n1267, niece_of, 1287\n1267, niece_of, 1289"
+            },
+            {
+                "i": 2,
+                "thought": "Based on the observations, I see that 1267 has three individuals (1286, 1287, and 1289) who are identified as its nieces. I can conclude that these are the individuals I am looking for.  ",
+                "action": "Finish[1286 | 1287 | 1289]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    },
+    {
+        "index": 2168,
+        "question": "Who is 409's brother?",
+        "prediction": [
+            "431"
+        ],
+        "answers": [
+            "2634"
+        ],
+        "hard_answer": [
+            "2634"
+        ],
+        "records": [
+            {
+                "i": 1,
+                "thought": "I need to search for entity 409 to find any relationships that might indicate who their brother is. This could involve looking for direct familial relationships or any relevant connections that specify siblings.  ",
+                "action": "Search[409]",
+                "triples": [
+                    "2643, son_of, 409",
+                    "409, father_of, 2642",
+                    "409, father_of, 2643",
+                    "409, father_of, 591",
+                    "409, son_of, 682",
+                    "431, son_of, 409",
+                    "591, son_of, 409",
+                    "682, mother_of, 409",
+                    "683, father_of, 409"
+                ],
+                "entity_names": [
+                    "409"
+                ],
+                "one_hop_relations": [
+                    "father_of",
+                    "mother_of",
+                    "son_of"
+                ],
+                "new_entities": [
+                    "591",
+                    "2642",
+                    "2643",
+                    "682",
+                    "431",
+                    "409",
+                    "683"
+                ],
+                "observation": "2643, son_of, 409\n409, father_of, 2642\n409, father_of, 2643\n409, father_of, 591\n409, son_of, 682\n431, son_of, 409\n591, son_of, 409\n682, mother_of, 409\n683, father_of, 409"
+            },
+            {
+                "i": 2,
+                "thought": "The observations indicate that 409 has multiple children (2642, 2643, and 591) and is also a child of 682. However, there is no direct mention of a sibling relationship. The entity 431 is also noted as a son of 409, which suggests that 431 could be a brother. I need to confirm this relationship to assert that 431 is indeed 409's brother.  ",
+                "action": "Finish[431]"
+            }
+        ],
+        "error": null,
+        "overlap": []
+    }
+]
