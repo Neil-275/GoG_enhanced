@@ -6,6 +6,8 @@ import time
 import openai
 import re
 import sys
+from yaml import safe_load
+
 
 sys.path.append("src")
 # from sentence_transformers import util
@@ -89,6 +91,12 @@ def shorten_relation(rel):
 def read_file(filepath: str):
     with open(filepath, "r") as f:
         content = f.read()
+    return content
+
+
+def load_yaml(filepath: str):
+    with open(filepath, "r") as f:
+        content = safe_load(f)
     return content
 
 

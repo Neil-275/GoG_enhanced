@@ -17,14 +17,20 @@ from GoG.utils import (
     shorten_relation,
     convert_triples_to_str,
     extract_numbers_from_string,
-    parse_generated_relation_directions
+    parse_generated_relation_directions,
+    load_yaml
 )
-from GoG.GoG_llms import run_llm
+from GoG.GoG_llms import run_llm, run_llm_structured
 from GoG.gnn_interface import OneShotInterface
 import pandas as pd
 import pickle as pkl
 import os
 import sys
+from GoG.schema import (
+    ReasoningChain, Action, GatherChainOutput,
+    Triplet, ChainExpansion, NewChain,
+    FilterRelationOutput
+)
 # from rank_bm25 import BM25Okapi
 
 # Note: Some legacy methods are not available in the new KGInterface
@@ -97,6 +103,7 @@ class KGEnv:
         self.generate_call_count = 0
         self.topic_entities = None
         self.question = None
+        self.reasoning_chains: list[ReasoningChain] = []
 
     # def update_name_to_id(self, name_to_id):
     #     name_to_id = {name.lower(): id for name, id in name_to_id.items()}
@@ -110,6 +117,13 @@ class KGEnv:
     #     id_to_name = {id:id for id in id_to_name}
     #     self.id_to_name.update(id_to_name)
     #     self.name_to_id.update({label: id for id, label in id_to_name.items()})
+
+    @property
+    def reasoning_chains_str(self):
+        string = ""
+        for chain in self.reasoning_chains:
+            string += str(chain) + "\n"
+        return string
 
     def assign_query(self, topic_entities, question):
         self.topic_entities = topic_entities
@@ -126,16 +140,16 @@ class KGEnv:
         self.llm_output = None
         self.generate_call_count = 0
 
-
     def convert_records_to_str(self):
         string = ""
         for record in self.records:
-            string += "Thought {i}: {thought}\nAction {i}: {action}\nObservation {i}: {observation}\n".format(
-                i=record["i"],
-                action=record["action"],
-                thought=record["thought"],
-                observation=record["observation"],
-            )
+            # string += "Thought {i}: {thought}\nAction {i}: {action}\nObservation {i}: {observation}\n".format(
+            #     i=record["i"],
+            #     action=record["action"],
+            #     thought=record["thought"],
+            #     observation=record["observation"],
+            # )
+            string += f"Thought: {record['thought']}\nAction: {record['action']}\n"
         return string
 
     def synthesize_answer(self, prompt):
@@ -183,35 +197,93 @@ class KGEnv:
 
     @property
     def last_thought(self):
+        if not self.records:
+            return ""
         return self.records[-1]["thought"]
 
     @property
     def last_action(self):
+        if not self.records:
+            return ""
         return self.records[-1]["action"]
 
-    def step(self, action_str=None):
-        logger.debug(action_str)
+    # def step(self, action_str=None):
+    #     logger.debug(action_str)
 
-        pattern = r"(\w+)(\[.+\])"
-        result = re.match(pattern, action_str)
+    #     pattern = r"(\w+)(\[.+\])"
+    #     result = re.match(pattern, action_str)
 
-        logger.debug(f'Result: {result}')
-        action = result.group(1).lower()
-        parameter = result.group(2)
+    #     logger.debug(f'Result: {result}')
+    #     action = result.group(1).lower()
+    #     parameter = result.group(2)
 
-        logger.info(f"Action: {action}, Parameter: {parameter}")
+    #     logger.info(f"Action: {action}, Parameter: {parameter}")
 
-        if action == "search":
-            if parameter == "[ALL]":
-                # repeat last search, but search two-hop
-                self.records[-1]["thought"] = self.records[-2]["thought"]
-                entity_str = convert_list_to_str(self.records[-2]["new_entities"])
-                return self.search(entity_str)
-            else:
-                return self.search(parameter)
-        elif action == "generate":
+    #     if action == "search":
+    #         if parameter == "[ALL]":
+    #             # repeat last search, but search two-hop
+    #             self.records[-1]["thought"] = self.records[-2]["thought"]
+    #             entity_str = convert_list_to_str(self.records[-2]["new_entities"])
+    #             return self.search(entity_str)
+    #         else:
+    #             return self.search(parameter)
+    #     elif action == "generate":
+    #         self.generate_call_count += 1
+    #         return self.generate(parameter)
+
+    def step(self, action: Action):
+        if action.type == "search":
+            return self.search(action.params)
+        elif action.type == "generate":
             self.generate_call_count += 1
-            return self.generate(parameter)
+            # TODO: Change the parameter
+            return self.generate(action.params)
+
+    def gather_triplets(self, triplets: list[tuple]):
+        gather_prompt: dict[str, str] = load_yaml(f"{self.args.prompt_dir}/gather.yaml")
+        gather_system = gather_prompt["system"]
+        gather_user = gather_prompt["user"].format(
+            question=self.question,
+            previous_thought_and_actions=self.convert_records_to_str(),
+            existing_reasoning_chains=self.reasoning_chains_str,
+            triplets_to_gather=convert_triples_to_str(triplets)
+        )
+
+        gather_response: GatherChainOutput = run_llm_structured(
+            system_prompt=gather_system,
+            user_prompt=gather_user,
+            response_model=GatherChainOutput
+        )
+
+        for expansion in gather_response.chain_expansion:
+            for chain in self.reasoning_chains:
+                if chain.id == expansion.id:
+                    chain.triplets.extend([
+                        (triplet.subject, triplet.relation, triplet.object)
+                        for triplet in expansion.triplets_to_append
+                    ])
+                    break
+            else:
+                self.reasoning_chains.append(
+                    ReasoningChain(
+                        id=str(len(self.reasoning_chains) + 1),
+                        triplets=[
+                            (triplet.subject, triplet.relation, triplet.object)
+                            for triplet in expansion.triplets_to_append
+                        ]
+                    )
+                )
+
+        for new_chain in gather_response.new_chains:
+            self.reasoning_chains.append(
+                ReasoningChain(
+                    id=str(len(self.reasoning_chains) + 1),
+                    triplets=[
+                        (triplet.subject, triplet.relation, triplet.object)
+                        for triplet in new_chain.triplets
+                    ]
+                )
+            )
 
     def generate(self, thought):
         # [...]
@@ -348,7 +420,7 @@ class KGEnv:
 
         return filtered_triples, relations
 
-    def search(self, entity_names):
+    def search_v0(self, entity_names):
         # print(f"Search entity names: {entity_names}", type(entity_names))
         entity_names = parse_llm_output_to_list(entity_names)
 
@@ -442,7 +514,42 @@ class KGEnv:
 
         return convert_triples_to_str(all_related_triples)
 
-    def filter_relations(self, entity_name, relations, thought):
+    def search(self, entity_names: list):
+        """
+        Search for related triples of the given entity names using KGInterface.
+        """
+        all_related_triples = []
+        for entity in entity_names:
+            # Get 1-hop triplets for the entity using KGInterface
+            entity_id = self.convert_name_to_id(entity)
+            if self.kg:
+                try:
+                    neighbors_df = self.kg.get_1hop_triples(entity_id)
+                    neighbors = neighbors_df.values.tolist() if len(neighbors_df) > 0 else []
+                    relations = list(set([triple[1] for triple in neighbors]))
+                except Exception as e:
+                    logger.error(f"Failed to get 1-hop triples for {entity_id}: {e}")
+                    neighbors = []
+                    relations = []
+            else:
+                neighbors = []
+                relations = []
+
+            # Filtering triplets related to question based on relations using LLM
+            filtered_relations = self.filter_relations(
+                entity,
+                relations,
+                self.last_thought
+            )
+
+            related_triplets = self.sample_triples_by_relation(neighbors, filtered_relations)
+            all_related_triples.extend(related_triplets)
+
+        all_related_triples = set(tuple(triple) for triple in all_related_triples)
+        all_related_triples = sorted(all_related_triples)
+        return all_related_triples
+
+    def filter_relations_v0(self, entity_name, relations, thought):
         # logger.debug(f"{thought}\n{entity_name}")
 
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/filter_relations")
@@ -472,6 +579,32 @@ class KGEnv:
         filtered_relations = parse_llm_output_to_list(filtered_relations, sep=',')
 
         return filtered_relations
+
+    def filter_relations(self, entity_name, relations, thought):
+        if len(relations) == 0:
+            return []
+        try:
+            filter_prompt: dict[str, str] = load_yaml(f"{self.args.prompt_dir}/filter_relations.yaml")
+            filter_system = filter_prompt["system"]
+            filter_user = filter_prompt["user"].format(
+                question=self.question,
+                thought=thought,
+                entity=entity_name,
+                relations=convert_list_to_str(relations)
+            )
+            filter_response: FilterRelationOutput = run_llm_structured(
+                system_prompt=filter_system,
+                user_prompt=filter_user,
+                response_model=FilterRelationOutput
+            )
+
+            logger.debug(
+                f"Filter result: {filter_response.relations} with thought: {filter_response.thought}"
+            )
+            return filter_response.relations
+        except Exception as e:
+            logger.error(f"Failed to filter relations for {entity_name}: {e}. Returning original relations")
+            return relations
 
     def select_entity_id_by_types(self, question, entity_name, id_to_types):
         # Note: This method uses id_to_types which requires retrieve_id2types_by_name

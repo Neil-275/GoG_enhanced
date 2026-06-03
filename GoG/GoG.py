@@ -20,7 +20,7 @@ import pandas as pd
 
 # from evaluate import eval_results
 # from kb_interface.freebase_func import convert_name_to_id
-from GoG.GoG_llms import run_llm
+from GoG.GoG_llms import run_llm, run_llm_structured
 from threading import Lock
 # from datasets import load_dataset
 from GoG.utils import (
@@ -30,11 +30,13 @@ from GoG.utils import (
     read_file,
     proxy_load_dataset,
     convert_list_to_str,
+    load_yaml
 )
 from loguru import logger
 import traceback
 import sys
 import subprocess
+from GoG.schema import PlannerResponse, FallbackOutput
 
 
 multiprocessing.set_start_method('spawn', force=True)
@@ -71,7 +73,7 @@ def write_results(data, env: KGEnv, prediction, args, error: str = None):
         )
 
 
-def find_answer(process_idx, idxes_to_process, args, datas, env):
+def find_answer_v0(process_idx, idxes_to_process, args, datas, env):
     logger.debug(f"{process_idx}, {idxes_to_process[0]}")
 
     # if args.wiki:
@@ -239,6 +241,111 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
     logger.info(f"{process_idx} finished")
 
 
+def fallback_answer_question(env: KGEnv, args):
+    # Load fallback prompt
+    fallback_prompt: dict = load_yaml(f"{args.prompt_dir}/fallback.yaml")
+
+    # Prepare messages for fallback LLM
+    fallback_system = fallback_prompt["system"]
+    fallback_user = fallback_prompt["user"].format(
+        question=env.question,
+        existing_reasoning_chains=env.reasoning_chains_str,
+        previous_thought_and_actions=env.convert_records_to_str(),
+    )
+
+    fallback_response: FallbackOutput = run_llm_structured(
+        fallback_system,
+        fallback_user,
+        response_model=FallbackOutput,
+    )
+    return fallback_response.candidates
+
+
+def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv, max_atempts=6):
+    logger.debug(f"{process_idx}, {idxes_to_process[0]}")
+
+    # Do not use arg `no_kg` anymore
+    planner_prompt: dict = load_yaml(f"{args.prompt_dir}/planner.yaml")
+    prediction: list[str] = []
+
+    for n, idx in enumerate(idxes_to_process):
+        try:
+            data = datas[idx]
+            if "question" not in data:
+                data["question"] = data["ProcessedQuestion"]
+
+            logger.info("-----------")
+            logger.info(f"Process query {idx} ...")
+            logger.info(f"Question: {datas[idx]['question']}")
+
+            env.assign_query(data["q_entity"], data['question'])
+
+            done: bool = False
+            for attempt in range(max_atempts):
+                i = len(env.records) + 1
+                planner_system = planner_prompt["system"]
+                planner_user: str = planner_prompt["user"].format(
+                    question=data['question'],
+                    reasoning_chains=env.reasoning_chains_str,
+                    previous_thought_and_actions=env.convert_records_to_str(),
+                )
+                planner_response: PlannerResponse = run_llm_structured(
+                    planner_system,
+                    planner_user,
+                    response_model=PlannerResponse,
+                )
+
+                thought = planner_response.thought
+                action = planner_response.action
+
+                logger.debug(f"Thought {i}: {thought}")
+                logger.debug(f"Action {i}: {action}")
+
+                if action.type == "finish":
+                    done = True
+                    prediction = action.params
+                    env.records.append(
+                        {
+                            "i": i,
+                            "thought": thought,
+                            "action": f"finish[{','.join(prediction)}]",
+                        }
+                    )
+                    break
+                else:
+                    # Both search and generate will return triplets,
+                    # which will be added to the environment and gathered into reasoning chains
+                    env.records.append(
+                        {
+                            "i": i,
+                            "thought": thought,
+                            "action": f"{action.type}[{','.join(action.params)}]"
+                        }
+                    )
+                    obs = env.step(action)
+                    env.gather_triplets(obs)
+
+                    logger.debug(f"[DEBUG] Current reasoning chains: {env.reasoning_chains_str}")
+                    # TODO: Add observation to records if needed
+
+            if not done:
+                logger.warning(
+                    f"Cannot finish query {idx} after {max_atempts} attempts, "
+                    "Use fallback to answer question"
+                )
+                prediction = fallback_answer_question(env, args)
+
+            logger.info(f"Finish query {idx}")
+            logger.info(f"Prediction: {prediction}")
+            logger.info(f"Ground truth: {data['answer']}")
+            write_results(data, env, prediction, args)
+
+        except Exception as e:
+            write_results(data, env, None, args, error=str(e))
+            logger.exception(f"Error processing query {idx} and leave it missing: {e}")
+
+    logger.info(f"{process_idx} finished")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -293,7 +400,7 @@ if __name__ == "__main__":
     parser.add_argument("--n_related_triples", type=int, default=10)
     parser.add_argument("--wiki", action="store_true")
     parser.add_argument("--wiki_num", default=3, type=int)
-    parser.add_argument("--prompt_dir", default='GoG/prompts_v3', type=str)
+    parser.add_argument("--prompt_dir", default='GoG/prompts', type=str)
     parser.add_argument("--sc_num", type=int, default=1,
                         help="choose the number of self-consistency check.")
     parser.add_argument("--debug", action="store_true")
