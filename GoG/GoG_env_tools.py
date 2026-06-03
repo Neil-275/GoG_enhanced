@@ -295,7 +295,10 @@ class KGEnv:
                 result.append(triple_str)
                 
         if len(result) == 0:
+            print("No valid triples generated.")
             return "No valid triples generated."
+        print("Generated triples:")
+        print("\n".join(result))
         return "\n".join(result)
 
     def get_template_variables(self, template_string):

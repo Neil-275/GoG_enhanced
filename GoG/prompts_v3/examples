@@ -3,47 +3,39 @@ For every step, you must first generate a 'Thought' that decomposes the current 
 ## Action Types and Formatting Syntax
 
 1. Search[EntityID_1 | EntityID_2 | ...]
-   - Purpose: Retrieves the explicit, ground-truth 1-hop subgraph (triples) for the specified entities from the KG.
+   - Purpose: Retrieves the triples for the specified entities from the KG.
    - Constraint: 
-      + Extract only concrete entity IDs mentioned in your current Thought. In the first loop, you MUST select from the core topic entities provided in the question. 
-      + Separate multiple entity IDs using a pipe character (|). 
-      + Only use Search for at most 3 entities at a time
-      + Only use Search once for each entity
+      + Always apply Search for the topic entity in the first search
 
 2. Generate[Thought]
    - Purpose: Find extra triples base on a proposed relation around an entity
    - Constraint:
       + The Thought must describe a relation or attribute to discover from an entity
-   - If Generate returns no predictions
-      + Resume explicit graph exploration from previously discovered entities. 
-      + Try alternative relation paths or inverse relations
-
+   
 3. Finish[Answer_1 | Answer_2 | ...]
    - Purpose: Concludes the task and returns the final answers.
    - Constraint: Answers must match the exact entity id present in the retrieved or generated triples. If no logical answer can be derived, output: Finish[unknown]. Separate multiple answers with a pipe character (|).
 
 
-## Critical Tool Selection Protocols
-
-To navigate the incomplete graph efficiently, your Thought step must adhere to these strict routing rules:
-- ALWAYS use `Search` first when dealing with a new entity to capture what is explicitly known in the graph. Do not assume data is missing before checking it. 
-- ONLY use `Generate` if you have already executed `Search` on an entity, but the returned explicit triples contain a structural dead-end or are missing the specific relation required to advance your reasoning path.
-- Do not call `Generate` if the explicit triples from `Search` already cleanly resolve your current reasoning step.
+## Critical Tool Usage:
+- Only use Search for at most 3 entities at a time
+- Only use Generate for 1 entities at a time
+- ONLY use `Generate` if you have already executed `Search` on an entity, but the returned explicit triples contain a structural dead-end or have no relevant triples that have you advance your reasoning
+- If Generate returns no predictions
+      + Switch to another way with existing knowledge
 
 ## Output Format Constraint
 You must generate exactly one Thought block and exactly one Action block per iteration
 
 Important context:
-- Focus on RELATION PATHS as reasoning patterns, not individual triples
+- All entities are masked with ids, use the relations label to infer about them
+- Focus on RELATION PATHS as reasoning patterns
 - Real-world knowledge graphs are always incomplete. Do NOT expect to always find a direct triple that answers the question.
-- Rely on indirect evidence, combining multiple facts and relation paths. If no direct edge exists, reason over intermediate nodes and triples to imply the answer.
-- All entities are masked with ids
 
-
-
+### Example process:
 Question: What state is the education institution that has sports team 561 in?
 Topic Entity: [561]
-Thought 1: I need to search 561 and find the education institution that has it.
+Thought 1: I need to search 561 to find the education institution that has it.
 Action 1: Search[561]
 Observation 1: 561, school_sports_team.school, 125
 561, sports_team.sport, 930

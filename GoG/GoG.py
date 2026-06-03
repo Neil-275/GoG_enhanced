@@ -378,6 +378,9 @@ if __name__ == "__main__":
     #     #     break
     # datas = [data for data in datas if data['id'] in failed_cases]
     print(f"Number of datas to process: {len(datas)}")
+    seed = 222
+    random.seed(seed)
+    random.shuffle(datas)
     datas = datas[1:4]
     idxes_to_process = range(len(datas))
 
@@ -393,8 +396,8 @@ if __name__ == "__main__":
     # args.reranker = FlagReranker("BAAI/bge-reranker-large", use_fp16=True)
     ## Produce a sample_args file
     import pickle as pkl
-    with open("sample_args_fb15k_237.pkl", "wb") as f:
-        pkl.dump(args, f)
+    # with open("sample_args_fb15k_237.pkl", "wb") as f:
+    #     pkl.dump(args, f)
 
     env = KGEnv(args)
 
