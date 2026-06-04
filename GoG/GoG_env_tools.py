@@ -129,7 +129,7 @@ class KGEnv:
         self.topic_entities = topic_entities
         self.question = question
         self.records = []
-
+        self.reasoning_chains = []
         self.triples = []
         self.abbr_rel_to_rel = {}
         self.explored_entities = set()
@@ -140,16 +140,19 @@ class KGEnv:
         self.llm_output = None
         self.generate_call_count = 0
 
-    def convert_records_to_str(self):
+    def convert_records_to_str(self, gather = False):
         string = ""
-        for record in self.records:
+        for i, record in enumerate(self.records):
             # string += "Thought {i}: {thought}\nAction {i}: {action}\nObservation {i}: {observation}\n".format(
             #     i=record["i"],
             #     action=record["action"],
             #     thought=record["thought"],
             #     observation=record["observation"],
             # )
-            string += f"Thought: {record['thought']}\nAction: {record['action']}\n"
+            if gather:
+                string += f"Thought {i+1}: {record['thought']}"
+            else:
+                string += f"Thought {i+1}: {record['thought']}\nAction {i+1}: {record['action']}\nObservation {i+1}: {record['observation']}\n"
         return string
 
     def synthesize_answer(self, prompt):
@@ -232,19 +235,19 @@ class KGEnv:
     #         return self.generate(parameter)
 
     def step(self, action: Action):
+        logger.info("{}[{}]".format(action.type, action.params))
         if action.type == "search":
-            return self.search(action.params)
+            return self.search(action.params.entities)
         elif action.type == "generate":
             self.generate_call_count += 1
-            # TODO: Change the parameter
-            return self.generate(action.params)
+            return self.generate(action.params.query)
 
     def gather_triplets(self, triplets: list[tuple]):
         gather_prompt: dict[str, str] = load_yaml(f"{self.args.prompt_dir}/gather.yaml")
         gather_system = gather_prompt["system"]
         gather_user = gather_prompt["user"].format(
             question=self.question,
-            previous_thought_and_actions=self.convert_records_to_str(),
+            previous_thought_and_actions=self.convert_records_to_str(gather=True),
             existing_reasoning_chains=self.reasoning_chains_str,
             triplets_to_gather=convert_triples_to_str(triplets)
         )
@@ -254,36 +257,90 @@ class KGEnv:
             user_prompt=gather_user,
             response_model=GatherChainOutput
         )
+        # print("gather invoked")
+        observation_lines = []
 
-        for expansion in gather_response.chain_expansion:
-            for chain in self.reasoning_chains:
-                if chain.id == expansion.id:
-                    chain.triplets.extend([
-                        (triplet.subject, triplet.relation, triplet.object)
-                        for triplet in expansion.triplets_to_append
-                    ])
-                    break
-            else:
+        if gather_response.chain_expansion:
+            observation_lines.append("Expand existing chains:")
+            for expansion in gather_response.chain_expansion:
+                target_chain = None
+                for chain in self.reasoning_chains:
+                    if chain.id == expansion.id:
+                        target_chain = chain
+                        break
+
+                existing_triplets = set()
+                if target_chain is not None:
+                    existing_triplets = {
+                        tuple(triplet)
+                        for triplet in target_chain.triplets
+                    }
+
+                appended_triplets = []
+                filtered_triplets = []
+                for triplet in expansion.triplets_to_append:
+                    triplet_tuple = (triplet.subject, triplet.relation, triplet.object)
+                    if triplet_tuple in existing_triplets:
+                        continue
+                    existing_triplets.add(triplet_tuple)
+                    filtered_triplets.append(triplet_tuple)
+                    appended_triplets.append(
+                        f"({triplet.subject}, {triplet.relation}, {triplet.object})"
+                    )
+
+                triplet_text = "; ".join(appended_triplets) if appended_triplets else "no triplets"
+                observation_lines.append(
+                    f"- Chain {expansion.id}: append {triplet_text}"
+                )
+
+                if not filtered_triplets:
+                    continue
+
+                if target_chain is not None:
+                    target_chain.triplets.extend(filtered_triplets)
+                else:
+                    self.reasoning_chains.append(
+                        ReasoningChain(
+                            id=str(len(self.reasoning_chains) + 1),
+                            triplets=filtered_triplets,
+                        )
+                    )
+
+        if gather_response.new_chains:
+            observation_lines.append("Create new chains:")
+            for new_chain in gather_response.new_chains:
+                existing_triplets = set()
+                filtered_triplets = []
+                for triplet in new_chain.triplets:
+                    triplet_tuple = (triplet.subject, triplet.relation, triplet.object)
+                    if triplet_tuple in existing_triplets:
+                        continue
+                    existing_triplets.add(triplet_tuple)
+                    filtered_triplets.append(triplet_tuple)
+
+                triplet_text = "; ".join(
+                    f"({subject}, {relation}, {object})"
+                    for subject, relation, object in filtered_triplets
+                ) or "no new triplets"
+                observation_lines.append(
+                    f"- Chain {new_chain.id}: {triplet_text}"
+                )
+
+                if not filtered_triplets:
+                    continue
+
                 self.reasoning_chains.append(
                     ReasoningChain(
                         id=str(len(self.reasoning_chains) + 1),
-                        triplets=[
-                            (triplet.subject, triplet.relation, triplet.object)
-                            for triplet in expansion.triplets_to_append
-                        ]
+                        triplets=filtered_triplets,
                     )
                 )
 
-        for new_chain in gather_response.new_chains:
-            self.reasoning_chains.append(
-                ReasoningChain(
-                    id=str(len(self.reasoning_chains) + 1),
-                    triplets=[
-                        (triplet.subject, triplet.relation, triplet.object)
-                        for triplet in new_chain.triplets
-                    ]
-                )
-            )
+        if not observation_lines:
+            observation_lines.append("No changes to the reasoning chains.")
+        self.records[-1]["observation"] = "\n".join(observation_lines)
+
+        self.records[-1]["chain"] = self.reasoning_chains_str.split("\n")
 
     def generate(self, thought):
         # [...]
@@ -355,7 +412,7 @@ class KGEnv:
                     relation_path_str = f"{candidate}: {candidate} -{relation_path_str}> {start_entity}"
                 print("relation_path_str:", relation_path_str)
                 relation_paths[candidate] = relation_path_str
-            verified_candidates = self.verify(start_entity, relation, relation_paths, direction)
+            verified_candidates = self.verify(start_entity, shorten_relation(relation), relation_paths, direction)
             for candidate in verified_candidates:
                 if direction == 0:
                     triple = [str(start_entity), str(relation), str(candidate)]
@@ -367,8 +424,8 @@ class KGEnv:
                 result.append(triple_str)
                 
         if len(result) == 0:
-            return "No valid triples generated."
-        return "\n".join(result)
+            return []
+        return result
 
     def get_template_variables(self, template_string):
     # Field names can be None for raw text chunks, so filter those out
@@ -547,6 +604,7 @@ class KGEnv:
 
         all_related_triples = set(tuple(triple) for triple in all_related_triples)
         all_related_triples = sorted(all_related_triples)
+        # self.records[-1]["returned search"] = all_related_triples
         return all_related_triples
 
     def filter_relations_v0(self, entity_name, relations, thought):

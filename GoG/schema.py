@@ -53,9 +53,34 @@ class ReasoningChain(BaseModel):
     # status: Literal["expandable", "complete_promised", "complete_unpromised", None] = None
 
 
-class Action(BaseModel):
-    type: Literal["search", "finish"]
-    params: list[str]
+class SearchParams(BaseModel):
+    entities: list[str] = Field(description="The entities to search in the knowledge graph.")
+
+
+class GenerateParams(BaseModel):
+    query: str = Field(description="The open-ended natural language query to generate triples from.")
+
+
+class FinishParams(BaseModel):
+    entities: list[str] = Field(description="The final answer entities.")
+
+
+class SearchAction(BaseModel):
+    type: Literal["search"]
+    params: SearchParams
+
+
+class GenerateAction(BaseModel):
+    type: Literal["generate"]
+    params: GenerateParams
+
+
+class FinishAction(BaseModel):
+    type: Literal["finish"]
+    params: FinishParams
+
+
+Action = Union[SearchAction, GenerateAction, FinishAction]
 
 
 class PlannerResponse(BaseModel):

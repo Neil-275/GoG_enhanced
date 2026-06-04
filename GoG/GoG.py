@@ -284,17 +284,21 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv, max_atem
             for attempt in range(max_atempts):
                 i = len(env.records) + 1
                 planner_system = planner_prompt["system"]
+                # print("planner_system: ", planner_system)
                 planner_user: str = planner_prompt["user"].format(
                     question=data['question'],
                     reasoning_chains=env.reasoning_chains_str,
                     previous_thought_and_actions=env.convert_records_to_str(),
-                )
+                )   
+                # print("***************\n planner_prompt: \n", planner_user)
+                # print("*******************\n")
                 planner_response: PlannerResponse = run_llm_structured(
                     planner_system,
                     planner_user,
                     response_model=PlannerResponse,
                 )
-
+                # print("################\nplanner_response: \n", planner_response)
+                # print("################\n")
                 thought = planner_response.thought
                 action = planner_response.action
 
@@ -303,7 +307,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv, max_atem
 
                 if action.type == "finish":
                     done = True
-                    prediction = action.params
+                    prediction = action.params.entities
                     env.records.append(
                         {
                             "i": i,
@@ -315,11 +319,15 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv, max_atem
                 else:
                     # Both search and generate will return triplets,
                     # which will be added to the environment and gathered into reasoning chains
+                    if action.type == "search":
+                        action_value = ",".join(action.params.entities)
+                    else:
+                        action_value = action.params.query
                     env.records.append(
                         {
                             "i": i,
                             "thought": thought,
-                            "action": f"{action.type}[{','.join(action.params)}]"
+                            "action": f"{action.type}[{action_value}]"
                         }
                     )
                     obs = env.step(action)
@@ -463,8 +471,11 @@ if __name__ == "__main__":
             pass
     elif os.path.exists(output_file) and not args.force:
         with open(output_file, "r") as f:
+            
             output_datas = [json.loads(line) for line in f.readlines()]
-        processed_idxes = set([data["id"] for data in output_datas])
+            # print(f.readlines()[-1])
+        # print(output_datas[-1])
+        processed_idxes = set([data["index"] for data in output_datas])
 
         datas = [data for data in datas if data['id'] not in processed_idxes]
 
@@ -484,8 +495,9 @@ if __name__ == "__main__":
     #     # if k >= 10:  # Limit to first 10 failed cases
     #     #     break
     # datas = [data for data in datas if data['id'] in failed_cases]
+    datas = datas[22:23]
     print(f"Number of datas to process: {len(datas)}")
-    datas = datas[1:4]
+   
     idxes_to_process = range(len(datas))
 
 
@@ -500,8 +512,8 @@ if __name__ == "__main__":
     # args.reranker = FlagReranker("BAAI/bge-reranker-large", use_fp16=True)
     ## Produce a sample_args file
     import pickle as pkl
-    with open("sample_args_fb15k_237.pkl", "wb") as f:
-        pkl.dump(args, f)
+    # with open("sample_args_fb15k_237.pkl", "wb") as f:
+    #     pkl.dump(args, f)
 
     env = KGEnv(args)
 

@@ -1,48 +1,31 @@
 system: |
-  You are a strict Graph Reasoning Engine. Your job is to group retrieved triplets into reasoning chains.
+ You are a strict Graph Reasoning Engine. Your job is to group retrieved triplets into reasoning chains.
 
-  A reasoning chain is a connected sequence of triplets that supports ONE coherent reasoning direction toward answering the question.
-  Triplets in the same chain must:
-  - be structurally connected,
-  - contribute to the same reasoning direction,
-  - and not represent a separate hypothesis or branch.
+  A reasoning chain is a connected sequence of triplets that supports ONE coherent reasoning direction toward answering the question. Triplets in the same chain must be structurally connected and share the same hypothesis.
 
   ## CRITICAL RULES
 
-  1. EMPTY EXISTING CHAINS
-  - If Existing Reasoning Chains is empty or blank, do NOT use chain_expansion.
-  - All valid triplets must be placed into new_chains.
+  1. CHAIN EXPANSION (When to append)
+  - Append a triplet to an existing chain ONLY if it directly connects by sharing an entity AND matches that chain's specific reasoning direction.
+  - Do NOT append a triplet if it shares an entity but branches into a different hypothesis.
 
-  2. CHAIN EXPANSION
-  - Append a triplet to an existing chain only if:
-    a) existing chains are not empty, and
-    b) the triplet directly connects to that chain by sharing an entity AND fits the same reasoning direction.
-  - If it shares an entity but belongs to a different hypothesis/branch, do NOT append it.
+  2. NEW CHAINS (When to split or start)
+  - Create a new chain if the existing chain list is empty, or if a triplet starts a distinct hypothesis/branch.
+  - Separate chains for distinct logical paths (e.g., paternal vs. maternal lines, different locations/candidates).
+  - Do not merge triplets into a single chain just because they mention the same target entity.
 
-  3. NEW CHAINS
-  - Create a new chain when a triplet starts a different reasoning direction or hypothesis.
-  - Separate chains for different branches such as paternal vs maternal line, different locations, different candidates, or different causal paths.
-  - Do not merge triplets into one chain only because they mention the same target entity.
 
   4. DISCARD UNHELPFUL TRIPLETS
   - Discard only triplets that do not help build, extend, or strengthen any plausible reasoning path toward the answer.
-  - Do not discard a triplet merely because it is not immediately answerable on its own.
+  - Do not discard a triplet merely because it cannot answer the question on its own.
 
-  5. CONSISTENCY
-  - Every triplet in one chain must be mutually supportive of the same query path.
-  - If a triplet could fit multiple chains, place it only where it best matches the dominant reasoning direction.
-  - Do not create chains with unrelated triplets.
-
-  5. MULTIPLE CHAINS
-  - It is common to have multiple valid reasoning chains for a question, representing different hypotheses or paths
-  - Try to expand chains as much as possible,
 
   ## OUTPUT FORMAT
   Respond strictly in JSON format. Do not wrap the JSON in markdown.
 
   In the "thought" field, briefly state:
   1) whether existing chains were empty,
-  2) how you separated different reasoning directions,
+  2) how you separated different reasoning directions
   3) why each chain is coherent.
 
   {
@@ -54,8 +37,8 @@ system: |
           ["subject", "relation", "object"]
         ]
       }
-    ],
-    "new_chains": [
+      ],
+      "new_chains": [
       {
         "id": "2",
         "triplets": [
@@ -94,9 +77,10 @@ system: |
           ["80", "wife_of", "84"]
         ]
       }
+    ]
   }
 
-  Wife_of can be begin a chain due to it can combine with other triplets to infer the answer, but it should not be in the same chain with nephew_of because it represents a different reasoning direction.
+  wife_of can be begin a chain due to it can combine with other triplets to infer the answer, but it should not be in the same chain with nephew_of because it represents a different reasoning direction.
 
 user: |
   Question: {question}
