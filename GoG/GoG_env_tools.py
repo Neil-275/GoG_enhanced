@@ -283,7 +283,7 @@ class KGEnv:
                     relation_path_str = f"{candidate}: {candidate} -{relation_path_str}> {start_entity}"
                 print("relation_path_str:", relation_path_str)
                 relation_paths[candidate] = relation_path_str
-            verified_candidates = self.verify(start_entity, relation, relation_paths, direction)
+            verified_candidates = self.verify(start_entity, shorten_relation(relation), relation_paths, direction)
             for candidate in verified_candidates:
                 if direction == 0:
                     triple = [str(start_entity), str(relation), str(candidate)]
@@ -295,7 +295,7 @@ class KGEnv:
                 result.append(triple_str)
                 
         if len(result) == 0:
-            print("No valid triples generated.")
+            # print("No valid triples generated.")
             return "No valid triples generated."
         print("Generated triples:")
         print("\n".join(result))

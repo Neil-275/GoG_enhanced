@@ -357,7 +357,7 @@ if __name__ == "__main__":
     elif os.path.exists(output_file) and not args.force:
         with open(output_file, "r") as f:
             output_datas = [json.loads(line) for line in f.readlines()]
-        processed_idxes = set([data["id"] for data in output_datas])
+        processed_idxes = set([data["index"] for data in output_datas])
 
         datas = [data for data in datas if data['id'] not in processed_idxes]
 
@@ -377,11 +377,11 @@ if __name__ == "__main__":
     #     # if k >= 10:  # Limit to first 10 failed cases
     #     #     break
     # datas = [data for data in datas if data['id'] in failed_cases]
+    # seed = 222
+    # random.seed(seed)
+    # random.shuffle(datas)
+    # datas = datas[1:4]
     print(f"Number of datas to process: {len(datas)}")
-    seed = 222
-    random.seed(seed)
-    random.shuffle(datas)
-    datas = datas[1:4]
     idxes_to_process = range(len(datas))
 
 
@@ -395,7 +395,7 @@ if __name__ == "__main__":
     # args.model = SentenceTransformer("BAAI/bge-large-en-v1.5")
     # args.reranker = FlagReranker("BAAI/bge-reranker-large", use_fp16=True)
     ## Produce a sample_args file
-    import pickle as pkl
+    # import pickle as pkl
     # with open("sample_args_fb15k_237.pkl", "wb") as f:
     #     pkl.dump(args, f)
 
