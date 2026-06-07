@@ -11,10 +11,10 @@ from loguru import logger
 import pickle as pkl
 import torch
 from torch_geometric.data import Data
-from sentence_transformers import SentenceTransformer, util, models
+# from sentence_transformers import SentenceTransformer, util, models
 import numpy as np
 
-embed_model = SentenceTransformer('all-MiniLM-L6-v2')
+# embed_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # ============================================================================
 # Dataset Configuration Classes
@@ -227,7 +227,7 @@ class KGInterface:
         # We intentionally do not use any precomputed entity mapping.
         # Load relations and entities (optional)
         self.relations = list(self.complete_kg['relation'].unique())
-        self.create_rel_emb()
+        # self.create_rel_emb()
 
         self.entities = set(pd.concat([
             self.complete_kg['head'].astype(str), 

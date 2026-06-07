@@ -1,5 +1,5 @@
 Given the existing triples, please generate some new relations based on your current thought regarding what are missing for the mentioned entity that serve further exploration.
-You must output only the entity ID and the missing relation following the schema of the provided triples in the format: `EntityID: relation_name` without further exploration
+You must only output triples without other words.
 
 Here are some examples.
 
@@ -11,15 +11,15 @@ Known Triples:
 125	educational_institution.campuses	2666
 125	educational_institution.school_type	15
 Output:
- 125: location.located_in
+ 125 location.located_in 30
 
 
 Thought: what is the timezone of 5612
 Known Triples:
 5612	located_in	412
-412	timezone	27
+412 timezone	27
 Output:
- 5612: timezone	
+ 5612	timezone	44
 
 Here is the question.
 

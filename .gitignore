@@ -9,3 +9,4 @@ results/
 NBFNet_PyG/experiments/*
 *.pyc
 __pycache__/
+.claude/

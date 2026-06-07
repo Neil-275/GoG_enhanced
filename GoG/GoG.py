@@ -81,7 +81,8 @@ def write_results(data, env: KGEnv, prediction, args):
                 "index": data["id"],
                 "question": data["question"],
                 "prediction": prediction,
-                "ground_truth": data["answer"] + data['hard_answer'],
+                "ground_truth": data["answer"],
+                "hard_answer": data['hard_answer'],
                 "generate_call_count": env.generate_call_count,
                 "records": env.records,
             }
@@ -112,8 +113,8 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
 
     t1 = time.time()
     for n, idx in enumerate(idxes_to_process):
-        if n > 9: 
-            break
+        # if n > 9: 
+        #     break
         if (n + 1) % 10 == 0:
             t2 = time.time()
             logger.debug(f"{process_idx}: {n / len(idxes_to_process)}, {t2 - t1}")
@@ -325,7 +326,7 @@ if __name__ == "__main__":
     parser.add_argument("--n_related_triples", type=int, default=10)
     parser.add_argument("--wiki", action="store_true")
     parser.add_argument("--wiki_num", default=3, type=int)
-    parser.add_argument("--prompt_dir", default='GoG/prompts_v2', type=str)
+    parser.add_argument("--prompt_dir", default='GoG/prompts_v3', type=str)
     parser.add_argument("--sc_num", type=int, default=1,
                         help="choose the number of self-consistency check.")
     parser.add_argument("--debug", action="store_true")
@@ -389,7 +390,7 @@ if __name__ == "__main__":
 
     
     #REMOVE LATER
-    # datas = datas[12:22]
+    # datas = datas[:1]
 
     
     idxes_to_process = range(len(datas))

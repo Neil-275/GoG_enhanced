@@ -19,7 +19,7 @@ from GoG.utils import (
     parse_generated_relations
 )
 from GoG.GoG_llms import run_llm
-from GoG.gnn_interface import GNNInterface
+# from GoG.gnn_interface import GNNInterface
 import pandas as pd
 import pickle as pkl
 import sys
@@ -59,8 +59,8 @@ class KGEnv:
         # Initialize KGInterface
 
         self.kg:KGInterface = KGInterface(self.dataset_name)
-        self.gnn:GNNInterface = GNNInterface(self.dataset_name)
-        self.gnn.assign_graph(self.kg.pyg_data)
+        # self.gnn:GNNInterface = GNNInterface(self.dataset_name)
+        # self.gnn.assign_graph(self.kg.pyg_data)
         print(f"Dataset Name: {self.dataset_name}")
         logger.info(f"Initialized KGInterface with dataset: {self.dataset_name}")
 
@@ -169,32 +169,21 @@ class KGEnv:
         if thought.startswith("["):
             thought = thought[1:-1]
 
-        entities = extract_numbers_from_string(thought)
-        related_triples_df = [self.kg.get_1hop_triples(str(entity_id)) 
-                           for entity_id in entities if str(entity_id) in self.kg.entities]
-        related_triples = [triple for df in related_triples_df for triple in df.values.tolist()]
-        # triples = triples_df.values.tolist() if len(triples_df) > 0 else []
-        related_triples = random.sample(related_triples, k=min(len(related_triples), 3))
-        # print("Related triples for generation:")
-        # for triple in related_triples:
-        #     print(triple)
-        # print("length of related_triples:", len(related_triples))
-        related_triple_str = convert_triples_to_str(related_triples)
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/generate_triples")
         # prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/generate_triples_wo_ctx")
         prompt = format_prompt(prompt_path)
-    
+
         n = self.args.sc_num
-        # neighbors = self.kg.get_1hop_triples(self.name_to_id[self.topic_entities[0].lower()])
+
         sep = "\t"
         prompt = (
             prompt + f"Thought: {thought}\n"
-            f"Known Triples: {related_triple_str}\n"
+            # f"Known Triples: {related_triple_str}\n"
             f"Missing relations: "
         )
 
         # logger.debug(f"Generate prompt:{prompt}")
-        # print("Generate prompt:", prompt)
+
         responses = run_llm(
             prompt,
             self.args.temperature,
@@ -204,71 +193,34 @@ class KGEnv:
             stop=None,
             n=n
         )
-        # print("LLM responses:")
-        # print(responses)
 
-        # print("Parsed generated relations:")
-        parsed_relations = parse_generated_relations(responses)
+        print(responses)
 
-        # print(parsed_relations)
-        result = []
-        for start_entity, relation in parsed_relations.items():
-            relation = relation[0]
-            
-            relation, _ = self.kg.get_best_relation_match(relation, 0.0)
-            # print(f"Relation: {relation}")
-            relation_id = self.kg.rel2id.get(relation)
-            
-            candidates = self.gnn.predict_topk(start_entity, relation_id, k=10)
-            relation_paths = {}
-            for candidate in candidates[0].tolist():
-                relation_path = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
-                if relation_path == None or len(relation_path["relations"]) > 6:
-                    continue
-                # print("candidate:", candidate, end="\t")
-                # print("relation_path:", relation_path)
-                # relation_path is a dict with key path and relation_path
-                relation_path_str = f"{start_entity}-"
-                for i, ent, rel in zip(range(len(relation_path["relations"])), relation_path["path"][1:], relation_path["relations"]):
-                    relation_path_str += f"[{rel}]-> "
+        if n == 1:
+            responses = [responses]
+        self.records[-1]["generated_triples"] = {}
+        for i, response in enumerate(responses):
+            generated_triples = []
+            logger.debug(responses)
+            for line in response.split("\n"):
+                try:
+                    h, r, t = [item.strip() for item in line.split(sep)]
+                    generated_triples.append([h, r, t])
+                except Exception as e:
+                    logger.error(traceback.format_exc())
+                    logger.error(line)
 
-                # print("relation_path_str:", relation_path_str)
-                relation_paths[candidate] = relation_path_str + str(candidate)
-            verified_candidates = self.verify(thought, relation_paths)
-            for candidate in verified_candidates:
-                triple = [str(start_entity), str(relation), str(candidate)]
-                triple_str = convert_triples_to_str([triple])
-                # print("Generated triple:", triple_str)
-                self.records[-1]["generated_triples"] = triple_str
-                result.append(triple_str)
+            generated_triples = sorted(generated_triples)
+            self.records[-1]["generated_triples"][i + 1] = generated_triples
 
-        
+        if n > 1:
+            verified_triples = self.verify(thought)
+            result = convert_triples_to_str(verified_triples)
+        else:
+            result = convert_triples_to_str(generated_triples)
 
+        return result
 
-        # if n == 1:
-        #     responses = [responses]
-        # self.records[-1]["generated_triples"] = {}
-        # for i, response in enumerate(responses):
-        #     generated_triples = []
-        #     logger.debug(responses)
-        #     for line in response.split("\n"):
-        #         try:
-        #             h, r, t = [item.strip() for item in line.split(sep)]
-        #             generated_triples.append([h, r, t])
-        #         except Exception as e:
-        #             logger.error(traceback.format_exc())
-        #             logger.error(line)
-
-        #     generated_triples = sorted(generated_triples)
-        #     self.records[-1]["generated_triples"][i + 1] = generated_triples
-
-        # if n > 1:
-        #     verified_triples = self.verify(thought)
-        #     result = convert_triples_to_str(verified_triples)
-        # else:
-        #     result = convert_triples_to_str(generated_triples)
-
-        return "\n".join(result)
 
     def verify(self, thought, relation_paths):
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/verify_triples")
