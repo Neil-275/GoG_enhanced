@@ -17,7 +17,8 @@ from GoG.utils import (
     shorten_relation,
     convert_triples_to_str,
     extract_numbers_from_string,
-    parse_generated_relation_directions
+    parse_generated_relation_directions,
+    shorten_triple_list
 )
 from GoG.GoG_llms import run_llm
 from GoG.gnn_interface import OneShotInterface
@@ -212,6 +213,10 @@ class KGEnv:
         elif action == "generate":
             self.generate_call_count += 1
             return self.generate(parameter)
+        elif action == "collect":
+            return f"Collected {parameter}"
+
+        raise ValueError(f"Unsupported action: {action_str}")
 
     def generate(self, thought):
         # [...]
@@ -296,7 +301,7 @@ class KGEnv:
                 
         if len(result) == 0:
             # print("No valid triples generated.")
-            return "No valid triples generated."
+            return "No plausible triples generated."
         print("Generated triples:")
         print("\n".join(result))
         return "\n".join(result)
@@ -420,11 +425,18 @@ class KGEnv:
         # for triple in all_related_triples:
         #     print(f"  {triple}")
 
-        self.triples.extend(deepcopy(all_related_triples))
+        tmp = []
+        for triple in all_related_triples:
+            if triple not in self.triples:
+                self.triples.append(triple)
+                tmp.append(triple)
 
-        self.records[-1]["triples"] = all_related_triples
-        self.records[-1]["entity_names"] = entity_names
-        self.records[-1]["one_hop_relations"] = filtered_relations
+        all_related_triples = tmp
+        # self.triples.extend(deepcopy(all_related_triples))
+
+        # self.records[-1]["triples"] = all_related_triples
+        # self.records[-1]["entity_names"] = entity_names
+        # self.records[-1]["one_hop_relations"] = filtered_relations
 
         new_entities = set()
         for triple in all_related_triples:
@@ -442,6 +454,9 @@ class KGEnv:
         self.records[-1]["new_entities"] = list(new_entities)
 
         self.explored_entities.update(new_entities)
+        
+
+        # all_related_triples = shorten_triple_list(all_related_triples, entity_names)
 
         return convert_triples_to_str(all_related_triples)
 

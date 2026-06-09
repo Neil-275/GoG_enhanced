@@ -10,19 +10,19 @@ Your goal is to identify:
 1. The single relation that would most directly help resolve the reasoning thought.
 2. The direction in which the relation chosen should be traversed.
 
-Direction encoding:
+### Direction encoding:
 
-* 0 = outgoing relation from the entity
-* 1 = incoming relation to the entity
+Direction = 0
+Traverse outward from E: (E, relation, ?)
 
-Rules:
+Direction = 1
+Traverse inward to E: (?, relation, E)
+
+### Rules:
 
 1. Use only the provided candidate relations.
 2. Select the relation that best matches the information requested in the thought.
-3. Focus on semantic meaning rather than keyword overlap.
-4. Prefer the most specific relation when multiple candidates are related.
-5. Predict the direction that should be followed relative to the entity mentioned in the thought.
-6. Do not generate new relations.
+3. Predict the direction that should be followed relative to the entity mentioned in the thought.
 
 [Output Format]
 
@@ -30,30 +30,10 @@ Output ONLY:
 
 EntityID: relation_name: direction
 
-where direction is either 0 or 1.
+where direction is either 0 for outgoing or 1 for incoming.
 
 No explanations.
 No additional text.
-
-[Examples]
-
-Thought: which state is 125 in
-
-Candidate relations:
-location.located_in
-educational_institution.school_type
-
-Output:
-125: location.located_in: 0
-
-Thought: who was born at 44
-
-Candidate relations:
-location.place_lived
-location.place_of_birth
-
-Output:
-44: location.place_of_birth: 1
 
 [Context]
 

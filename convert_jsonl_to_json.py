@@ -68,7 +68,7 @@ Examples:
         """
     )
     parser.add_argument(
-        "input_file",
+        "--input_file",
         help="Path to the input JSONL file"
     )
     parser.add_argument(

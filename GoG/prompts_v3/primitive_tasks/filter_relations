@@ -1,4 +1,4 @@
-Please select at most 3 relations that are most semantically relevant to the question.
+Please select at least 4 relations that are most semantically relevant to the question.
 You should answer these relations in list format directly without redundant words.
 If there is no relevant relation, please output [].
 

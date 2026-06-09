@@ -44,7 +44,7 @@ lock = Lock()
 
 def answer_question_without_kg(env: KGEnv, prompt, args):
     answers = env.synthesize_answer(prompt)
-    # logger.info(env.llm_output)
+    logger.info(answers)
     return answers
 
 
@@ -127,7 +127,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 prediction = answer_question_without_kg(env, base_prompt, args)
                 write_results(data, env, prediction, args)
                 continue
-
+            prediction_pool = []
             for _ in range(6):
                 i = len(env.records) + 1
 
@@ -143,6 +143,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
 
                 legal = False
                 n_retry = 0
+                is_collect = 0
                 while not legal:
                     n_retry += 1
                     if n_retry == 6:
@@ -164,8 +165,11 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                         legal = True
                     except:
                         # output final answers directly
-                        if 'Finish' in thought_action:
+                        if 'Collect' in thought_action:
                             thought = action = thought_action
+                            legal = True
+                        elif 'Finish' in thought_action:
+                            done = True
                             legal = True
                         else:
                             logger.debug(f"ohh... {thought_action}")
@@ -174,13 +178,21 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 logger.debug(f"Thought {i}: {thought}")
                 logger.debug(f"Action {i}: {action}")
 
-                match = re.search("Finish(\[.*\])", action)
+                match = re.search(r"Collect(?:ed)?(\[.*\])", action)
+                
                 if match:
                     logger.debug("Match  ", match)
                     prediction = match.group(1)
-                    prediction = parse_llm_output_to_list(prediction)
-                    # print("prediction: ", prediction)
+                    prediction_pool.extend(parse_llm_output_to_list(prediction))
+                    obs = f"Collected the answers: {prediction}"
+                    logger.info(f"Collected the answers: {prediction}")
+                    is_collect = 1
+               
+                match = re.search("Finish", action)
+                if match:
                     done = True
+                    # print("prediction: ", prediction)
+                    # done = True
                     # if prediction[0].lower() == "unknown":
                     #     # Finish["unkown"]
                     #     # not enough information even after generation
@@ -203,13 +215,13 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
 
                 env.records.append({"i": i, "thought": thought, "action": action})
                 if done:
-                    logger.info(
-                        f"Finish query {idx} with KG, prediction: {prediction}"
-                    )
-                    write_results(data, env, prediction, args)
+                    # logger.info(
+                    #     f"Finish query {idx} with KG, prediction: {prediction_pool} ..."
+                    # )
+                    # write_results(data, env, prediction_pool, args)
                     break
-
-                obs = env.step(action)
+                if not is_collect: # Search or Generate
+                    obs = env.step(action)
                 obs = obs.replace("\\n", "")
                 env.records[-1]["observation"] = obs
 
@@ -219,7 +231,12 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 prompt = base_prompt + records_str
                 logger.debug(records_str)
 
-            if not done:
+            if prediction_pool:
+                prediction_pool = list(set(prediction_pool))
+                logger.info(f"Finish query {idx} with KG, prediction: {prediction_pool} ...")
+                write_results(data, env, prediction_pool, args)
+
+            elif not done:
                 logger.warning(
                     f"Finish query {idx} without KG..."
                 )
@@ -244,7 +261,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dataset",
         type=str,
-        default="brink_dataset/family/test_passed.tsv",
+        default="brink_dataset/family/test_is_collect.tsv",
         help="choose the dataset.",
     )
     parser.add_argument(
@@ -326,8 +343,6 @@ if __name__ == "__main__":
                 data[k] = literal_eval(data[k])
         # print(data)
                 
-    # exit()
-    # print(datas[0])
     postfix = '_no-kb' if args.no_kg else ""
     dataset_name = args.dataset.split("/")[1]
     
@@ -380,7 +395,7 @@ if __name__ == "__main__":
     # seed = 222
     # random.seed(seed)
     # random.shuffle(datas)
-    # datas = datas[1:4]
+    datas = datas[1:4]
     print(f"Number of datas to process: {len(datas)}")
     idxes_to_process = range(len(datas))
 

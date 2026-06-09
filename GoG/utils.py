@@ -48,10 +48,35 @@ def add_ns(entity_id):
         entity_id = "ns:" + entity_id
     return entity_id
 
+def shorten_triple_list(triples: list, entity_names: list):
+    triple_dict = dict()
+
+    for triple in triples:
+        h, r, t = triple
+        if h in entity_names:
+            if h not in triple_dict:
+                triple_dict[h] = dict()
+            if r not in triple_dict[h] or "outgoing" not in triple_dict[h][r]:
+                triple_dict[h][r] = {"outgoing": []}
+            triple_dict[h][r]["outgoing"].append(t)
+        if t in entity_names:
+            if t not in triple_dict:
+                triple_dict[t] = dict()
+            if r not in triple_dict[t] or "incoming" not in triple_dict[t][r]:
+                triple_dict[t][r] = {"incoming": []}
+            triple_dict[t][r]["incoming"].append(h)
+    res = []
+    for k, v in triple_dict.items():
+        for rel, r_v in v.items():
+            if "outgoing" in r_v:
+                res.append([k, rel, "["+", ".join(r_v['outgoing']) +"]"])
+            elif "incoming" in r_v:
+                res.append(["["+", ".join(r_v['incoming']) +"]", rel, k])
+    return res
 
 def convert_triples_to_str(triples, sep=", "):
     if len(triples) == 0:
-        return "  No triples found."
+        return "  No new triples found."
     if len(triples[0]) == 2:
         triples = sorted(triples, key=lambda x: x[0]) # sort by incoming/outgoing
         incoming_str = ""
@@ -71,7 +96,7 @@ def convert_triples_to_str(triples, sep=", "):
         return incoming_str + "\n" + outgoing_str
 
     for i, triple in enumerate(triples):
-        triple = [remove_ns(item) for item in triple]
+        # triple = [item for item in triple]
         triples[i] = sep.join(triple)
     return "\n".join(triples)
 
