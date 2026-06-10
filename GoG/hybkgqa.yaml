@@ -18,6 +18,7 @@ dependencies:
       - wandb
       - python-dotenv
       - SPARQLWrapper
+      - transformers==5.4.0
       - sentence-transformers
       - openai
       - ipykernel

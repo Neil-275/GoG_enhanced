@@ -15,3 +15,4 @@ corrupt_queries/
 .vscode/
 /LOCAL_SCORING_PLAN.md
 one_shot_subgraph/results/
+exp_run/

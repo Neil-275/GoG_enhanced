@@ -1,1 +1,1 @@
-{"num_examples": 3, "num_missing_predictions": 2, "Hits@Any": 0.0, "Precision": 0.0, "Recall": 0.0, "F1": 0.0, "Hits@Hard": 0.0, "HHR": 0.0}
+{"num_examples": 1, "num_missing_predictions": 0, "Hits@Any": 1.0, "Precision": 1.0, "Recall": 1.0, "F1": 1.0, "Hits@Hard": 1.0, "HHR": 1.0}

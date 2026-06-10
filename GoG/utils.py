@@ -56,14 +56,18 @@ def shorten_triple_list(triples: list, entity_names: list):
         if h in entity_names:
             if h not in triple_dict:
                 triple_dict[h] = dict()
-            if r not in triple_dict[h] or "outgoing" not in triple_dict[h][r]:
+            if r not in triple_dict[h]:
                 triple_dict[h][r] = {"outgoing": []}
+            if "outgoing" not in triple_dict[h][r]:
+                triple_dict[h][r]["outgoing"] = []
             triple_dict[h][r]["outgoing"].append(t)
         if t in entity_names:
             if t not in triple_dict:
                 triple_dict[t] = dict()
-            if r not in triple_dict[t] or "incoming" not in triple_dict[t][r]:
+            if r not in triple_dict[t]:
                 triple_dict[t][r] = {"incoming": []}
+            if "incoming" not in triple_dict[t][r]:
+                triple_dict[t][r]["incoming"] = []
             triple_dict[t][r]["incoming"].append(h)
     res = []
     for k, v in triple_dict.items():

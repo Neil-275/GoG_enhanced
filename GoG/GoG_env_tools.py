@@ -434,7 +434,7 @@ class KGEnv:
         all_related_triples = tmp
         # self.triples.extend(deepcopy(all_related_triples))
 
-        # self.records[-1]["triples"] = all_related_triples
+        self.records[-1]["triples"] = all_related_triples
         # self.records[-1]["entity_names"] = entity_names
         # self.records[-1]["one_hop_relations"] = filtered_relations
 
@@ -456,7 +456,7 @@ class KGEnv:
         self.explored_entities.update(new_entities)
         
 
-        # all_related_triples = shorten_triple_list(all_related_triples, entity_names)
+        all_related_triples = shorten_triple_list(all_related_triples, entity_names)
 
         return convert_triples_to_str(all_related_triples)
 

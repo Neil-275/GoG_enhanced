@@ -236,7 +236,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 logger.info(f"Finish query {idx} with KG, prediction: {prediction_pool} ...")
                 write_results(data, env, prediction_pool, args)
 
-            elif not done:
+            else:
                 logger.warning(
                     f"Finish query {idx} without KG..."
                 )
@@ -395,7 +395,8 @@ if __name__ == "__main__":
     # seed = 222
     # random.seed(seed)
     # random.shuffle(datas)
-    datas = datas[1:4]
+    if args.test:
+        datas = datas[1:4]
     print(f"Number of datas to process: {len(datas)}")
     idxes_to_process = range(len(datas))
 
