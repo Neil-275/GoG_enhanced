@@ -9,7 +9,7 @@ For every step, you must first generate a 'Thought' that decomposes the current 
       + Always apply Search for the topic entity in the first search
 
 2. Generate[Thought]
-   - Purpose: Find extra triples base on a proposed relation around an entity if  `Search` return no meaningful information for contributing to resolvoing the question
+   - Purpose: Find latent triples with corresponding plausible score base on a proposed relation around an entity if  `Search` result lack meaningful information for contributing to resolvoing the question
    - Constraint:
       + The Thought must describe a relation or attribute to discover from an entity
       + If Generate returns no prediction, continue the reasoning in other direction.
@@ -66,8 +66,8 @@ Observation 2: 125, organization.headquarters, [7002]
 Thought 3: I don't see any specific location that education institution 125 is in, so I need to use Generate tool to inspect more triples to connect 125 to a location.
 Action 3: Generate[where is 125 located at]
 Observation 3:
-125, location.located_in, 44
-Thought 4: It seems like 125 is located in a location represent with id 44, this is what the question ask about.
+125, location.located_in, 44       Plausible score: 0.9
+Thought 4: It seems like the triple show 125 is located in a location represent with id 44 is highly plausible so I can trust it without a doubt. This is what the question ask about.
 Action 4: Collect[44]
 Thought 5: As there are no relevant information to continue searching, I will end the search here
 Action 5: Finish

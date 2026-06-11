@@ -1,6 +1,7 @@
 from collections import defaultdict
 from copy import deepcopy
 from logging import Formatter
+import json
 import random
 import re
 # import spacy
@@ -286,15 +287,16 @@ class KGEnv:
                     relation_path_str = f"{candidate}: {start_entity} -{relation_path_str}> {candidate}"
                 else:
                     relation_path_str = f"{candidate}: {candidate} -{relation_path_str}> {start_entity}"
-                print("relation_path_str:", relation_path_str)
+                # print("relation_path_str:", relation_path_str)
                 relation_paths[candidate] = relation_path_str
             verified_candidates = self.verify(start_entity, shorten_relation(relation), relation_paths, direction)
             for candidate in verified_candidates:
                 if direction == 0:
-                    triple = [str(start_entity), str(relation), str(candidate)]
+                    triple = [str(start_entity), str(relation), str(candidate[0])]
                 else:
-                    triple = [str(candidate), str(relation), str(start_entity)]
+                    triple = [str(candidate[0]), str(relation), str(start_entity)]
                 triple_str = convert_triples_to_str([triple])
+                triple_str = triple_str + "\tPlausible score:" + str(candidate[1])
                 # print("Generated triple:", triple_str)
                 self.records[-1]["generated_triples"] = triple_str
                 result.append(triple_str)
@@ -310,14 +312,16 @@ class KGEnv:
     # Field names can be None for raw text chunks, so filter those out
         return [field_name for _, field_name, _, _ in Formatter().parse(template_string) if field_name is not None]
 
-    def verify(self, start_entity, relation, relation_paths, direction):
+    def verify(self, start_entity, relation, relation_paths, direction, threshold=0.5):
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/verify_triples")
         prompt = format_prompt(prompt_path)
         # print("type of prompt:", type(prompt))
         # print("Format str:", self.get_template_variables(prompt))
         if direction == 0:
+            # print(f"Verifying candidate triples for: {start_entity} -[{relation}]-> ?")
             prompt = prompt.format(subject=start_entity, relation=relation, object="?")
         else:
+            # print(f"Verifying candidate triples for: ? -[{relation}]-> {start_entity}")
             prompt = prompt.format(subject="?", relation=relation, object=start_entity)
         relation_path_str = [f"{relation_path}" for candidate, relation_path in relation_paths.items()]
         relation_path_str = "\n".join(relation_path_str)
@@ -335,10 +339,33 @@ class KGEnv:
             self.args.LLM_type,
             stop=None,
         )
-        # print("Verify response:", response)
-        candidate = extract_numbers_from_string(response, last_line=True)
-        self.records[-1]['verified_candidates'] = candidate
-        return candidate
+        # print("Verify LLM output:", response, flush=True)
+
+        if not response:
+            self.records[-1]['verified_candidates'] = []
+            return []
+
+        candidate_ids = []
+        response_text = response.strip()
+
+        if response_text != "None":
+            if "[" in response_text and "]" in response_text:
+                response_text = response_text[response_text.index("["):response_text.rindex("]") + 1]
+
+            try:
+                parsed_response = json.loads(response_text)
+            except json.JSONDecodeError:
+                parsed_response = None
+
+            if isinstance(parsed_response, list):
+                for item in parsed_response:
+                    if not isinstance(item, dict):
+                        continue
+                    if "candidate_id" in item and "score" in item and item["score"] >= threshold:
+                        candidate_ids.append((item["candidate_id"], item["score"]))
+
+        self.records[-1]['verified_candidates'] = candidate_ids
+        return candidate_ids
                 # for line in response.split("\n"):
         #     try:
         #         h, r, t = [item.strip() for item in line.split('\t')]
