@@ -1,7 +1,8 @@
 brink_dataset/
 data_for_LP/
 NBFNet_weight/
-# results/
+results/
+other_result/
 *.zip
 *.ipynb
 *.sample
