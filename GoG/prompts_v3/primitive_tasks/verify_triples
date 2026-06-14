@@ -7,19 +7,14 @@ Rules:
 - A candidate is valid only if the path explicitly establishes the core relational structure required by the target relation.
 - Reject candidates when the path shows weak association or does not establish the essential relational structure required by the target relation.
 
-For EACH candidate:
-1. Summarize the relation implied by the full path.
-2. Decide whether the implied relation matches the target relation.
-3. Assign a confidence score from 0.0 to 1.0:
+For EACH candidate, assign a confidence score from 0.0 to 1.0:
    - 0.8–1.0: path directly and specifically establishes the target relation
    - 0.5–0.7: path establishes the relation but with some weakness 
    - 0.2–0.4: path is loosely related but does not clearly establish the target relation
    - 0.0–0.1: path is irrelevant or contradicts the target relation
 
-Keep each deduction short and grounded only in the provided path.
-
 Final Output:
-After the deductions, output a JSON list. Each entry corresponds to one candidate with the following fields:
+Output a JSON list. Each entry corresponds to one candidate with the following fields:
 `candidate_id`,
 `score`,
 

@@ -271,7 +271,7 @@ class KGEnv:
             print(f"Found: {start_entity}: {relation}: {direction}")
 
             candidates = self.gnn.predict_topk(start_entity, relation, direction, k=3, known=False)
-
+            print("candidates:", candidates)
             relation_paths = {}
             for candidate in candidates:
                 if direction == 0:
@@ -287,8 +287,10 @@ class KGEnv:
                     relation_path_str = f"{candidate}: {start_entity} -{relation_path_str}> {candidate}"
                 else:
                     relation_path_str = f"{candidate}: {candidate} -{relation_path_str}> {start_entity}"
-                # print("relation_path_str:", relation_path_str)
+                print("relation_path_str:", relation_path_str)
                 relation_paths[candidate] = relation_path_str
+            if not relation_paths:
+                return "No plausible triples generated."
             verified_candidates = self.verify(start_entity, shorten_relation(relation), relation_paths, direction)
             for candidate in verified_candidates:
                 if direction == 0:
@@ -326,7 +328,7 @@ class KGEnv:
         relation_path_str = [f"{relation_path}" for candidate, relation_path in relation_paths.items()]
         relation_path_str = "\n".join(relation_path_str)
         
-        prompt = prompt + "Candidates:\n" + relation_path_str + "\nDeduction space: "
+        prompt = prompt + "Candidates:\n" + relation_path_str + "\nAnswer: "
         # print(123)
         # print("Verify prompt:", prompt)
         # verified_triples = []
@@ -339,7 +341,7 @@ class KGEnv:
             self.args.LLM_type,
             stop=None,
         )
-        # print("Verify LLM output:", response, flush=True)
+        print("Verify LLM output:", response, flush=True)
 
         if not response:
             self.records[-1]['verified_candidates'] = []
@@ -461,7 +463,7 @@ class KGEnv:
         all_related_triples = tmp
         # self.triples.extend(deepcopy(all_related_triples))
 
-        self.records[-1]["triples"] = all_related_triples
+        # self.records[-1]["triples"] = all_related_triples
         # self.records[-1]["entity_names"] = entity_names
         # self.records[-1]["one_hop_relations"] = filtered_relations
 

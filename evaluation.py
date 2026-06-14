@@ -14,6 +14,7 @@ class PredictionEntry(BaseModel):
     prediction: set[str] | None = None
     answers: set[str] = Field(alias="ground_truth")
     hard_answer: set[str] = Field(alias="ground_truth_entities")
+    generate_call_count: int | None = None
     records: list | None = None
     error: str | None = None
     
