@@ -316,7 +316,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--test", action="store_true",
                         help="save results to test_predictions.jsonl (overwrites on each run).")
-    
+    parser.add_argument("--run_fail_case", default = None)
     # parser.add_argument("start_idx", type=int, default=0, help="the start index of the dataset to process.")
 
     args = parser.parse_args()
@@ -397,6 +397,14 @@ if __name__ == "__main__":
     # random.shuffle(datas)
     if args.test:
         datas = datas[1:4]
+    if args.run_fail_case:
+        failed_cases = []
+
+        with open(args.run_fail_case, "r") as f:
+            failed_cases = json.load(f)
+        failed_id = set([case["index"] for case in failed_cases])
+        datas = [data for data in datas if data['id'] in failed_id]
+        logger.info(f"Running on {len(datas)} failed cases...")
     print(f"Number of datas to process: {len(datas)}")
     idxes_to_process = range(len(datas))
 

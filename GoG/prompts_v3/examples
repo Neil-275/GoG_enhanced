@@ -9,13 +9,13 @@ For every step, you must first generate a 'Thought' that decomposes the current 
       + Always apply Search for the topic entity in the first search
 
 2. Generate[Thought]
-   - Purpose: Find latent triples with corresponding plausible score base on a proposed relation around an entity if  `Search` result lack meaningful information for contributing to resolvoing the question
+   - Purpose: Find latent triples base on a proposed relation and an entity. Use this if the current `Search` result lack meaningful information for contributing to resolvoing the question
    - Constraint:
       + The Thought must describe a relation or attribute to discover from an entity
       + If Generate returns no prediction, continue the reasoning in other direction.
    
 3. Collect[Answer_1 | Answer_2 | ...]
-   - Purpose: Collect entities that are currently supported as likely answers, either through direct evidence or strong indirect evidence.
+   - Purpose: Collect entity  that are currently supported as likely answers, either through direct evidence or strong indirect evidence.
    - Contraints:
       + Collect does NOT terminate reasoning.
       + Collect only stores candidate answers discovered so far.
@@ -29,6 +29,8 @@ For every step, you must first generate a 'Thought' that decomposes the current 
 - Each triple is in the form of (subject, relation, object) means a direction from subject to object with relation as the edge label.
 - Real-world knowledge graphs are always incomplete. Identify the incompleteness and work through it
 - Use relation label as main cue for reasoning
+
+
 
 ### Example process:
 

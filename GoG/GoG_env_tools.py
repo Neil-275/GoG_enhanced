@@ -224,12 +224,12 @@ class KGEnv:
         if thought.startswith("["):
             thought = thought[1:-1]
 
-        entities = extract_numbers_from_string(thought)
-        related_triples_df = [self.kg.get_1hop_triples(str(entity_id)) 
-                           for entity_id in entities if str(entity_id) in self.kg.entities]
-        related_triples = [triple for df in related_triples_df for triple in df.values.tolist()]
-        related_triples = random.sample(related_triples, k=min(len(related_triples), 3))
-        related_triple_str = convert_triples_to_str(related_triples)
+        # entities = extract_numbers_from_string(thought)
+        # related_triples_df = [self.kg.get_1hop_triples(str(entity_id)) 
+        #                    for entity_id in entities if str(entity_id) in self.kg.entities]
+        # related_triples = [triple for df in related_triples_df for triple in df.values.tolist()]
+        # related_triples = random.sample(related_triples, k=min(len(related_triples), 3))
+        # related_triple_str = convert_triples_to_str(related_triples)
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/generate_triples")
         prompt = format_prompt(prompt_path)
 
@@ -271,27 +271,37 @@ class KGEnv:
             print(f"Found: {start_entity}: {relation}: {direction}")
 
             candidates = self.gnn.predict_topk(start_entity, relation, direction, k=3, known=False)
-            print("candidates:", candidates)
+            # print("candidates:", candidates)
             relation_paths = {}
             for candidate in candidates:
                 if direction == 0:
-                    relation_path = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
+                    cand_relation_paths = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
                 else:
-                    relation_path = self.kg.get_shortest_path_with_relations(str(candidate), str(start_entity))
-                if relation_path == None:
+                    cand_relation_paths = self.kg.get_shortest_path_with_relations(str(candidate), str(start_entity))
+                if cand_relation_paths == None:
                     continue
-                relation_path_str = ""
-                for i, ent, rel in zip(range(len(relation_path["relations"])), relation_path["path"][1:], relation_path["relations"]):
-                    relation_path_str += f"[{shorten_relation(rel)}]-"
-                if direction == 0:
-                    relation_path_str = f"{candidate}: {start_entity} -{relation_path_str}> {candidate}"
-                else:
-                    relation_path_str = f"{candidate}: {candidate} -{relation_path_str}> {start_entity}"
-                print("relation_path_str:", relation_path_str)
-                relation_paths[candidate] = relation_path_str
+                cand_path = ""
+                for relation_path in cand_relation_paths:
+                    relation_path_str = ""
+                    # print(relation_path)
+                    for i, ent, rel, direc in zip(range(len(relation_path["relations"])), relation_path["path"], relation_path["relations"], relation_path["directions"]):
+                        rel = shorten_relation(rel)
+                        next_ent = relation_path["path"][i+1]
+                        if direc == "forward":
+                            relation_path_str +=  f"({convert_triples_to_str([[ent, rel, next_ent]])})"
+                        else:
+                            relation_path_str += f"({convert_triples_to_str([[next_ent, rel, ent]])})"
+                        if i == 0:
+                            relation_path_str += ";"
+                    relation_path_str = "[" + relation_path_str + "]"
+                cand_path += relation_path_str + "\n"
+                # print(cand_path)
+                if candidate not in relation_paths:
+                    relation_paths[candidate] = []
+                relation_paths[candidate].append(cand_path)
             if not relation_paths:
                 return "No plausible triples generated."
-            verified_candidates = self.verify(start_entity, shorten_relation(relation), relation_paths, direction)
+            verified_candidates = self.verify(start_entity, thought, relation_paths)
             for candidate in verified_candidates:
                 if direction == 0:
                     triple = [str(start_entity), str(relation), str(candidate[0])]
@@ -306,26 +316,31 @@ class KGEnv:
         if len(result) == 0:
             # print("No valid triples generated.")
             return "No plausible triples generated."
-        print("Generated triples:")
-        print("\n".join(result))
+        # print("Generated triples:")
+        # print("\n".join(result))
         return "\n".join(result)
 
     def get_template_variables(self, template_string):
     # Field names can be None for raw text chunks, so filter those out
         return [field_name for _, field_name, _, _ in Formatter().parse(template_string) if field_name is not None]
 
-    def verify(self, start_entity, relation, relation_paths, direction, threshold=0.5):
+    def verify(self, topic_entity, question, relation_paths, threshold=0.5):
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/verify_triples")
         prompt = format_prompt(prompt_path)
         # print("type of prompt:", type(prompt))
         # print("Format str:", self.get_template_variables(prompt))
-        if direction == 0:
-            # print(f"Verifying candidate triples for: {start_entity} -[{relation}]-> ?")
-            prompt = prompt.format(subject=start_entity, relation=relation, object="?")
-        else:
-            # print(f"Verifying candidate triples for: ? -[{relation}]-> {start_entity}")
-            prompt = prompt.format(subject="?", relation=relation, object=start_entity)
-        relation_path_str = [f"{relation_path}" for candidate, relation_path in relation_paths.items()]
+        # if direction == 0:
+        #     # print(f"Verifying candidate triples for: {start_entity} -[{relation}]-> ?")
+        #     prompt = prompt.format(subject=start_entity, relation=relation, object="?")
+        # else:
+        #     # print(f"Verifying candidate triples for: ? -[{relation}]-> {start_entity}")
+        #     prompt = prompt.format(subject="?", relation=relation, object=start_entity)
+        prompt = prompt.format(question=question, topic_entity=topic_entity)
+        relation_path_str = []
+        for candidate, relation_path in relation_paths.items():
+            paths = "\n".join(relation_path)
+            relation_path_str.append(f"Candidate: {candidate}\nPaths: {paths}")
+            print(relation_path_str[-1])
         relation_path_str = "\n".join(relation_path_str)
         
         prompt = prompt + "Candidates:\n" + relation_path_str + "\nAnswer: "
@@ -341,7 +356,7 @@ class KGEnv:
             self.args.LLM_type,
             stop=None,
         )
-        print("Verify LLM output:", response, flush=True)
+        # print("Verify LLM output:", response, flush=True)
 
         if not response:
             self.records[-1]['verified_candidates'] = []
@@ -421,16 +436,19 @@ class KGEnv:
             for i in range(len(relations)):
                 # only remain the last two parts
                 abbr_rel = shorten_relation(relations[i])
+                # abbr_rel = relations[i]
                 self.abbr_rel_to_rel[abbr_rel] = relations[i]
                 relations[i] = abbr_rel
 
             for i in range(len(triples)):
                 if len(triples[i]) == 2:
                     abbr_rel = shorten_relation(triples[i][1][1])
+                    # abbr_rel = triples[i][1][1]
                     self.abbr_rel_to_rel[abbr_rel] = triples[i][1][1]
                     triples[i][1][1] = abbr_rel
                 elif len(triples[i]) == 3:
                     abbr_rel = shorten_relation(triples[i][1])
+                    # abbr_rel = triples[i][1]
                     self.abbr_rel_to_rel[abbr_rel] = triples[i][1]
                     triples[i][1] = abbr_rel
 

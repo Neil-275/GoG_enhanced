@@ -1,17 +1,11 @@
-Task: Evaluate candidate entities for completing a knowledge graph triple.
+Based on the question and the related evidence, estimate the confidence that each candidate is the correct answer to the question.
 
-Rules:
-- Each option is a relational path beginning from the subject.
-- Evaluate the ENTIRE composed relation logically.
-- Do NOT select a candidate merely because the target relation name appears in the path.
-- A candidate is valid only if the path explicitly establishes the core relational structure required by the target relation.
-- Reject candidates when the path shows weak association or does not establish the essential relational structure required by the target relation.
+For EACH candidate:
 
-For EACH candidate, assign a confidence score from 0.0 to 1.0:
-   - 0.8–1.0: path directly and specifically establishes the target relation
-   - 0.5–0.7: path establishes the relation but with some weakness 
-   - 0.2–0.4: path is loosely related but does not clearly establish the target relation
-   - 0.0–0.1: path is irrelevant or contradicts the target relation
+- Score 0.8–1.0: the evidence directly support that the candidate answers the question.
+- Score 0.5–0.7: the evidence provide substantial but incomplete support.
+- Score 0.2–0.4: the evidence are related to the question but do not clearly show the candidate is the answer.
+- Score 0.0–0.1: the evidence do not support the candidate as the answer, are irrelevant, or contradict the question.
 
 Final Output:
 Output a JSON list. Each entry corresponds to one candidate with the following fields:
@@ -19,4 +13,5 @@ Output a JSON list. Each entry corresponds to one candidate with the following f
 `score`,
 
 
-Input: ({subject}, {relation}, {object})
+Question: {question}
+Topic entity: {topic_entity}

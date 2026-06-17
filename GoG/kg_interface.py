@@ -351,28 +351,41 @@ class KGInterface:
             Dictionary with keys:
                 - 'path': List of entities in shortest path
                 - 'relations': List of relations along the path
+                - 'directions': List of edge directions ('forward' or 'backward')
                 - 'length': Number of hops
                 or None if no path exists
         """
-        graph = self._get_graph(kg_type)
+        directed_graph = self._get_graph(kg_type)
+        graph = directed_graph.to_undirected(as_view=True)
         try:
-            entity_path = nx.shortest_path(graph, source, target)
-            
+            entity_paths = list(nx.all_shortest_paths(graph, source, target))
+            # print("Entity paths:", entity_paths)
             # Extract relations from consecutive entity pairs
-            relations = []
-            for i in range(len(entity_path) - 1):
-                head, tail = entity_path[i], entity_path[i + 1]
-                edge_data = graph.get_edge_data(head, tail)
-                if edge_data:
-                    # Handle multiple edges (MultiDiGraph)
-                    relation = edge_data[0]['relation']
-                    relations.append(relation)
             
-            return {
-                'path': entity_path,
-                'relations': relations,
-                'length': len(entity_path) - 1
-            }
+            for entity_path in entity_paths:
+                relations = []
+                directions = []
+                result_paths = []
+                for i in range(len(entity_path) - 1):
+                    head, tail = entity_path[i], entity_path[i + 1]
+                    edge_data = directed_graph.get_edge_data(head, tail)
+                    direction = 'forward'
+                    if not edge_data:
+                        edge_data = directed_graph.get_edge_data(tail, head)
+                        direction = 'backward'
+                    if edge_data:
+                        # Handle multiple edges (MultiDiGraph)
+                        relation = edge_data[0]['relation']
+                        relations.append(relation)
+                        directions.append(direction)
+                result_paths.append({
+                    'path': entity_path,
+                    'relations': relations,
+                    'directions': directions,
+                    'length': len(entity_path) - 1
+                })
+            
+            return result_paths
         except (nx.NetworkXNoPath, nx.NodeNotFound):
             return None
     
