@@ -557,14 +557,20 @@ class KGInterface:
         }
 
 
-    def get_best_relation_match(self, rel, k=None, threshold=0.0):
+    def get_best_relation_match(self, rel, rel_set=None, k=None, threshold=0.0):
         """
         Matches an LLM-generated string to the closest KG relation.
 
-        If `k` is provided, return the top-k most similar relations instead of
-        a single thresholded match.
+        If `k` is provided, return up to top-k most similar relations that meet
+        the threshold instead of a single thresholded match.
         """
         ## preprocess the relation
+        if rel_set is None:
+            rel_set = self.rel_emb
+            relation_labels = self.relations
+        else:
+            relation_labels = list(rel_set)
+            rel_set = embed_model.encode(rel_set, convert_to_tensor=True)
         rel = shorten_relation(rel)
         # Embed the LLM's "creative" output
         query_embedding = embed_model.encode(rel, convert_to_tensor=True)
@@ -572,16 +578,20 @@ class KGInterface:
 
 
         # Compute Cosine Similarity against all 822 relations
-        cosine_scores = util.cos_sim(query_embedding, self.rel_emb)[0]
+        cosine_scores = util.cos_sim(query_embedding, rel_set)[0]
         
         # Find the index of the highest score
         best_match_idx = int(np.argmax(cosine_scores.cpu()))
         max_score = cosine_scores[best_match_idx].item()
 
         if k is not None:
-            top_k = min(int(k), len(self.relations))
+            top_k = min(int(k), len(relation_labels))
             top_indices = cosine_scores.topk(top_k).indices.tolist()
-            return [self.relations[idx] for idx in top_indices]
+            return [
+                relation_labels[idx]
+                for idx in top_indices
+                if cosine_scores[idx].item() >= threshold
+            ]
         
         # 4. Apply the "Safety Threshold"
         if max_score >= threshold:

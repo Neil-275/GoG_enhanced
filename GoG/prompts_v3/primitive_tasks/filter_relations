@@ -13,9 +13,5 @@ Entity: 314
 Relation: [human_language.main_country, human_language.language_family, languoid.parent, human_language.writing_system, languoid.languoid_class, human_language.countries_spoken_in, object_profile.prominent_type, languoid.document, ontology_instance.equivalent_instances, languoid.local_name, human_language.region]
 Answer: [human_language.main_country, human_language.countries_spoken_in, human_language.region]
 
-Thought: I need to search for the team that 880 is the mascot for.
-Entity: 880
-Relation: [gardening_hint.last_referenced_by]
-Answer: []
 
 Here is the question.

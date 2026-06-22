@@ -1,25 +1,17 @@
-Task: Evaluate candidate entities for completing the knowledge graph triple.
+For each entry, score how well the evidence supports the proposed triple.
 
-Rules:
-- Evidence is a list of triples that show how the topic entity connect with the candidates
-- Evaluate the ENTIRE composed relation logically.
-- A candidate is valid only if the evidence explicitly establishes the core relational structure required by the target relation.
+Scoring criteria:
+- 0.8–1.0: evidence directly and explicitly establishes the triple
+- 0.5–0.7: evidence supports the triple but indirectly
+- 0.2–0.4: evidence is loosely related but does not clearly establish it
+- 0.0–0.1: evidence is irrelevant or contradicts the triple
 
-Required reasoning process:
-For EACH candidate:
-1. Evaluate the implied relation against the original question as the primary semantic criterion — does this evidence answer what was actually asked? Use the target triple as grounding context only: it specifies the expected relation type and entity type, but should not override the intent of the question. If the target triple's relation label is ambiguous or coarse, defer to the original question's meaning.
-2. Path specificity: are intermediate entities directly relevant to the query, or incidental?
-3. Assign a confidence score as the conclusion of steps 1–3:
-   - 0.8–1.0: evidence directly and specifically establishes the target relation
-   - 0.5–0.7: evidence establishes the relation but with some weakness
-   - 0.2–0.4: evidence is loosely related but does not clearly establish the relation
-   - 0.0–0.1: evidence is irrelevant or contradicts the target relation
+For each entry:
+- Evaluate whether the composed relation chain in the evidence 
+  logically establishes (head, relation, tail)
+- Consider path specificity: are intermediate entities directly 
+  relevant or incidental?
 
+Output a JSON list: [{"triple": ..., "score": ...}]
 
-
-Final Output:
-After giving your deductions, output a JSON list. Each entry corresponds to one entry with the following keys:
-`triple`, `score`
-
-
-Input:
+Entries:

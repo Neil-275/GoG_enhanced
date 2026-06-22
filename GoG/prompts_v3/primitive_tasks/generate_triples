@@ -1,43 +1,48 @@
-[Task]
-
 You are given:
 
-* A reasoning thought containing an entity ID.
-* A set of candidate relations.
+- A query containing an entity E.
+- A set of relevance-filtered neighboring relations connected to E.
+- A set of candidate relations.
 
-Your goal is to identify:
+Your task is to select at least 1 and at most 3 relation candidates that directly answer the query. Then specify the direction for each of the relation with respect to the entity and the question
 
-1. The single relation that would most directly help resolve the reasoning thought.
-2. The direction in which the relation chosen should be traversed.
+Note on specifying direction:
+- outgoing:
+  (E, relation, ?)
 
-### Direction encoding:
+  Use this when the answer is obtained by following the relation FROM E.
 
-Direction = 0
-Traverse outward from E: (E, relation, ?)
+- incoming:
+  (?, relation, E)
 
-Direction = 1
-Traverse inward to E: (?, relation, E)
+  Use this when the answer is obtained by finding entities that point TO E through the relation.
 
-### Rules:
+IMPORTANT:
++ The neighboring relations describe the local structure around E. They are NOT candidate answers by themselves. Use them as structural evidence to help interpret the query and disambiguate similar candidate relations.
++ Direction is defined relative to the GIVEN ENTITY E.
++ Output the relation exactly as they are in the candidates
 
-1. Use only the provided candidate relations.
-2. Select the relation that best matches the information requested in the thought.
-3. Predict the direction that should be followed relative to the entity mentioned in the thought.
+Examples on specifying the direction:
 
-[Output Format]
+Question: "What is the position of player E?"
+Pattern: (E, position, ?)
+Direction: outgoing
 
-Output ONLY:
+Question: "Which player has position E?"
+Pattern: (?, position, E)
+Direction: incoming
 
-EntityID: relation_name: direction
+Question: "Who is the parent of E?"
+Pattern: (E, parent, ?)
+Direction: outgoing
 
-where direction is either 0 for outgoing or 1 for incoming.
+Question: "Who has E as parent?"
+Pattern: (?, parent, E)
+Direction: incoming
 
-No explanations.
-No additional text.
-
-[Context]
-
-Thought: {thought}
-
-Candidate relations:
+Output your answer in the form of a json list. Each entry corresponds to one candidate with the following keys:
+`relation`, `direction`
+Question: {thought}
+Neighboring relations: {neighboring_relations}
+Candidate relations: 
 {candidate_relations}

@@ -287,6 +287,19 @@ def parse_generated_relations(text):
     
     return result
 
+def parse_json_list(text):
+    response_text = text.strip()
+
+    if response_text != "None":
+        if "[" in response_text and "]" in response_text:
+            response_text = response_text[response_text.index("["):response_text.rindex("]") + 1]
+
+        try:
+            parsed_response = json.loads(response_text)
+        except json.JSONDecodeError:
+            parsed_response = None
+
+    return parsed_response
 
 def parse_generated_relation_directions(text):
     """
@@ -294,22 +307,22 @@ def parse_generated_relation_directions(text):
 
     Args:
         text (str): Multi-line text where each matching line contains an entity
-            ID, a relation name, and a direction encoded as 0 or 1.
+            ID, a relation name, and a direction encoded as "outgoing" or "incoming".
 
     Returns:
         dict: Mapping from entity IDs to (relation_name, direction) tuples.
     """
     result = {}
-    pattern = r"^\s*(\d+)\s*:\s*(.+?)\s*:\s*([01])\s*$"
+    pattern = r"^\s*(\d+)\s*:\s*(.+?)\s*:\s*(outgoing|incoming)\s*$"
 
     for line in text.splitlines():
-        match = re.match(pattern, line)
+        match = re.match(pattern, line, re.IGNORECASE)
         if not match:
             continue
 
         entity_id = match.group(1)
         relation = match.group(2).strip()
-        direction = int(match.group(3))
+        direction = match.group(3).lower()
         result[entity_id] = (relation, direction)
 
     return result

@@ -13,6 +13,7 @@ from GoG.kg_interface import KGInterface
 from GoG.utils import (
     convert_list_to_str,
     format_prompt,
+    parse_json_list,
     parse_llm_output_to_list,
     read_file,
     shorten_relation,
@@ -224,23 +225,34 @@ class KGEnv:
         if thought.startswith("["):
             thought = thought[1:-1]
 
-        # entities = extract_numbers_from_string(thought)
-        # related_triples_df = [self.kg.get_1hop_triples(str(entity_id)) 
-        #                    for entity_id in entities if str(entity_id) in self.kg.entities]
+        entities = extract_numbers_from_string(thought)
+        
+        related_triples_df = [self.kg.get_1hop_triples(str(entity_id)) 
+                           for entity_id in entities if str(entity_id) in self.kg.entities]
+        relation_set = set()
+        for df in related_triples_df:
+            for triple in df.values.tolist():
+                if len(triple) == 2:
+                    relation_set.add(triple[1][1])
+                elif len(triple) == 3:
+                    relation_set.add(triple[1])
+        start_entity = entities[0]
+        related_relations = self.kg.get_best_relation_match(thought, rel_set=list(relation_set), k=5, threshold=0.6) if self.kg.rels else []
         # related_triples = [triple for df in related_triples_df for triple in df.values.tolist()]
         # related_triples = random.sample(related_triples, k=min(len(related_triples), 3))
         # related_triple_str = convert_triples_to_str(related_triples)
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/generate_triples")
         prompt = format_prompt(prompt_path)
 
-        candidate_relations = self.kg.get_best_relation_match(thought, k=5) if self.kg.rels else []
+        candidate_relations = self.kg.get_best_relation_match(thought, k=10) if self.kg.rels else []
         candidate_relations_str = "\n".join(candidate_relations)
     
         n = self.args.sc_num
+        # print(f"Candidate relations: {candidate_relations_str}")
         prompt = (
             prompt.format(
                 thought=thought,
-                # existing_triples=related_triple_str,
+                neighboring_relations="[" + ", ".join(related_relations) + "]",
                 candidate_relations=candidate_relations_str,
             )
             + "\nAnswer: "
@@ -260,27 +272,29 @@ class KGEnv:
         # print("LLM responses:")
         # print(responses)
 
-        parsed_generations = parse_generated_relation_directions(responses)
+        parsed_generations = parse_json_list(responses)
 
-        result = []
-        for start_entity, (relation_text, direction) in parsed_generations.items():
+        # return parsed_generations, candidate_relations
+        verify_candidates = []
+        for item in parsed_generations:
+            relation_text = item.get("relation")
+            direction = item.get("direction")
             relation, _ = self.kg.get_best_relation_match(relation_text)
             if not relation:
                 continue
-
-            print(f"Found: {start_entity}: {relation}: {direction}")
-
-            candidates = self.gnn.predict_topk(start_entity, relation, direction, k=3, known=False)
+            # print(f"Found: {start_entity}: {relation}: {direction}")
+            
+            candidates = self.gnn.predict_topk(start_entity, relation, direction, k=5, known=False)
             # print("candidates:", candidates)
-            relation_paths = {}
-            for candidate in candidates:
-                if direction == 0:
+            verify_candidate = {}
+            for candidate in candidates: ## Loop through the candidates of GNNs
+                if direction == "outgoing":
                     cand_relation_paths = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
-                else:
+                if direction == "incoming":
                     cand_relation_paths = self.kg.get_shortest_path_with_relations(str(candidate), str(start_entity))
                 if cand_relation_paths == None:
                     continue
-                cand_path = ""
+                cand_paths = []
                 for relation_path in cand_relation_paths:
                     relation_path_str = ""
                     # print(relation_path)
@@ -291,27 +305,28 @@ class KGEnv:
                             relation_path_str +=  f"({convert_triples_to_str([[ent, rel, next_ent]])})"
                         else:
                             relation_path_str += f"({convert_triples_to_str([[next_ent, rel, ent]])})"
-                        if i == 0:
-                            relation_path_str += ";"
+                        if i < len(relation_path["relations"]) - 1:
+                            relation_path_str += "; "
                     relation_path_str = "[" + relation_path_str + "]"
-                cand_path += relation_path_str + "\n"
+                    cand_paths.append(relation_path_str)
                 # print(cand_path)
-                if candidate not in relation_paths:
-                    relation_paths[candidate] = []
-                relation_paths[candidate].append(cand_path)
-            if not relation_paths:
-                return "No plausible triples generated."
-            verified_candidates = self.verify(start_entity, thought, relation_paths)
-            for candidate in verified_candidates:
-                if direction == 0:
-                    triple = [str(start_entity), str(relation), str(candidate[0])]
-                else:
-                    triple = [str(candidate[0]), str(relation), str(start_entity)]
-                triple_str = convert_triples_to_str([triple])
-                triple_str = triple_str + "\tPlausible score:" + str(candidate[1])
-                # print("Generated triple:", triple_str)
-                self.records[-1]["generated_triples"] = triple_str
-                result.append(triple_str)
+                verify_candidate = {
+                    "relation": relation_text,
+                    "evidence": cand_paths,
+                    "candidate_id": candidate,
+                    "direction": direction,
+                }
+            verify_candidates.append(verify_candidate)
+        verified_candidates = self.verify(start_entity, thought, verify_candidates)
+        result = []
+        for candidate in verified_candidates:
+            # print(123)
+            triple = candidate['triple']
+            triple_str = convert_triples_to_str([triple])
+            triple_str = triple_str + "\tPlausible score:" + str(candidate['score'])
+            # print("Generated triple: ", triple_str)
+            self.records[-1]["generated_triples"] = triple_str
+            result.append(triple_str)
                 
         if len(result) == 0:
             # print("No valid triples generated.")
@@ -324,26 +339,30 @@ class KGEnv:
     # Field names can be None for raw text chunks, so filter those out
         return [field_name for _, field_name, _, _ in Formatter().parse(template_string) if field_name is not None]
 
-    def verify(self, topic_entity, question, relation_paths, threshold=0.5):
+    def verify(self, topic_entity, question,  verify_candidates, threshold=0.5):
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/verify_triples")
         prompt = format_prompt(prompt_path)
         # print("type of prompt:", type(prompt))
         # print("Format str:", self.get_template_variables(prompt))
-        # if direction == 0:
-        #     # print(f"Verifying candidate triples for: {start_entity} -[{relation}]-> ?")
-        #     prompt = prompt.format(subject=start_entity, relation=relation, object="?")
-        # else:
-        #     # print(f"Verifying candidate triples for: ? -[{relation}]-> {start_entity}")
-        #     prompt = prompt.format(subject="?", relation=relation, object=start_entity)
-        prompt = prompt.format(question=question, topic_entity=topic_entity)
-        relation_path_str = []
-        for candidate, relation_path in relation_paths.items():
-            paths = "\n".join(relation_path)
-            relation_path_str.append(f"Candidate: {candidate}\nPaths: {paths}")
-            print(relation_path_str[-1])
-        relation_path_str = "\n".join(relation_path_str)
+        for cand in verify_candidates:
+            if cand["direction"] == "outgoing":
+                # print(f"Verifying candidate triples for: {topic_entity} -[{relation}]-> ?")
+                triple = str(topic_entity) +  ", " + cand["relation"] + ", " + str(cand["candidate_id"])
+            if cand["direction"] == "incoming":
+                # print(f"Verifying candidate triples for: ? -[{relation}]-> {topic_entity}")
+                triple = str(cand["candidate_id"]) + ", " + cand["relation"] + ", " + str(topic_entity)
+            evidence = "\n".join(cand["evidence"])
+            prompt = prompt + f"Proposed triple: ({triple})\nEvidence: {evidence}\n"
+
+        # relation_path_str = []
+        # for candidate, relation_path in relation_paths.items():
+        #     paths = "\n".join(relation_path)
+        #     relation_path_str.append(f"Candidate: {candidate}\nEvidence: {paths}")
+        #     # print(relation_path_str[-1])
+        # relation_path_str = "\n".join(relation_path_str)
         
-        prompt = prompt + "Candidates:\n" + relation_path_str + "\nAnswer: "
+        # prompt = prompt + "Candidates:\n" + relation_path_str  +"\nAnswer: "
+        # prompt = prompt + "Candidates:\n" + relation_path_str + "\nReasoning space:" 
         # print(123)
         # print("Verify prompt:", prompt)
         # verified_triples = []
@@ -362,27 +381,22 @@ class KGEnv:
             self.records[-1]['verified_candidates'] = []
             return []
 
-        candidate_ids = []
+        verified_cands = []
         response_text = response.strip()
 
-        if response_text != "None":
-            if "[" in response_text and "]" in response_text:
-                response_text = response_text[response_text.index("["):response_text.rindex("]") + 1]
+        parsed_response = parse_json_list(response_text)
+        # print("Parsed verify response:", parsed_response, flush=True)
+        if isinstance(parsed_response, list):
+            for item in parsed_response:
+                if not isinstance(item, dict):
+                    continue
+                if "triple" in item and "score" in item and item["score"] >= threshold:
+                    triple = [str(item["triple"][0]), str(item["triple"][1]), str(item["triple"][2])]
+                    item["triple"] = triple
+                    verified_cands.append(item)
 
-            try:
-                parsed_response = json.loads(response_text)
-            except json.JSONDecodeError:
-                parsed_response = None
-
-            if isinstance(parsed_response, list):
-                for item in parsed_response:
-                    if not isinstance(item, dict):
-                        continue
-                    if "candidate_id" in item and "score" in item and item["score"] >= threshold:
-                        candidate_ids.append((item["candidate_id"], item["score"]))
-
-        self.records[-1]['verified_candidates'] = candidate_ids
-        return candidate_ids
+        self.records[-1]['verified_candidates'] = verified_cands
+        return verified_cands
                 # for line in response.split("\n"):
         #     try:
         #         h, r, t = [item.strip() for item in line.split('\t')]
