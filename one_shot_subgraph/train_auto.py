@@ -25,8 +25,9 @@ parser.add_argument('--add_manual_edges', action='store_true')
 parser.add_argument('--remove_1hop_edges', default=True)
 parser.add_argument('--only_eval', action='store_true')
 parser.add_argument('--not_shuffle_train', default=True)
-parser.add_argument('--ppr_k', type=int, default=2, help='k for k-hop localized PPR')
+parser.add_argument('--ppr_k', type=int, default=0, help='k for k-hop localized PPR')
 parser.add_argument('--drop_graph', action='store_true', help='Drop NetworkX graph after building samplers')
+parser.add_argument('--brink', action='store_true', help='Use Brink dataset')
 args = parser.parse_args()
 
 class Options(object):
@@ -169,7 +170,7 @@ if __name__ == '__main__':
         params = {'lr': 0.001, 'hidden_dim': 64, 'attn_dim': 2, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9429713470775948, 'lamb': 0.000946516892415447, 'dropout': 0.19456805575101324}
     elif dataset == 'fb15k_237':
         # [VALID] MRR:0.6117 H@1:0.5477 H@10:0.7273        [TEST] MRR:0.6064 H@1:0.5403 H@10:0.7218 
-        params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9429713470775948, 'lamb': 0.000946516892415447, 'dropout': 0.19456805575101324}
+        params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9, 'lamb': 0.001, 'dropout': 0.2}
         # params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 6, 'act': 'relu', 'initializer': 'relation', 'concatHidden': False, 'shortcut': True, 'readout': 'linear', 'decay_rate': 0.9429713470775948, 'lamb': 0.000946516892415447, 'dropout': 0.19456805575101324}
     elif dataset == 'family':
         params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9429713470775948, 'lamb': 0.000946516892415447, 'dropout': 0.19456805575101324}

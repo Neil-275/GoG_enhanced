@@ -32,9 +32,16 @@ class DataLoader(Dataset):
         self.n_ent = n_ent
         self.n_rel = n_rel
         self.filters = defaultdict(lambda:set())
-
-        facts_path = os.path.join(task_dir, 'facts.txt')
-        train_path = os.path.join(task_dir, 'train.txt')
+        if not args.brink:
+            facts_path = os.path.join(task_dir, 'facts.txt')
+            train_path = os.path.join(task_dir, 'train.txt')
+            self.valid_triple = self.read_triples('valid.txt')
+            self.test_triple  = self.read_triples('test.txt')
+        else:
+            facts_path = os.path.join(task_dir, 'facts_brink.txt')
+            train_path = os.path.join(task_dir, 'train_brink.txt')
+            self.valid_triple = self.read_triples('valid_brink.txt')
+            self.test_triple  = self.read_triples('test_brink.txt')
         facts_exists = os.path.exists(facts_path)
         train_exists = os.path.exists(train_path)
         if not facts_exists and not train_exists:
@@ -46,8 +53,7 @@ class DataLoader(Dataset):
         # If both exist, we read both and merge them, then later split via shuffle_train().
         self.fact_triple = self.read_triples('facts.txt') if facts_exists else []
         self.train_triple = self.read_triples('train.txt') if train_exists else []
-        self.valid_triple = self.read_triples('valid.txt')
-        self.test_triple  = self.read_triples('test.txt')
+        
 
         merged_triples = []
         merged_triples += self.fact_triple
