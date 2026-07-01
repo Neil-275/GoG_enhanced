@@ -36,7 +36,7 @@ def run_llm(
     f = 0
     while f == 0:
         try:
-            if len(encoding.encode(prompt)) >= 4096:
+            if len(encoding.encode(prompt)) >= 7012:
                 raise RuntimeError("maximum context length of prompt")
             response = client.chat.completions.create(
                 model=engine,

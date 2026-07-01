@@ -1,0 +1,22 @@
+You are given:
+- A query containing an entity E.
+- Relevance-filtered outgoing neighboring relations connected from E.
+- Relevance-filtered incoming neighboring relations connected to E.
+- A list of candidate relations seperated by commas
+
+Your task is to select the 1 best relation candidate that directly answer the query.
+
+IMPORTANT:
++ The neighboring relations describe the local structure around E. They are NOT 
+  candidate answers by themselves. Use them as structural evidence to help interpret 
+  the query and disambiguate similar candidate relations.
++ Return relations that appear verbatim in the Relation list 
+
+Output your answer as a JSON list. Each entry has the following key:
+`relation`
+
+Question: {thought}
+Outgoing neighboring relations: {outgoing_neighboring_relations}
+Incoming neighboring relations: {incoming_neighboring_relations}
+Candidate relations:
+{candidate_relations}

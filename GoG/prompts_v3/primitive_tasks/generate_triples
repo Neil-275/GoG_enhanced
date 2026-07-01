@@ -1,24 +1,15 @@
 You are given:
 
 - A query containing an entity E.
-- A set of relevance-filtered neighboring relations connected to E.
+- Relevance-filtered outgoing neighboring relations connected from E.
+- Relevance-filtered incoming neighboring relations connected to E.
 - A set of candidate relations.
 
-Your task is to select at least 1 and at most 3 relation candidates that directly answer the query. Then specify the direction for each of the relation with respect to the entity and the question
+Your task is to select the best relation candidates that directly answer the query. Then specify the direction the relation with respect to the entity and the question
 
-Note on specifying direction:
-- outgoing:
-  (E, relation, ?)
-
-  Use this when the answer is obtained by following the relation FROM E.
-
-- incoming:
-  (?, relation, E)
-
-  Use this when the answer is obtained by finding entities that point TO E through the relation.
 
 IMPORTANT:
-+ The neighboring relations describe the local structure around E. They are NOT candidate answers by themselves. Use them as structural evidence to help interpret the query and disambiguate similar candidate relations.
++ The neighboring relations describe the local structure around E. They are NOT candidate answers by themselves. Use them as structural evidence to help interpret the query, determine direction, and disambiguate similar candidate relations.
 + Direction is defined relative to the GIVEN ENTITY E.
 + Output the relation exactly as they are in the candidates
 
@@ -41,8 +32,9 @@ Pattern: (?, parent, E)
 Direction: incoming
 
 Output your answer in the form of a json list. Each entry corresponds to one candidate with the following keys:
-`relation`, `direction`
+`relation`, `pattern`, `direction`
 Question: {thought}
-Neighboring relations: {neighboring_relations}
+Outgoing neighboring relations: {outgoing_neighboring_relations}
+Incoming neighboring relations: {incoming_neighboring_relations}
 Candidate relations: 
 {candidate_relations}

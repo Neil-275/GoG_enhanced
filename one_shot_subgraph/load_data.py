@@ -38,6 +38,7 @@ class DataLoader(Dataset):
             self.valid_triple = self.read_triples('valid.txt')
             self.test_triple  = self.read_triples('test.txt')
         else:
+            print("==> using brink dataset")
             facts_path = os.path.join(task_dir, 'facts_brink.txt')
             train_path = os.path.join(task_dir, 'train_brink.txt')
             self.valid_triple = self.read_triples('valid_brink.txt')
@@ -51,9 +52,12 @@ class DataLoader(Dataset):
 
         # Optional: some datasets provide only one combined file.
         # If both exist, we read both and merge them, then later split via shuffle_train().
-        self.fact_triple = self.read_triples('facts.txt') if facts_exists else []
-        self.train_triple = self.read_triples('train.txt') if train_exists else []
-        
+        if not args.brink:
+            self.fact_triple = self.read_triples('facts.txt') if facts_exists else []
+            self.train_triple = self.read_triples('train.txt') if train_exists else []
+        else:
+            self.fact_triple = self.read_triples('facts_brink.txt') if facts_exists else []
+            self.train_triple = self.read_triples('train_brink.txt') if train_exists else []
 
         merged_triples = []
         merged_triples += self.fact_triple
@@ -66,8 +70,8 @@ class DataLoader(Dataset):
         self.valid_data = self.double_triple(self.valid_triple)
         self.test_data  = self.double_triple(self.test_triple)
         self.idd_data = np.concatenate([np.expand_dims(np.arange(self.n_ent),1), 2*self.n_rel*np.ones((self.n_ent, 1)), np.expand_dims(np.arange(self.n_ent),1)], 1)
-            
-        self.shuffle_train()
+        if not self.args.brink:
+            self.shuffle_train()
         self.valid_q, self.valid_a = self.load_query(self.valid_data)
         self.test_q,  self.test_a  = self.load_query(self.test_data)
         self.n_train = len(self.train_data)

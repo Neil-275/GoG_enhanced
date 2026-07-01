@@ -13,6 +13,7 @@ from GoG.kg_interface import KGInterface
 from GoG.utils import (
     convert_list_to_str,
     format_prompt,
+    get_edges,
     parse_json_list,
     parse_llm_output_to_list,
     read_file,
@@ -28,6 +29,7 @@ import pandas as pd
 import pickle as pkl
 import os
 import sys
+from ast import literal_eval
 # from rank_bm25 import BM25Okapi
 
 # Note: Some legacy methods are not available in the new KGInterface
@@ -75,7 +77,7 @@ class KGEnv:
 
         self.records = []
 
-        self.triples = []
+        
         self.abbr_rel_to_rel = {}
 
         self.id_to_name = {}
@@ -92,7 +94,7 @@ class KGEnv:
         # self.doc_to_vec = spacy.load("en_core_web_lg")
 
         self.explored_entities = set()
-
+        self.explored_triples = []
         self.mid_crucial_triples = None
         self.n_related_triples = self.args.n_related_triples
         # only used in answer without kg
@@ -100,7 +102,7 @@ class KGEnv:
         self.generate_call_count = 0
         self.topic_entities = None
         self.question = None
-
+        self.crucial_rel = None
     # def update_name_to_id(self, name_to_id):
     #     name_to_id = {name.lower(): id for name, id in name_to_id.items()}
     #     self.name_to_id.update(name_to_id)
@@ -114,20 +116,36 @@ class KGEnv:
     #     self.id_to_name.update(id_to_name)
     #     self.name_to_id.update({label: id for id, label in id_to_name.items()})
 
-    def assign_query(self, topic_entities, question):
-        self.topic_entities = topic_entities
-        self.question = question
+    def find_crucial_rel(self, data):
+        q_entity = literal_eval(data["q_entity"])[0]
+        hard_answer = literal_eval(data["hard_answer"])[0]
+        crucial_edges = get_edges(self.kg.drop_edges, q_entity, hard_answer)
+        if crucial_edges.empty or len(crucial_edges) > 1:
+            return None
+        return crucial_edges
+
+    def assign_query(self, data):
+        self.topic_entities = data["q_entity"]
+        self.question = data["question"]
         self.records = []
 
-        self.triples = []
+        self.explored_triples = []
         self.abbr_rel_to_rel = {}
         self.explored_entities = set()
 
-        self.mid_crucial_triples = None
+        if self.args.hard_only:
+            self.crucial_rel = self.find_crucial_rel(data)
+        else:
+            self.crucial_rel = None
         self.n_related_triples = self.args.n_related_triples
         # only used in answer without kg
         self.llm_output = None
         self.generate_call_count = 0
+        # q_entity = literal_eval(case["q_entity"])[0]
+        # hard_answer = literal_eval(case["hard_answer"])[0]
+        # crucial_edges = get_edges(drop_edges, q_entity, hard_answer)
+        # if crucial_edges.empty or len(crucial_edges) > 1:
+            # continue
 
 
     def convert_records_to_str(self):
@@ -137,7 +155,7 @@ class KGEnv:
                 i=record["i"],
                 action=record["action"],
                 thought=record["thought"],
-                observation=record["observation"],
+                observation=record.get("observation", ""),
             )
         return string
 
@@ -220,48 +238,84 @@ class KGEnv:
 
         raise ValueError(f"Unsupported action: {action_str}")
 
+    def construct_neighbor_relation_set(self, entities, thought):
+        related_triples_df = [
+            (str(entity_id), self.kg.get_1hop_triples(str(entity_id)))
+            for entity_id in entities if str(entity_id) in self.kg.entities
+        ]
+        outgoing_neighbor_relation_set = set()
+        incoming_neighbor_relation_set = set()
+        for entity_id, df in related_triples_df:
+            for triple in df.values.tolist():
+                if len(triple) == 2:
+                    direction, wrapped_triple = triple
+                    if direction == 0:
+                        outgoing_neighbor_relation_set.add(wrapped_triple[1])
+                    elif direction == 1:
+                        incoming_neighbor_relation_set.add(wrapped_triple[1])
+                elif len(triple) == 3:
+                    head, relation, tail = triple
+                    if str(head) == entity_id:
+                        outgoing_neighbor_relation_set.add(relation)
+                    if str(tail) == entity_id:
+                        incoming_neighbor_relation_set.add(relation)
+        start_entity = entities[0]
+        outgoing_related_relations = self.kg.get_best_relation_match(
+            thought, rel_set=list(outgoing_neighbor_relation_set), k=5, threshold=0.1
+        ) if self.kg.rels and outgoing_neighbor_relation_set else []
+        incoming_related_relations = self.kg.get_best_relation_match(
+            thought, rel_set=list(incoming_neighbor_relation_set), k=5, threshold=0.1
+        ) if self.kg.rels and incoming_neighbor_relation_set else []
+        return outgoing_related_relations, incoming_related_relations, start_entity
+
+    def parse_json_list_responses(self, responses):
+        if isinstance(responses, str):
+            responses = [responses]
+
+        parsed_items = []
+        for response in responses:
+            if not response:
+                continue
+            parsed_response = parse_json_list(response)
+            if isinstance(parsed_response, list):
+                parsed_items.extend(
+                    item for item in parsed_response if isinstance(item, dict)
+                )
+        return parsed_items
+
     def generate(self, thought):
         # [...]
         if thought.startswith("["):
             thought = thought[1:-1]
 
         entities = extract_numbers_from_string(thought)
+        outgoing_related_relations, incoming_related_relations, start_entity = self.construct_neighbor_relation_set(entities, thought)
         
-        related_triples_df = [self.kg.get_1hop_triples(str(entity_id)) 
-                           for entity_id in entities if str(entity_id) in self.kg.entities]
-        relation_set = set()
-        for df in related_triples_df:
-            for triple in df.values.tolist():
-                if len(triple) == 2:
-                    relation_set.add(triple[1][1])
-                elif len(triple) == 3:
-                    relation_set.add(triple[1])
-        start_entity = entities[0]
-        related_relations = self.kg.get_best_relation_match(thought, rel_set=list(relation_set), k=5, threshold=0.6) if self.kg.rels else []
+        
         # related_triples = [triple for df in related_triples_df for triple in df.values.tolist()]
         # related_triples = random.sample(related_triples, k=min(len(related_triples), 3))
         # related_triple_str = convert_triples_to_str(related_triples)
-        prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/generate_triples")
-        prompt = format_prompt(prompt_path)
+        relation_selection_prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/relation_selection.txt")
+        relation_selection_prompt = format_prompt(relation_selection_prompt_path)
 
-        candidate_relations = self.kg.get_best_relation_match(thought, k=10) if self.kg.rels else []
-        candidate_relations_str = "\n".join(candidate_relations)
-    
+        candidate_relations = self.kg.get_best_relation_match(thought, k=5) if self.kg.rels else []
+        candidate_relations_str = "[{}]".format(", ".join(candidate_relations))
+
         n = self.args.sc_num
         # print(f"Candidate relations: {candidate_relations_str}")
-        prompt = (
-            prompt.format(
+        relation_selection_prompt = (
+            relation_selection_prompt.format(
                 thought=thought,
-                neighboring_relations="[" + ", ".join(related_relations) + "]",
+                outgoing_neighboring_relations="[" + ", ".join(outgoing_related_relations) + "]",
+                incoming_neighboring_relations="[" + ", ".join(incoming_related_relations) + "]",
                 candidate_relations=candidate_relations_str,
             )
             + "\nAnswer: "
         )
 
-        logger.debug(f"Generate prompt:{prompt}")
-        # print("Generate prompt:", prompt)
-        responses = run_llm(
-            prompt,
+        logger.debug(f"Relation selection prompt:{relation_selection_prompt}")
+        relation_selection_responses = run_llm(
+            relation_selection_prompt,
             self.args.temperature,
             self.args.max_length,
             self.args.opeani_api_keys,
@@ -269,55 +323,120 @@ class KGEnv:
             stop=None,
             n=n
         )
-        # print("LLM responses:")
-        # print(responses)
+        # print("Relation selection LLM responses:")
+        # print(relation_selection_responses)
 
-        parsed_generations = parse_json_list(responses)
+        selected_relation_items = self.parse_json_list_responses(relation_selection_responses)
+        selected_relations = []
+        updated_selected_relation_items = []
 
+        for item in selected_relation_items:
+            relation = item.get("relation")
+            for gd_relation in candidate_relations:
+                # print("gd_relation:", gd_relation, "relation:", relation)
+                if relation in gd_relation:
+                    relation = gd_relation
+                    break
+            if relation and relation not in selected_relations:
+                selected_relations.append(relation)
+                t_dict = {"relation": relation}
+            updated_selected_relation_items.append(t_dict)
+        selected_relation_items = updated_selected_relation_items
+        ## recreate selected_relation_items with updated relations
+        
+
+        direction_specification_prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/direction_specification.txt")
+        direction_specification_prompt = format_prompt(direction_specification_prompt_path)
+        # selected_relations_str = "{}".format(", ".join(selected_relation_items))
+        selected_relations_str = str(selected_relation_items)
+
+        direction_specification_prompt = (
+            direction_specification_prompt.format(
+                thought=thought,
+                selected_relations=selected_relations_str,
+            )
+            + "\nAnswer: "
+        )
+        # print(f"Direction specification prompt: {direction_specification_prompt}"   )
+        # logger.debug(f"Direction specification prompt:{direction_specification_prompt}")
+        direction_specification_responses = run_llm(
+            direction_specification_prompt,
+            self.args.temperature,
+            self.args.max_length,
+            self.args.opeani_api_keys,
+            self.args.LLM_type,
+            stop=None,
+            n=n
+        )
+        # print("Direction specification LLM responses:")
+        # print(direction_specification_responses)
+
+        parsed_generations = self.parse_json_list_responses(direction_specification_responses)
+        # check if relations in parsed_generatations are the same in selected_relations
+        # for item in parsed_generations:
+        #     relation_text = item.get("relation")
+        #     if relation_text not in selected_relations:
+        #         print(f"Relation {relation_text} is in parsed_generations but not in selected_relations")
         # return parsed_generations, candidate_relations
         verify_candidates = []
+        # for item in parsed_generations:
+        #     relation = item.get("relation")
+        #     direction = item.get("direction")
+        #     # relation, _ = self.kg.get_best_relation_match(relation_text)
+        #     if not relation:
+        #         continue
+        #     # print(f"Found: {start_entity}: {relation}: {direction}")
+            
+        #     candidates = self.gnn.predict_topk(start_entity, relation, direction, k=3, known=False)
+            # print("candidates:", candidates)
+            # verify_candidate = {}
+            # for candidate in candidates: ## Loop through the candidates of GNNs
+            #     if direction == "outgoing":
+            #         cand_relation_paths = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
+            #     if direction == "incoming":
+            #         cand_relation_paths = self.kg.get_shortest_path_with_relations(str(candidate), str(start_entity))
+            #     if cand_relation_paths == None:
+            #         continue
+            #     cand_paths = []
+            #     for relation_path in cand_relation_paths:
+            #         relation_path_str = ""
+            #         # print(relation_path)
+            #         for i, ent, rel, direc in zip(range(len(relation_path["relations"])), relation_path["path"], relation_path["relations"], relation_path["directions"]):
+            #             rel = shorten_relation(rel)
+            #             next_ent = relation_path["path"][i+1]
+            #             if direc == "forward":
+            #                 relation_path_str +=  f"({convert_triples_to_str([[ent, rel, next_ent]])})"
+            #             else:
+            #                 relation_path_str += f"({convert_triples_to_str([[next_ent, rel, ent]])})"
+            #             if i < len(relation_path["relations"]) - 1:
+            #                 relation_path_str += "; "
+            #         relation_path_str = "[" + relation_path_str + "]"
+            #         cand_paths.append(relation_path_str)
+            #     # print(cand_path)
+            #     verify_candidate = {
+            #         "relation": relation_text,
+            #         "evidence": cand_paths,
+            #         "candidate_id": candidate,
+            #         "direction": direction,
+            #     }
+        #     verify_candidates.append(verify_candidate)
+        # verified_candidates = self.verify(start_entity, thought, verify_candidates)
+        verified_candidates = []
         for item in parsed_generations:
-            relation_text = item.get("relation")
+            relation = item.get("relation")
             direction = item.get("direction")
-            relation, _ = self.kg.get_best_relation_match(relation_text)
+            # relation, _ = self.kg.get_best_relation_match(relation_text)
             if not relation:
                 continue
             # print(f"Found: {start_entity}: {relation}: {direction}")
-            
-            candidates = self.gnn.predict_topk(start_entity, relation, direction, k=5, known=False)
+            # print(type(start_entity))
+            candidates = self.gnn.predict_topk(str(start_entity), relation, direction, k=3, known=False)
             # print("candidates:", candidates)
-            verify_candidate = {}
-            for candidate in candidates: ## Loop through the candidates of GNNs
-                if direction == "outgoing":
-                    cand_relation_paths = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
-                if direction == "incoming":
-                    cand_relation_paths = self.kg.get_shortest_path_with_relations(str(candidate), str(start_entity))
-                if cand_relation_paths == None:
-                    continue
-                cand_paths = []
-                for relation_path in cand_relation_paths:
-                    relation_path_str = ""
-                    # print(relation_path)
-                    for i, ent, rel, direc in zip(range(len(relation_path["relations"])), relation_path["path"], relation_path["relations"], relation_path["directions"]):
-                        rel = shorten_relation(rel)
-                        next_ent = relation_path["path"][i+1]
-                        if direc == "forward":
-                            relation_path_str +=  f"({convert_triples_to_str([[ent, rel, next_ent]])})"
-                        else:
-                            relation_path_str += f"({convert_triples_to_str([[next_ent, rel, ent]])})"
-                        if i < len(relation_path["relations"]) - 1:
-                            relation_path_str += "; "
-                    relation_path_str = "[" + relation_path_str + "]"
-                    cand_paths.append(relation_path_str)
-                # print(cand_path)
-                verify_candidate = {
-                    "relation": relation_text,
-                    "evidence": cand_paths,
-                    "candidate_id": candidate,
-                    "direction": direction,
-                }
-            verify_candidates.append(verify_candidate)
-        verified_candidates = self.verify(start_entity, thought, verify_candidates)
+            for candidate in candidates:
+                verified_candidates.append({
+                    "triple": [str(start_entity), relation, str(candidate)] if direction == "outgoing" else [str(candidate), relation, str(start_entity)],
+                    "score": 0.6
+                })
         result = []
         for candidate in verified_candidates:
             # print(123)
@@ -352,7 +471,7 @@ class KGEnv:
                 # print(f"Verifying candidate triples for: ? -[{relation}]-> {topic_entity}")
                 triple = str(cand["candidate_id"]) + ", " + cand["relation"] + ", " + str(topic_entity)
             evidence = "\n".join(cand["evidence"])
-            prompt = prompt + f"Proposed triple: ({triple})\nEvidence: {evidence}\n"
+            prompt = prompt + f"Proposed triple: ({triple})\nEvidence: {evidence}\n\n"
 
         # relation_path_str = []
         # for candidate, relation_path in relation_paths.items():
@@ -364,7 +483,7 @@ class KGEnv:
         # prompt = prompt + "Candidates:\n" + relation_path_str  +"\nAnswer: "
         # prompt = prompt + "Candidates:\n" + relation_path_str + "\nReasoning space:" 
         # print(123)
-        # print("Verify prompt:", prompt)
+        print("Verify prompt:", prompt)
         # verified_triples = []
         response = run_llm(
             prompt,
@@ -375,7 +494,7 @@ class KGEnv:
             self.args.LLM_type,
             stop=None,
         )
-        # print("Verify LLM output:", response, flush=True)
+        print("Verify LLM output:", response, flush=True)
 
         if not response:
             self.records[-1]['verified_candidates'] = []
@@ -414,12 +533,12 @@ class KGEnv:
 
         return filtered_triples, relations
 
-    def search(self, entity_names):
-        # print(f"Search entity names: {entity_names}", type(entity_names))
-        entity_names = parse_llm_output_to_list(entity_names)
+    def search(self, start_entities):
+        # print(f"Search entity names: {start_entities}", type(start_entities))
+        start_entities = parse_llm_output_to_list(start_entities)
 
         all_related_triples = []
-        for entity_name in entity_names:
+        for entity_name in start_entities:
             entity_id = self.convert_name_to_id(entity_name)
             # Use KGInterface to get 1-hop triples
             if self.kg:
@@ -433,8 +552,14 @@ class KGEnv:
                     # triples = incoming_triples + outgoing_triples
                     # relations = list(set([triple[1][1] for triple in triples]))
                     triples_df = self.kg.get_1hop_triples(entity_id)
+                    if self.crucial_rel:
+                        triples_df = triples_df[~(triples_df['relation'].isin(self.crucial_rel) & 
+                                                triples_df['head'].isin(self.topic_entities))]
+
                     # Convert DataFrame to list format: [head, relation, tail]
                     triples = triples_df.values.tolist() if len(triples_df) > 0 else []
+                    ### Filter out crucial triples if they exist
+                    
                     relations = list(set([triple[1] for triple in triples]))
                     # logger.debug(f"Relations after get_1hop_triples: {relations}")
                 except Exception as e:
@@ -449,20 +574,20 @@ class KGEnv:
 
             for i in range(len(relations)):
                 # only remain the last two parts
-                abbr_rel = shorten_relation(relations[i])
-                # abbr_rel = relations[i]
+                # abbr_rel = shorten_relation(relations[i])
+                abbr_rel = relations[i]
                 self.abbr_rel_to_rel[abbr_rel] = relations[i]
                 relations[i] = abbr_rel
 
             for i in range(len(triples)):
                 if len(triples[i]) == 2:
-                    abbr_rel = shorten_relation(triples[i][1][1])
-                    # abbr_rel = triples[i][1][1]
+                    # abbr_rel = shorten_relation(triples[i][1][1])
+                    abbr_rel = triples[i][1][1]
                     self.abbr_rel_to_rel[abbr_rel] = triples[i][1][1]
                     triples[i][1][1] = abbr_rel
                 elif len(triples[i]) == 3:
-                    abbr_rel = shorten_relation(triples[i][1])
-                    # abbr_rel = triples[i][1]
+                    # abbr_rel = shorten_relation(triples[i][1])
+                    abbr_rel = triples[i][1]
                     self.abbr_rel_to_rel[abbr_rel] = triples[i][1]
                     triples[i][1] = abbr_rel
 
@@ -475,7 +600,7 @@ class KGEnv:
             # print(f"Relations after filter_relations (LLM filtered): {filtered_relations}")
 
             related_triples = self.sample_triples_by_relation(triples, filtered_relations)
-            
+            # print(f"Related triples for entity {entity_name}:")
             # Extract relations from sampled triples
             # sampled_relations = sorted(list(set([triple[1] for triple in related_triples])))
 
@@ -488,15 +613,15 @@ class KGEnv:
 
         tmp = []
         for triple in all_related_triples:
-            if triple not in self.triples:
-                self.triples.append(triple)
+            if triple not in self.explored_triples:
+                self.explored_triples.append(triple)
                 tmp.append(triple)
 
         all_related_triples = tmp
-        # self.triples.extend(deepcopy(all_related_triples))
+        # self.explored_triples.extend(deepcopy(all_related_triples))
 
         # self.records[-1]["triples"] = all_related_triples
-        # self.records[-1]["entity_names"] = entity_names
+        # self.records[-1]["start_entities"] = start_entities
         # self.records[-1]["one_hop_relations"] = filtered_relations
 
         new_entities = set()
@@ -511,13 +636,15 @@ class KGEnv:
                     new_entities.add(triple[0])
                 if triple[2].lower() in self.name_to_id:
                     new_entities.add(triple[2])
-        new_entities -= self.explored_entities
+        explored_entities = set(self.explored_entities)
+        new_entities -= explored_entities
         self.records[-1]["new_entities"] = list(new_entities)
 
-        self.explored_entities.update(new_entities)
+        explored_entities.update(new_entities)
+        self.explored_entities = explored_entities
         
 
-        all_related_triples = shorten_triple_list(all_related_triples, entity_names)
+        all_related_triples = shorten_triple_list(all_related_triples, start_entities)
 
         return convert_triples_to_str(all_related_triples)
 
@@ -527,17 +654,18 @@ class KGEnv:
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/filter_relations")
         prompt = format_prompt(prompt_path)
         random.shuffle(relations)
+        relation_set = set(relations)
         # relations = sorted(relations)
         # logger.debug(f"original relations {relations}")
 
         prompt = (
             prompt + f"Thought: {thought}\n"
             f"Entity: {entity_name}\n"
-            f"Relation: [{', '.join(relations)}]\n"
+            f"Relation: [{', '.join(relation_set)}]\n"
             f"Answer: "
         )
         # print(f"Prompt: {prompt}")
-        filtered_relations = run_llm(
+        response = run_llm(
             prompt,
             self.args.temperature,
             self.args.max_length,
@@ -545,10 +673,30 @@ class KGEnv:
             self.args.LLM_type,
             stop=None,
         )
-
+        # print("filtered_relations: " + response)
         # filtered_relations = [rel.strip() for rel in filtered_relations.split(",")]
         # TODO: could generate relations not appeared in the relation list
-        filtered_relations = parse_llm_output_to_list(filtered_relations, sep=',')
+        filtered_relations = parse_llm_output_to_list(response, sep=', ') if response else None
+        grounded_relations = []
+        for relation in filtered_relations:
+            if relation not in relation_set:
+                for gd_relation in relation_set:
+                    if relation in gd_relation:
+                        relation = gd_relation
+                        break
+            grounded_relations.append(relation)
+        filtered_relations = grounded_relations
+        filtered_relations = [
+            relation for relation in filtered_relations
+            if relation in relation_set
+        ]
+
+        if not filtered_relations:
+            logger.warning(
+                f"Filtered relations for entity {entity_name} did not match candidates. "
+                f"LLM response: {response!r}. Falling back to candidate relations."
+            )
+            return relations[:3]
 
         return filtered_relations
 
@@ -595,6 +743,7 @@ class KGEnv:
         # only remain related triples
         relation_to_triples = defaultdict(list)
         for triple in triples:
+            # print(f"Processing triple: {triple}")
             if len(triple) == 2:
                 relation = triple[1][1]
                 if relation in filtered_relations:

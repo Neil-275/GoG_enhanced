@@ -12,6 +12,7 @@ For each entry:
 - Consider path specificity: are intermediate entities directly 
   relevant or incidental?
 
-Output a JSON list: [{"triple": ..., "score": ...}]
+Output a JSON list with following keys:
+`triple`, `score`
 
 Entries:

@@ -41,10 +41,19 @@ class BaseModel(object):
         self.mean_rank_dict = {}
             
     def saveModelToFiles(self, args, best_metric, deleteLastFile=True):
+        output_path = getattr(self.args, 'output_path', self.args.data_path)
         if args.val_num == -1:
-            savePath = f'{self.args.data_path}/saveModel/topk_{self.args.topk}_layer_{self.args.layer}_{best_metric}.pt'
+            savePath = os.path.join(
+                output_path,
+                'saveModel',
+                f'topk_{self.args.topk}_layer_{self.args.layer}_{best_metric}.pt'
+            )
         else:
-            savePath = f'{self.args.data_path}/saveModel/topk_{self.args.topk}_layer_{self.args.layer}_valNum_{self.args.val_num}_{best_metric}.pt'
+            savePath = os.path.join(
+                output_path,
+                'saveModel',
+                f'topk_{self.args.topk}_layer_{self.args.layer}_valNum_{self.args.val_num}_{best_metric}.pt'
+            )
             
         print(f'Save checkpoint to : {savePath}')
         torch.save({

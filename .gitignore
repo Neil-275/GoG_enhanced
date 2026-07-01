@@ -17,3 +17,4 @@ corrupt_queries/
 /LOCAL_SCORING_PLAN.md
 one_shot_subgraph/results/
 exp_run/
+light_data_for_kaggle/

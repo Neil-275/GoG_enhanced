@@ -116,7 +116,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
             # exit()
             logger.info(f"Question: {data['question']}")
 
-            env.assign_query(data["q_entity"], data['question'])
+            env.assign_query(data)
             # env.mid_crucial_triples = data["mid_crucial_triples"]
 
             n_calls, n_badcalls, n_expand = 0, 0, 0
@@ -178,6 +178,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 logger.debug(f"Thought {i}: {thought}")
                 logger.debug(f"Action {i}: {action}")
 
+                obs = None
                 match = re.search(r"Collect(?:ed)?(\[.*\])", action)
                 
                 if match:
@@ -188,8 +189,17 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                     logger.info(f"Collected the answers: {prediction}")
                     is_collect = 1
                
-                match = re.search("Finish", action)
-                if match:
+                finish_match = re.search("Finish", action)
+                if finish_match:
+                    prediction_match = re.search(r"Finish(\[.*\])", action)
+                    if prediction_match:
+                        prediction = prediction_match.group(1)
+                        parsed_prediction = parse_llm_output_to_list(prediction)
+                        if parsed_prediction and parsed_prediction != ["unknown"]:
+                            prediction_pool.extend(parsed_prediction)
+                        obs = f"Finished with answers: {prediction}"
+                    else:
+                        obs = "Finished the search."
                     done = True
                     # print("prediction: ", prediction)
                     # done = True
@@ -215,6 +225,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
 
                 env.records.append({"i": i, "thought": thought, "action": action})
                 if done:
+                    env.records[-1]["observation"] = obs
                     # logger.info(
                     #     f"Finish query {idx} with KG, prediction: {prediction_pool} ..."
                     # )
@@ -317,6 +328,7 @@ if __name__ == "__main__":
     parser.add_argument("--test", action="store_true",
                         help="save results to test_predictions.jsonl (overwrites on each run).")
     parser.add_argument("--run_fail_case", default = None)
+    parser.add_argument("--hard_only", action="store_true", help="prune all ez answer in each query")
     # parser.add_argument("start_idx", type=int, default=0, help="the start index of the dataset to process.")
 
     args = parser.parse_args()
@@ -396,7 +408,8 @@ if __name__ == "__main__":
     # random.seed(seed)
     # random.shuffle(datas)
     if args.test:
-        datas = datas[1:4]
+        val_id = [180, 275]
+        datas = [data for data in datas if data['id'] in val_id]
     if args.run_fail_case:
         failed_cases = []
 
@@ -420,7 +433,8 @@ if __name__ == "__main__":
     # args.reranker = FlagReranker("BAAI/bge-reranker-large", use_fp16=True)
     ## Produce a sample_args file
     # import pickle as pkl
-    # with open("sample_args_fb15k_237.pkl", "wb") as f:
+    # print("Saving sample_args to sample_args_pretrain_fb15k_237.pkl")
+    # with open("sampled_args/sample_args_pretrain_fb15k_237.pkl", "wb") as f:
     #     pkl.dump(args, f)
 
     env = KGEnv(args)

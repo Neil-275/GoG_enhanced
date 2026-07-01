@@ -12,7 +12,7 @@ sys.path.append("src")
 # from sentence_transformers import SentenceTransformer
 import os
 from datasets import load_dataset
-
+import pandas as pd
 
 def set_environment_variable(func):
     def wrapper(*args, **kwargs):
@@ -48,7 +48,7 @@ def add_ns(entity_id):
         entity_id = "ns:" + entity_id
     return entity_id
 
-def shorten_triple_list(triples: list, entity_names: list):
+def  shorten_triple_list(triples: list, entity_names: list):
     triple_dict = dict()
 
     for triple in triples:
@@ -74,7 +74,7 @@ def shorten_triple_list(triples: list, entity_names: list):
         for rel, r_v in v.items():
             if "outgoing" in r_v:
                 res.append([k, rel, "["+", ".join(r_v['outgoing']) +"]"])
-            elif "incoming" in r_v:
+            if "incoming" in r_v:
                 res.append(["["+", ".join(r_v['incoming']) +"]", rel, k])
     return res
 
@@ -202,6 +202,28 @@ def compute_bm25_similarity(query, corpus, width=3):
 
     return relations, doc_scores
 
+def get_edges(df, head, tail =None, both=False):
+    if isinstance(head, str):
+        head = [head]
+    if isinstance(tail, str):
+        tail = [tail]
+
+    if both==True and tail is None:
+        edges = df[(df["head"].isin(head)) | (df["tail"].isin(head))]
+        # print(123)
+        return edges.reset_index(drop=True)
+    if tail is None and both == False:
+        edges = df[df["head"].isin(head)]
+        return edges
+    if tail and both == True:
+        # print(123)
+        edges_a = df[(df["head"].isin(head)) & (df["tail"].isin(tail))]
+        edges_b = df[(df["tail"].isin(head)) & (df["head"].isin(tail))]
+        edges = pd.concat([edges_a, edges_b])
+        return edges.reset_index(drop=True)
+    if tail and both == False:
+        edges = df[(df["head"].isin(head)) & (df["tail"].isin(tail))]
+        return edges
 
 def clean_relations(string, entity_id, head_relations):
     pattern = r"{\s*(?P<relation>[^()]+)\s+\(Score:\s+(?P<score>[0-9.]+)\)}"

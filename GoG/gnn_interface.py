@@ -157,7 +157,7 @@ class OneShotInterface:
         self,
         head: Entity,
         relation: Relation,
-        direction: int = [0,1],
+        direction: str = ["incoming", "outgoing"],
         k: int = 10,
         known=True,
     ):
@@ -174,7 +174,8 @@ class OneShotInterface:
         # print("relation:", relation)
         hid = _to_id(head, self.entity2id, 'entity')
         rid = _to_id(relation, self.relation2id, 'relation')
-        if direction == 1:
+        # print("Entity ID for '13162':", _to_id('13162', self.entity2id, 'entity'))
+        if direction == "incoming":
             rid = rid + self.kg.n_rel
         # print("rid:", rid)
         q_sub = torch.tensor([hid], dtype=torch.long)
@@ -183,39 +184,72 @@ class OneShotInterface:
         subgraph = self.sampler.getOneSubgraph(int(hid))
         subgraph_data = self.sampler.getBatchSubgraph([subgraph])
 
-        scoring_mode = getattr(self.args, 'scoring_mode', 'global')
-        if scoring_mode != 'local':
-            values = self.model.inference(q_sub, q_rel, subgraph_data)
-            maxx = values.max().item()
-            neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == rid)]
-            neighbors = np.concatenate([neighbors, self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == rid)]], axis=0)
-            ent_neighbors = set(neighbors[:, 2]).union(set(neighbors[:, 0])).difference({hid})
-            if known and ent_neighbors:
-                values[0, list(ent_neighbors)] = maxx + 1.0
+        # scoring_mode = getattr(self.args, 'scoring_mode', 'global')
+        # if scoring_mode != 'local':
+        #     values = self.model.inference(q_sub, q_rel, subgraph_data)
+        #     maxx = values.max().item()
+        #     neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == rid)]
+        #     neighbors = np.concatenate([neighbors, self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == rid)]], axis=0)
+        #     ent_neighbors = set(neighbors[:, 2]).union(set(neighbors[:, 0])).difference({hid})
+        #     if known and ent_neighbors:
+        #         values[0, list(ent_neighbors)] = maxx + 1.0
 
-            values, indices = torch.topk(values[0], k=k)
-            tail_ids = [self.id2entity[int(idx)] for idx in indices.detach().cpu().numpy()]
-            return tail_ids
+        #     values, indices = torch.topk(values[0], k=k)
+        #     tail_ids = [self.id2entity[int(idx)] for idx in indices.detach().cpu().numpy()]
+        #     return tail_ids
 
         # Local scoring: use candidate-only scores from inference.
         out = self.model.inference(q_sub, q_rel, subgraph_data, topk=None)
-        node_scores = out['node_scores']
-        abs_idxs = out['abs_idxs']
-        node_ptr = out['node_ptr']
-        start = int(node_ptr[0].item())
-        end = int(node_ptr[1].item())
-        cand_scores = node_scores[start:end].clone()
-        cand_abs = abs_idxs[start:end]
+        if isinstance(out, dict):
+            node_scores = out['node_scores']
+            abs_idxs = out['abs_idxs']
+            node_ptr = out['node_ptr']
+            start = int(node_ptr[0].item())
+            end = int(node_ptr[1].item())
+            cand_scores = node_scores[start:end].clone()
+            cand_abs = abs_idxs[start:end]
+        else:
+            batch_idxs, abs_idxs, _, _, _ = subgraph_data
+            batch_idxs = batch_idxs.to(out.device)
+            abs_idxs = abs_idxs.to(out.device)
+            cand_abs = abs_idxs[batch_idxs == 0]
+            cand_scores = out[0, cand_abs].clone()
 
-        neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == rid)]
-        neighbors = np.concatenate([neighbors, self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == rid)]], axis=0)
+        def _candidate_score_rank(entity: Entity):
+            target_id = _to_id(entity, self.entity2id, 'entity')
+            target_pos = torch.where(cand_abs == target_id)[0]
+            if target_pos.numel() == 0:
+                return "Not in candidates"
+            target_pos = int(target_pos[0].item())
+            target_score = cand_scores[target_pos]
+            rank = int((cand_scores > target_score).sum().item()) + 1
+            return rank
+        if rid < self.n_rel:
+            neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == rid)]
+        else:
+            neighbors = self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == rid)]
+        # print("neighbors: ", neighbors)
+        # for neighbor in neighbors:
+        #     print("Neighbor:", self.id2entity[int(neighbor[2])])
+        # print("Score rank before filtering of `13162` in candidates:", _candidate_score_rank('13162'))
+        # neighbors = np.concatenate([neighbors, self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == rid)]], axis=0)
         ent_neighbors = set(neighbors[:, 2]).union(set(neighbors[:, 0])).difference({hid})
-        if known and ent_neighbors:
-            ent_neighbors = torch.tensor(list(ent_neighbors), device=cand_abs.device, dtype=cand_abs.dtype)
-            mask = torch.isin(cand_abs, ent_neighbors)
-            if mask.any():
+        # print("ent_neighbors:", [int(n) for n in ent_neighbors])
+        if ent_neighbors:
+            neighbor_ids = torch.tensor(list(ent_neighbors), device=cand_abs.device, dtype=cand_abs.dtype)
+            mask = torch.isin(cand_abs, neighbor_ids)
+            # target_id = _to_id('13162', self.entity2id, 'entity')
+            # target_in_candidates = (cand_abs == target_id)
+            # target_filtered = bool((target_in_candidates & mask).any().item())
+            # print("Entity `13162` will be filtered:", target_filtered)
+            if known and mask.any():
                 maxx = cand_scores.max().item()
                 cand_scores[mask] = maxx + 1.0
+            elif not known and mask.any():
+                cand_scores = cand_scores[~mask]
+                cand_abs = cand_abs[~mask]
+
+        # print("Score rank after filtering of `13162` in candidates:", _candidate_score_rank('13162'))
 
         kk = min(int(k), int(cand_scores.numel()))
         if kk == 0:

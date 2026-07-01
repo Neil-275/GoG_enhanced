@@ -28,6 +28,8 @@ parser.add_argument('--not_shuffle_train', default=True)
 parser.add_argument('--ppr_k', type=int, default=0, help='k for k-hop localized PPR')
 parser.add_argument('--drop_graph', action='store_true', help='Drop NetworkX graph after building samplers')
 parser.add_argument('--brink', action='store_true', help='Use Brink dataset')
+parser.add_argument('--output_dir', type=str, default=None,
+                    help='Directory for generated logs, checkpoints, and PPR scores. Defaults to data_path.')
 args = parser.parse_args()
 
 class Options(object):
@@ -46,15 +48,13 @@ if __name__ == '__main__':
     else:
         dataset = dataset[-2]
     args.dataset = dataset
-    results_dir = 'results'
-    if not os.path.exists(results_dir):
-        os.makedirs(results_dir)
-    if not os.path.exists(os.path.join(results_dir, dataset)):
-        os.makedirs(os.path.join(results_dir, dataset))
+    args.output_path = args.output_dir if args.output_dir else args.data_path
+    results_dir = os.path.join(args.output_path, 'results')
+    os.makedirs(os.path.join(results_dir, dataset), exist_ok=True)
 
     opts = args
     time = str(time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()))
-    opts.perf_file = os.path.join(results_dir,  dataset + '/' + time + '.txt')
+    opts.perf_file = os.path.join(results_dir, dataset, time + '.txt')
     gpu = args.gpu
     torch.cuda.set_device(gpu)
     print('==> gpu:', gpu)
@@ -76,18 +76,20 @@ if __name__ == '__main__':
     
     # sampler for testing
     test_data = loader.double_triple(loader.all_triple)
+    print("len of test data:", len(test_data))
     test_homo_edges = list(set([(h,t) for (h,r,t) in test_data]))
     test_data = np.concatenate([np.array(test_data), loader.idd_data], 0)
     test_sampler = pprSampler(loader.n_ent, loader.n_rel, args.n_samp_ent, args.n_samp_edge,
-        test_homo_edges, test_data, args.data_path, split='test', args=args)
+        test_homo_edges, test_data, args.output_path, split='test', args=args)
 
     del test_homo_edges
         
     # sampler for training
     fact_homo_edges = list(set([(h,t) for (h,r,t) in loader.fact_data]))
+    print("len of fact data:", len(loader.fact_data))
     fact_data = np.concatenate([np.array(loader.fact_data), loader.idd_data], 0)
     train_sampler = pprSampler(loader.n_ent, loader.n_rel, args.n_samp_ent, args.n_samp_edge,
-        fact_homo_edges, fact_data, args.data_path, split='train', args=args)
+        fact_homo_edges, fact_data, args.output_path, split='train', args=args)
         
     del fact_homo_edges
         
@@ -97,9 +99,7 @@ if __name__ == '__main__':
     test_loader.addSampler(test_sampler)
     
     # check all output paths
-    checkPath('./results/')
-    checkPath(f'./results/{dataset}/')
-    checkPath(f'{args.data_path}/saveModel/')
+    os.makedirs(os.path.join(args.output_path, 'saveModel'), exist_ok=True)
             
     def run_model(params):       
         print('==> start training...')    

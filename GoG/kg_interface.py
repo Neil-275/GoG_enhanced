@@ -317,7 +317,7 @@ class KGInterface:
         except (nx.NetworkXNoPath, nx.NodeNotFound):
             return None
     
-    def find_all_paths(self, source: str, target: str, max_length: int = 3, kg_type: str = 'incomplete') -> List[List[str]]:
+    def find_all_paths(self, source: str, target: str, max_length: int = 2 , kg_type: str = 'incomplete') -> List[List[str]]:
         """
         Find all paths up to a maximum length between two entities.
         
@@ -474,17 +474,20 @@ class KGInterface:
             List of relation paths (each path is a list of relations)
         """
         graph = self._get_graph(kg_type)
+        # graph = graph.to_undirected(as_view=True)
         all_paths = self.find_all_paths(source, target, kg_type=kg_type)
+        paths = [list(p) for p in dict.fromkeys(tuple(p) for p in all_paths)]
         relation_paths = []
-        
-        for path in all_paths:
+        # print("All paths:", all_paths)
+        for path in paths:
             relation_path = []
+            # print("Path:", path, "Length:", len(path))
             for i in range(len(path) - 1):
                 # Get edge data between consecutive nodes
                 edge_data = graph.get_edge_data(path[i], path[i+1])
                 if edge_data:
                     relations = [edge_data[key]['relation'] for key in edge_data]
-                    relation_path.extend(relations)
+                    relation_path.append(relations)
             if relation_path:
                 relation_paths.append(relation_path)
         

@@ -1,0 +1,41 @@
+You are given:
+- A query containing an entity E.
+- a JSON list of relations that have already been selected as relevant to the query.
+
+Your task is to determine the direction of each relation with respect to E.
+
+The relation you output must match the input string CHARACTER FOR CHARACTER.
+The number of output entries must equal the number of input relations exactly.
+
+Direction is defined relative to E:
++ Outgoing: E is the subject  →  pattern (E, relation, ?)
++ Incoming: E is the object   →  pattern (?, relation, E)
+
+To determine direction, read the FULL relation string as a single semantic unit.
+The final segment typically names the endpoint type — reason about whether E 
+fills the role of subject or object of that full-path meaning.
+
+Examples:
+
+Question: "What is the position of player E?"
+Relation: position
+Pattern: (E, position, ?)     Direction: outgoing
+
+Question: "Which player has position E?"
+Relation: position
+Pattern: (?, position, E)     Direction: incoming
+
+Question: "Who is the parent of E?"
+Relation: parent
+Pattern: (E, parent, ?)       Direction: outgoing
+
+Question: "Who has E as parent?"
+Relation: parent
+Pattern: (?, parent, E)       Direction: incoming
+
+Output your answer as a JSON list. Each entry has the following keys:
+`relation`, `pattern`, `direction`
+The `relation` key is already presented in the input. Therefore, parse the input and then add the 2 keys: `pattern` and `direction`
+
+Question: {thought}
+Relations: {selected_relations}
