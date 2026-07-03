@@ -305,7 +305,7 @@ class KGEnv:
         candidate_relations_str = "[{}]".format(", ".join(candidate_relations))
 
         n = self.args.sc_num
-        # print(f"Candidate relations: {candidate_relations_str}")
+        print(f"Candidate relations: {candidate_relations_str}")
         relation_selection_prompt = (
             relation_selection_prompt.format(
                 thought=thought,
@@ -431,7 +431,7 @@ class KGEnv:
             # relation, _ = self.kg.get_best_relation_match(relation_text)
             if not relation:
                 continue
-            # print(f"Found: {start_entity}: {relation}: {direction}")
+            print(f"Found: {start_entity}: {relation}: {direction}")
             # print(type(start_entity))
             candidates = self.gnn.predict_topk(str(start_entity), relation, direction, k=3, known=False)
             # print("candidates:", candidates)
@@ -704,7 +704,7 @@ class KGEnv:
         if not filtered_relations:
             logger.warning(
                 f"Filtered relations for entity {entity_name} did not match candidates. "
-                f"LLM response: {response!r}. Falling back to candidate relations."
+                f"LLM response: {response!r}, while len(relation_set) = {len(relation_set)}. Falling back to candidate relations."
             )
             return relations[:3]
 

@@ -24,7 +24,6 @@ from GoG.GoG_llms import run_llm
 from threading import Lock
 # from datasets import load_dataset
 from GoG.utils import (
-    convert_jsonl_to_json,
     format_prompt,
     parse_llm_output_to_list,
     read_file,
@@ -34,7 +33,7 @@ from GoG.utils import (
 from loguru import logger
 import traceback
 import sys
-import subprocess
+from postprocess_predictions import postprocess_prediction_jsonl
 
 
 multiprocessing.set_start_method('spawn', force=True)
@@ -404,14 +403,14 @@ if __name__ == "__main__":
     #     # if k >= 10:  # Limit to first 10 failed cases
     #     #     break
     # datas = [data for data in datas if data['id'] in failed_cases]
-    # seed = 222
-    # random.seed(seed)
-    # random.shuffle(datas)
+    seed = 42
+    random.seed(seed)
+    random.shuffle(datas)
     if args.test:
         # val_id = [373, 388, 544]
-        datas = random.sample(datas, min(1, len(datas)))  # Randomly sample 3 cases for testing 
+        # datas = random.sample(datas, min(1, len(datas)))  # Randomly sample 3 cases for testing 
         # datas = [data for data in datas if data['id'] in val_id]
-        # datas = datas[:3]  # Limit to first 3 cases for testing
+        datas = datas[35:23]  # Limit to first 3 cases for testing
     if args.run_fail_case:
         failed_cases = []
 
@@ -456,73 +455,8 @@ if __name__ == "__main__":
         
         find_answer(0, idxes_to_process, args, datas, env)
 
-    json_filepath = convert_jsonl_to_json(output_file)
-    # eval_results(json_filepath)
-    
-    # Automatically extract failed cases from the predictions
-    logger.info(f"Extracting failed cases from {json_filepath}")
-    
-    if os.path.exists(json_filepath):
-        try:
-            # Get the absolute path to extract_fail_cases.py
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            parent_dir = os.path.dirname(script_dir)
-            extract_script = os.path.join(parent_dir, "extract_fail_cases.py")
-            
-            result = subprocess.run(
-                [sys.executable, extract_script, "--prediction_path", str(json_filepath)],
-                capture_output=True,
-                text=True,
-                check=False
-            )
-            
-            if result.stdout:
-                logger.info(f"Extract output: {result.stdout}")
-            
-            if result.returncode != 0:
-                logger.error(f"Failed to extract failed cases. Return code: {result.returncode}")
-                if result.stderr:
-                    logger.error(f"Error: {result.stderr}")
-            else:
-                logger.info("Successfully extracted failed cases")
-        except Exception as e:
-            logger.error(f"Error extracting failed cases: {e}")
-    else:
-        logger.warning(f"Predictions file not found: {json_filepath}")
-    
-    # Automatically run evaluation on the predictions
-    logger.info(f"Running evaluation on {json_filepath}")
-    
-    if os.path.exists(json_filepath):
-        try:
-            # Generate evaluation output filename based on predictions filename
-            json_path = Path(json_filepath)
-            eval_filename = json_path.stem.replace("_predictions", "_evaluation") + ".json"
-            eval_output_path = json_path.parent / eval_filename
-            
-            # Get the absolute path to evaluation.py
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            parent_dir = os.path.dirname(script_dir)
-            eval_script = os.path.join(parent_dir, "evaluation.py")
-            
-            result = subprocess.run(
-                [sys.executable, eval_script, "--prediction_file", str(json_filepath), 
-                 "--output_file", str(eval_output_path)],
-                capture_output=True,
-                text=True,
-                check=False
-            )
-            
-            if result.stdout:
-                logger.info(f"Evaluation output: {result.stdout}")
-            
-            if result.returncode != 0:
-                logger.error(f"Failed to run evaluation. Return code: {result.returncode}")
-                if result.stderr:
-                    logger.error(f"Error: {result.stderr}")
-            else:
-                logger.info(f"Successfully completed evaluation. Results saved to {eval_output_path}")
-        except Exception as e:
-            logger.error(f"Error running evaluation: {e}")
-    else:
-        logger.warning(f"Predictions file not found: {json_filepath}")
+    try:
+        postprocess_outputs = postprocess_prediction_jsonl(output_file)
+        logger.info(f"Post-processed predictions: {postprocess_outputs}")
+    except Exception as e:
+        logger.error(f"Error post-processing predictions: {e}")
