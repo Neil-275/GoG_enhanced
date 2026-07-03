@@ -36,7 +36,8 @@ one_shot_subgraph_config: dict = {
             "cache_dir": "data_for_LP/id_processed/family/",
             "add_inverse_edges": True,
             "add_idd_edges": True,
-            "checkpoint": "data_for_LP/id_processed/family/saveModel/topk_0.1_layer_8_ValMRR_0.462.pt",
+            # "checkpoint": "data_for_LP/id_processed/family/saveModel/topk_0.1_layer_8_ValMRR_0.462.pt",
+            "checkpoint": "data_for_LP/id_processed/family/finetuneModel/epoch_3_ValMRR_0.746.pt",
         },
     },
     "fb15k_237": {

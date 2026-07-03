@@ -203,6 +203,7 @@ class KGInterface:
             self.entities = [line.strip() for line in f]
         self.entity2id = {v: k for k, v in enumerate(self.entities)}
         self.n_ent = len(self.entities)
+        self.drop_edges = pd.concat([self.complete_kg, self.incomplete_kg]).drop_duplicates(keep=False)
         # Build a stable consecutive mapping for entities.
         
     def create_rel_emb(self):

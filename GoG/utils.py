@@ -1,4 +1,5 @@
 from pathlib import Path
+import ast
 import requests
 # from prompt_list import *
 import json
@@ -512,11 +513,19 @@ def convert_list_to_str(topic_entity_names, sep=" | "):
 
 
 def parse_llm_output_to_list(output, sep="|"):
-    match = re.search("\[(.*)\]", output)
+    match = re.search(r"\[.*?\]", output, re.DOTALL)
     if match:
-        answers = match.group(1)
-        answers = [item.strip() for item in answers.split(sep)]
-        return answers
+        answers = match.group(0)
+        try:
+            parsed_answers = ast.literal_eval(answers)
+        except (SyntaxError, ValueError):
+            answers = answers[1:-1]
+            answers = [item.strip() for item in answers.split(sep)]
+            return answers
+
+        if isinstance(parsed_answers, list):
+            return [str(item).strip() for item in parsed_answers]
+        return None
     else:
         # may be truncated
         if "[" in output:
@@ -541,5 +550,5 @@ def convert_jsonl_to_json(jsonl_filepath):
     return str(json_filepath)
 
 if __name__ == "__main__":
-    print(parse_llm_output_to_list("[Cody Linley/ Joe Jonas/ Nicholas Braun/ Abli"))
-    print(parse_llm_output_to_list("[222, 333, 5215, 1241"))
+    print(parse_llm_output_to_list("python\n['father_of', 'son_of', 'daughter_of']\n"))
+    # print(parse_llm_output_to_list("[222, 333, 5215, 1241"))

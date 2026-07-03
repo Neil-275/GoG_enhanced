@@ -117,8 +117,11 @@ class KGEnv:
     #     self.name_to_id.update({label: id for id, label in id_to_name.items()})
 
     def find_crucial_rel(self, data):
-        q_entity = literal_eval(data["q_entity"])[0]
-        hard_answer = literal_eval(data["hard_answer"])[0]
+        # print(data, data["q_entity"], data["hard_answer"])
+        # print(type(data["q_entity"]), type(data["hard_answer"]))
+        q_entity = data["q_entity"][0]
+        hard_answer = data["hard_answer"][0]
+        self.ez_answers = [ans for ans in data["a_entity"] if ans != hard_answer]
         crucial_edges = get_edges(self.kg.drop_edges, q_entity, hard_answer)
         if crucial_edges.empty or len(crucial_edges) > 1:
             return None
@@ -552,9 +555,16 @@ class KGEnv:
                     # triples = incoming_triples + outgoing_triples
                     # relations = list(set([triple[1][1] for triple in triples]))
                     triples_df = self.kg.get_1hop_triples(entity_id)
-                    if self.crucial_rel:
-                        triples_df = triples_df[~(triples_df['relation'].isin(self.crucial_rel) & 
-                                                triples_df['head'].isin(self.topic_entities))]
+                    if self.crucial_rel is not None and not self.crucial_rel.empty:
+                        edge_cols = ["head", "relation", "tail"]
+                        triples_df = triples_df.merge(
+                            self.crucial_rel[edge_cols].drop_duplicates(),
+                            on=edge_cols,
+                            how="left",
+                            indicator=True,
+                        )
+                        triples_df = triples_df[triples_df["_merge"] == "left_only"]
+                        triples_df = triples_df[edge_cols].reset_index(drop=True)
 
                     # Convert DataFrame to list format: [head, relation, tail]
                     triples = triples_df.values.tolist() if len(triples_df) > 0 else []

@@ -408,8 +408,10 @@ if __name__ == "__main__":
     # random.seed(seed)
     # random.shuffle(datas)
     if args.test:
-        val_id = [180, 275]
-        datas = [data for data in datas if data['id'] in val_id]
+        # val_id = [373, 388, 544]
+        datas = random.sample(datas, min(1, len(datas)))  # Randomly sample 3 cases for testing 
+        # datas = [data for data in datas if data['id'] in val_id]
+        # datas = datas[:3]  # Limit to first 3 cases for testing
     if args.run_fail_case:
         failed_cases = []
 
@@ -429,12 +431,10 @@ if __name__ == "__main__":
     n_process = min(args.n_process, num_samples)
     logger.debug(n_process)
 
-    # args.model = SentenceTransformer("BAAI/bge-large-en-v1.5")
-    # args.reranker = FlagReranker("BAAI/bge-reranker-large", use_fp16=True)
     ## Produce a sample_args file
     # import pickle as pkl
-    # print("Saving sample_args to sample_args_pretrain_fb15k_237.pkl")
-    # with open("sampled_args/sample_args_pretrain_fb15k_237.pkl", "wb") as f:
+    # print("Saving sample_args to sample_args_finetune_family.pkl")
+    # with open("sampled_args/sample_args_finetune_family.pkl", "wb") as f:
     #     pkl.dump(args, f)
 
     env = KGEnv(args)
