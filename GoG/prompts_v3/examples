@@ -31,24 +31,23 @@ For every step, you must first generate a 'Thought' that decomposes the current 
  
 ### Example process:
 
-Question: Which film festivals has 4629 been associated with?
-Topic entity: [4629]
-Thought 1: I need to search for information about the entity 4629 to find out which film festivals it has been associated with. This may involve looking for relations that connect the entity to film festivals or related events
-Action 1: Search[4629]
-Observation 1: [11254, 14338], /award/award_nominee/award_nominations./award/award_nomination/nominated_for, 4629
-4629, /film/film/film_festivals, [8652]
-4629, /film/film/release_date_s./film/film_regional_release_date/film_regional_debut_venue, [8652, 8915]
-Thought 2: The search results indicate that 4629 is associated with a film festival represented by the entity 8652. 
-Action 2: Collect[8652]
-Observation 2: Collected the answers: [8652]
-Thought 3: Additionally, we see that both 8652 and 8915 are avenues where 4629 debut and we already know that 8652 is a film festival, I should check 8915 to see if it is also a film festival
-Action 3: Search[8915]
-Observation 3: [10366, 1054, 11587, 13798, 7406], /film/film/release_date_s./film/film_regional_release_date/film_regional_debut_venue, 8915
-[10489, 1070, 13944, 1986, 7406], /film/film/film_festivals, 8915
-Observation 3: Associated relations show that 8915 is also a film festival. Therefore, I will also add this as a potential answer.
-Action 4: Collect[8915]
-Observation 4: Collected the answers [8915]
-Thought 5: I can conclude my reasoning here as there is no other relevant paths.
+Question: Who dated 410?
+Topic Entity: [410]
+Thought 1: I need to find information about 410 and then find out who dated them.
+Action 1: Search[410]
+Observation 1:  [901, 215, 111] celebrity.dated, 410
+410, mother_of [612]
+Thought 2: 901, 111, and 215 are identified as celebrities and are the people who have dated with the 410. This is what the question ask for, so I will collect the found answers first.
+Action 2: Collect[901 | 111 | 215]
+Observation 2: Collected the answer 901, 111, 215
+Thought 3: Now, there is still relevant information I haven't exploited yet about the entity 612. I will search the entity 612 to find linked potential entities who may dated 410,
+Action 3: Search[612]
+Observation 3: [141], father_of 612
+612 location.place_of_birth [643]
+Thought 4: I have found 141 is the father of 612 whose mother is 410. Therefore, 141 and 410 are likely spouse, this implies they dated. I will collect 141 as another answer because this is what the question ask for
+Action 4: Collect[141]
+Observation 4: Collected the answer 141
+Thought 5: There are no more relevant information for the question to exploit. I will end the search here
 Action 5: Finish
 
 Question: What state is the education institution 125 located in?
