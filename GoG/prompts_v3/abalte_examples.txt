@@ -1,0 +1,84 @@
+For every step, you must first generate a Thought that decomposes the current state of the question, followed immediately by exactly one Action.
+Your goal is to answer the question using entity IDs from the KG.
+
+## Actions
+### Search[EntityID_1 | EntityID_2 | ...]
+Retrieves factual triples from the KG.
+Rules:
+- The first action must be `Search` on the topic entity.
+- Do not repeat the same Search with the same arguments.
+- If a Search triple directly answers the question, collect the answer immediately.
+- Do not search an answer entity only to identify its label, because entity labels are masked.
+- Search another entity only if its relations may help answer the question.
+  
+### Collect[Answer_1 | Answer_2 | ...]
+Collects entity IDs that are likely answers.
+Rules:
+- Collect immediately when a factual Search triple directly matches the question.
+- Collect when an indirect path strongly supports the answer.
+- After collecting, continue exploring other relevant branches if they may reveal more answers.
+- Do not collect entities merely because they are connected to the topic entity; the relation or path must support the question.
+
+### Finish
+Stops the search.
+Rule:
+- Finish only when useful evidence has been exhausted or no relevant direction remains.    
+## Important Context
+- Each triple has the form `(subject, relation, object)`.
+- The relation is directed from subject to object.
+- Entity labels are masked; reason from relations and graph structure only.
+- Do not try to identify real-world labels.
+- Do not repeat the same action with the same arguments.
+
+## Evidence Priority
+Use this priority when deciding what to do:
+1. Direct Search evidence  
+    If Search returns a triple that directly matches the question, collect the answer entities immediately.
+2. Strong indirect Search evidence  
+    If factual triples form a strong reasoning path to an answer, collect it.
+3. Further Search  
+    If no answer is found yet, search relevant neighboring entities whose relations may help answer the question.
+    
+## Direct Answer Rule
+If the question asks for the object of a relation from entity `E`, and Search returns:
+`E, relevant_relation, [answers]`
+then collect `[answers]`.
+
+If the question asks for the subject pointing to entity `E`, and Search returns:
+`[answers], relevant_relation, E`
+then collect `[answers]`.
+
+Do not search these answer entities merely for type or label checking.
+
+## Example:
+Question: Who dated 410?  
+Topic Entity: [410]
+
+Thought 1: I need to find information about 410 and identify entities that dated 410.  
+Action 1: Search[410]
+
+Observation 1:  
+[901, 215, 111], celebrity.dated, 410  
+410, mother_of, [612]
+
+Thought 2: The Search result directly shows that 901, 215, and 111 have the relation celebrity.dated pointing to 410. Since the question asks who dated 410, these entities are direct answers. I should collect them immediately.  
+Action 2: Collect[901 | 215 | 111]
+
+Observation 2:  
+Collected the answers: [901 | 215 | 111]
+
+Thought 3: There is still relevant information involving 612, the child of 410. Searching 612 may reveal another entity strongly connected to 410 through a family relationship.  
+Action 3: Search[612]
+
+Observation 3:  
+[141], father_of, 612  
+612, location.place_of_birth, [643]
+
+Thought 4: Entity 141 is the father of 612, while 410 is the mother of 612. Sharing the same child is strong indirect evidence that 141 and 410 may have dated. Since the question asks who dated 410, I will collect 141 as a likely answer.  
+Action 4: Collect[141]
+
+Observation 4:  
+Collected the answer: [141]
+
+Thought 5: I have used the direct dating evidence and the relevant family-based indirect evidence. The remaining location information does not help answer who dated 410.  
+Action 5: Finish

@@ -305,7 +305,7 @@ class KGEnv:
         candidate_relations_str = "[{}]".format(", ".join(candidate_relations))
 
         n = self.args.sc_num
-        print(f"Candidate relations: {candidate_relations_str}")
+        # print(f"Candidate relations: {candidate_relations_str}")
         relation_selection_prompt = (
             relation_selection_prompt.format(
                 thought=thought,
@@ -702,12 +702,12 @@ class KGEnv:
         ]
 
         if not filtered_relations:
-            logger.warning(
-                f"Filtered relations for entity {entity_name} did not match candidates. "
-                f"LLM response: {response!r}, while len(relation_set) = {len(relation_set)}. Falling back to candidate relations."
-            )
-            return relations[:3]
-
+            # logger.warning(
+            #     f"Filtered relations for entity {entity_name} did not match candidates. "
+            #     f"LLM response: {response!r}, while len(relation_set) = {len(relation_set)}. Falling back to candidate relations."
+            # )
+            # return relations[:3]
+            filtered_relations = []
         return filtered_relations
 
     def select_entity_id_by_types(self, question, entity_name, id_to_types):

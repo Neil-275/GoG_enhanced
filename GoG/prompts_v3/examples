@@ -1,73 +1,128 @@
-For every step, you must first generate a 'Thought' that decomposes the current state of the question, followed immediately by exactly one 'Action'.
+For every step, you must first generate a Thought that decomposes the current state of the question, followed immediately by exactly one Action.
 
-## Action Types and Formatting Syntax
+Your goal is to answer the question using entity IDs from the KG.
 
-1. Search[EntityID_1 | EntityID_2 | ...]
-   - Purpose: Retrieves the triples from the KG for the specified entities .
-   - Constraint: 
-      + Always apply Search for the topic entity in the first search
+## Actions
 
-2. Generate[Query]
-   - Purpose: Generate plausible triples that can bridge reasoning gaps when the KG lacks explicit evidence. Return triples with their corresponding confidence in range [0, 1]. Use this if the current `Search` result lack direct information for contributing to resolving the question
-   - Constraint:
-      + The Query must describe a detailed relations and/or attributes to discover from an entity
-      + If Generate returns no prediction, continue the reasoning in other directions.
-   
-3. Collect[Answer_1 | Answer_2 | ...]
-   - Purpose: Collect entity  that are currently supported as likely answers, either through direct evidence or strong indirect evidence.
-   - Contraints:
-      + Collect entities immediately if they supported as likely answers.
-      + After collecting, direct to other branches if they are still relevant for answering the question.
+### Search[EntityID_1 | EntityID_2 | ...]
+Retrieves factual triples from the KG.
+Rules:
 
-4. Finish
-   - Purpose: Stop the search
-   - Constraint: Only stop the search if the found evidence have been used exhaustively and/or further searches don't return any relevant information
+* The first action must be `Search` on the topic entity.
+* Do not repeat the same Search with the same arguments.
+* If a Search triple directly answers the question, collect the answer immediately.
+* Do not search an answer entity only to identify its label, because entity labels are masked.
+* Search another entity only if its relations may help answer the question.
 
-### Important context:
-- Each triple is in the form of (subject, relation, object) means a direction from subject to object with relation as the edge label.
-- Restrict yourself on repeating the same action for the same arguments
-- All entities labels are masked with id, use their associated relations to infer about them.
+### Generate[Query]  
+Generates hypothetical triples with confidence scores in `[0, 1]`.
+Use Generate only when:
+* Search does not provide direct evidence.
+* Search does not provide a strong indirect reasoning path.
+* A missing relation around a specific entity would help continue reasoning.
+Rules:
+* The Query must clearly describe the missing relation or attribute.
+* Generated triples are not factual KG evidence.
+* Use generated triples as supplementary evidence.
+* When possible, support generated candidates with Search before collecting them.
+* If Generate returns no useful prediction, continue with other relevant Search branches.
+  
+### Collect[Answer_1 | Answer_2 | ...]
+Collects entity IDs that are likely answers.
+Rules:
+* Collect immediately when a factual Search triple directly matches the question.
+* Collect when an indirect path strongly supports the answer.
+* Be more cautious with generated triples than with Search triples.
+* After collecting, continue exploring other relevant branches if they may reveal more answers.
 
- 
-### Example process:
+### Finish
+Stops the search.  
+Rule:
+* Finish only when the useful evidence has been exhausted or no relevant direction remains.
 
+## Important Context
+* Each triple has the form `(subject, relation, object)`.
+* The relation is directed from subject to object.
+* Entity labels are masked; reason from relations and graph structure only.
+* Do not try to identify real-world labels.
+* Do not repeat the same action with the same arguments.
+
+## Evidence Priority
+Use this priority when deciding what to do:
+1. Direct Search evidence
+   If Search returns a triple that directly matches the question, collect the answer entities immediately.
+
+2. Strong indirect Search evidence
+   If factual triples form a strong reasoning path to an answer, collect it.
+   
+3. Generated evidence
+   Use Generate only to bridge missing KG evidence. Treat generated triples as plausible but uncertain.
+
+## Direct Answer Rule
+If the question asks for the object of a relation from entity `E`, and Search returns:
+`E, relevant_relation, [answers]`
+then collect `[answers]`.
+
+If the question asks for the subject pointing to entity `E`, and Search returns:
+`[answers], relevant_relation, E`
+then collect `[answers]`.
+
+Do not search these answer entities merely for type or label checking.
+## Example 1:
 Question: Who dated 410?
 Topic Entity: [410]
-Thought 1: I need to find information about 410 and then find out who dated them.
+
+Thought 1: I need to find information about 410 and identify entities that dated 410.
 Action 1: Search[410]
-Observation 1:  [901, 215, 111] celebrity.dated, 410
-410, mother_of [612]
-Thought 2: 901, 111, and 215 are identified as celebrities and are the people who have dated with the 410. This is what the question ask for, so I will collect the found answers first.
-Action 2: Collect[901 | 111 | 215]
-Observation 2: Collected the answer 901, 111, 215
-Thought 3: Now, there is still relevant information I haven't exploited yet about the entity 612. I will search the entity 612 to find linked potential entities who may dated 410,
+
+Observation 1:
+[901, 215, 111], celebrity.dated, 410
+410, mother_of, [612]
+
+Thought 2: The Search result directly shows that 901, 215, and 111 have the relation celebrity.dated pointing to 410. Since the question asks who dated 410, these entities are direct answers. I should collect them immediately.
+Action 2: Collect[901 | 215 | 111]
+
+Observation 2: Collected the answers: [901 | 215 | 111]
+
+Thought 3: There is still relevant information involving 612, the child of 410. Searching 612 may reveal another entity strongly connected to 410 through a family relationship.
 Action 3: Search[612]
-Observation 3: [141], father_of 612
-612 location.place_of_birth [643]
-Thought 4: I have found 141 is the father of 612 whose mother is 410. Therefore, 141 and 410 are likely spouse, this implies they dated. I will collect 141 as another answer because this is what the question ask for
+Observation 3:
+[141], father_of, 612
+612, location.place_of_birth, [643]
+
+Thought 4: Entity 141 is the father of 612, while 410 is the mother of 612. Sharing the same child is strong indirect evidence that 141 and 410 may have dated. Since the question asks who dated 410, I will collect 141 as a likely answer.
 Action 4: Collect[141]
-Observation 4: Collected the answer 141
-Thought 5: There are no more relevant information for the question to exploit. I will end the search here
+
+Observation 4:
+Collected the answer: [141]
+
+Thought 5: I have used the direct dating evidence and the relevant family-based indirect evidence. The remaining location information does not help answer who dated 410.
 Action 5: Finish
 
+## Example 2:
 Question: What state is the education institution 125 located in?
-Thought 2: I need to first get some information about the education institution 125 to find out where is it located
-Action 2: Search[125]
-Observation 2: 125, organization.headquarters, [7002]
+Topic Entity: [125]
+Thought 1: I need to search 125 to find where it is located.
+Action 1: Search[125]
+Observation 1:
+125, organization.headquarters, [7002]
 125, location.contains, [9123]
 125, location.events, [9321]
-Thought 3: I don't see any specific location that education institution 125 is in, so I need to use Generate tool to inspect more triples to connect 125 to a location.
-Action 3: Generate[where is 125 located at]
+Thought 2: Search does not directly show what state 125 is located in. I need to generate a missing located-in relation from 125.
+Action 2: Generate[what state or location is 125 located in]
+Observation 2:
+125, location.located_in, 44      Plausible score: 0.6
+125, location.located_in, 164     Plausible score: 0.6
+Thought 3: The generated triples are hypothetical, so I should search the proposed entities for structural support.
+Action 3: Search[44 | 164]
 Observation 3:
-125, location.located_in, 44       Plausible score: 0.6
-Thought 4: It seems like the triple show 125 is located in a location represent with id 44 is moderetely plausible. I should check 44 if there are some information that indicate 44 is a valid location.
-Action 4: Search [44]
-Observation 4:
-[111, 512], people.place_lived [44] 
-[17, 85], location.located_in [44]
-Thought 5: Based on the associated relations, we can guarantee that 44 is a valid location. Therefore I will take this as the answer to the question.
+[111, 512], people.place_lived, [44]
+[17, 85], location.located_in, [44]
+[164], business.sponsored, 125
+[164], organization.headquarters, 203
+Thought 4: Entity 44 is supported by location-related relations, while 164 appears business-related. I will collect 44.
 Action 4: Collect[44]
-Thought 5: As there are no relevant information to continue searching, I will end the search here
+Observation 4:
+Collected the answer: [44]
+Thought 5: No relevant direction remains.
 Action 5: Finish
-
-Here is the question.

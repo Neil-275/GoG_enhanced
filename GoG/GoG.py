@@ -407,10 +407,10 @@ if __name__ == "__main__":
     random.seed(seed)
     random.shuffle(datas)
     if args.test:
-        # val_id = [373, 388, 544]
+        val_id = [1053, 2745, 5144, 3717, 869, 4464, 1589, 2767]
         # datas = random.sample(datas, min(1, len(datas)))  # Randomly sample 3 cases for testing 
-        # datas = [data for data in datas if data['id'] in val_id]
-        datas = datas[35:23]  # Limit to first 3 cases for testing
+        datas = [data for data in datas if data['id'] in val_id]
+        # datas = datas[35:23]  # Limit to first 3 cases for testing
     if args.run_fail_case:
         failed_cases = []
 
