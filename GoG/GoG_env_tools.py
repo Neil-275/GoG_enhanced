@@ -326,8 +326,8 @@ class KGEnv:
             stop=None,
             n=n
         )
-        # print("Relation selection LLM responses:")
-        # print(relation_selection_responses)
+        print("Relation selection LLM responses:")
+        print(relation_selection_responses)
 
         selected_relation_items = self.parse_json_list_responses(relation_selection_responses)
         selected_relations = []
@@ -342,8 +342,7 @@ class KGEnv:
                     break
             if relation and relation not in selected_relations:
                 selected_relations.append(relation)
-                t_dict = {"relation": relation}
-            updated_selected_relation_items.append(t_dict)
+                updated_selected_relation_items.append({"relation": relation})
         selected_relation_items = updated_selected_relation_items
         ## recreate selected_relation_items with updated relations
         
@@ -371,16 +370,17 @@ class KGEnv:
             stop=None,
             n=n
         )
-        # print("Direction specification LLM responses:")
-        # print(direction_specification_responses)
+        print("Direction specification LLM responses:")
+        print(direction_specification_responses)
 
         parsed_generations = self.parse_json_list_responses(direction_specification_responses)
+        logger.debug(f"Parsed direction specifications: {parsed_generations}")
         # check if relations in parsed_generatations are the same in selected_relations
         # for item in parsed_generations:
         #     relation_text = item.get("relation")
         #     if relation_text not in selected_relations:
         #         print(f"Relation {relation_text} is in parsed_generations but not in selected_relations")
-        # return parsed_generations, candidate_relations
+        return parsed_generations, candidate_relations
         verify_candidates = []
         # for item in parsed_generations:
         #     relation = item.get("relation")
@@ -430,11 +430,34 @@ class KGEnv:
             direction = item.get("direction")
             # relation, _ = self.kg.get_best_relation_match(relation_text)
             if not relation:
+                logger.debug(f"Skipping parsed generation without relation: {item}")
+                continue
+            if relation not in selected_relations:
+                matched_relations = [
+                    gd_relation for gd_relation in selected_relations
+                    if relation in gd_relation or gd_relation in relation
+                ]
+                if matched_relations:
+                    relation = matched_relations[0]
+                else:
+                    logger.debug(
+                        f"Skipping parsed generation with unselected relation: {item}; "
+                        f"selected_relations={selected_relations}"
+                    )
+                    continue
+            if isinstance(direction, str):
+                direction = direction.strip().lower()
+            if direction not in {"incoming", "outgoing"}:
+                logger.debug(f"Skipping parsed generation with invalid direction: {item}")
                 continue
             print(f"Found: {start_entity}: {relation}: {direction}")
             # print(type(start_entity))
             candidates = self.gnn.predict_topk(str(start_entity), relation, direction, k=3, known=False)
             # print("candidates:", candidates)
+            if not candidates:
+                logger.debug(
+                    f"No GNN candidates for entity={start_entity}, relation={relation}, direction={direction}"
+                )
             for candidate in candidates:
                 verified_candidates.append({
                     "triple": [str(start_entity), relation, str(candidate)] if direction == "outgoing" else [str(candidate), relation, str(start_entity)],
@@ -452,6 +475,7 @@ class KGEnv:
                 
         if len(result) == 0:
             # print("No valid triples generated.")
+            self.records[-1]["verified_candidates"] = []
             return "No plausible triples generated."
         # print("Generated triples:")
         # print("\n".join(result))

@@ -209,7 +209,7 @@ class KGInterface:
     def create_rel_emb(self):
         m_rel = []
         for rel in self.relations:
-            rel = shorten_relation(rel)
+            # rel = shorten_relation(rel) 
             m_rel.append(rel)
         self.rel_emb = embed_model.encode(m_rel, convert_to_tensor=True)
 

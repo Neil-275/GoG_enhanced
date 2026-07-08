@@ -84,7 +84,10 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
     if args.no_kg:
         example = format_prompt(read_file(f"{args.prompt_dir}/examples_no-kg"))
     else:
-        example = format_prompt(read_file(f"{args.prompt_dir}/examples"))
+        if args.ablate:
+            example = format_prompt(read_file(f"{args.prompt_dir}/ablate_examples.txt"))
+        else:
+            example = format_prompt(read_file(f"{args.prompt_dir}/examples"))
 
     t1 = time.time()
     for n, idx in enumerate(idxes_to_process):
@@ -328,6 +331,8 @@ if __name__ == "__main__":
                         help="save results to test_predictions.jsonl (overwrites on each run).")
     parser.add_argument("--run_fail_case", default = None)
     parser.add_argument("--hard_only", action="store_true", help="prune all ez answer in each query")
+    parser.add_argument("--ablate", action="store_true", help="ablate the generation module")
+    parser.add_argument("--ver", default=None, type=str, help="version identifier for the experiment")
     # parser.add_argument("start_idx", type=int, default=0, help="the start index of the dataset to process.")
 
     args = parser.parse_args()
@@ -357,8 +362,20 @@ if __name__ == "__main__":
     postfix = '_no-kb' if args.no_kg else ""
     dataset_name = args.dataset.split("/")[1]
     
-    if args.test:
-        output_file = Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}/test_predictions.jsonl")
+    # if args.test:
+    #     output_file = Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}/test_predictions.jsonl")
+    # else:
+    if args.ver is not None:
+        if args.ablate:
+            output_file = (
+                Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
+                / f"{args.ver}_ablate_2_predictions.jsonl"
+            )
+        else:
+            output_file = (
+                Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
+                / f"{args.ver}_2_predictions.jsonl"
+            )
     else:
         output_file = (
             Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")

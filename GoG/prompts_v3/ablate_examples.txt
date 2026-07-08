@@ -16,25 +16,6 @@ Rules:
 * Do not search an answer entity only to identify its label, because entity labels are masked.
 * Search another entity only if its relations may help answer the question.
 
-### Generate[Query]
-
-Generates hypothetical triples with confidence scores in `[0, 1]`.
-
-Use Generate only when:
-
-* Search does not provide direct evidence.
-* Search does not provide a strong indirect reasoning path.
-* A missing relation around a specific entity would help continue reasoning.
-
-Rules:
-
-* The Query must clearly describe the missing relation or attribute around a specific entity.
-* Generated triples are not factual KG evidence.
-* Use generated triples as supplementary evidence.
-* If a generated triple proposes candidate answers, support them with Search when possible before collecting.
-* If Generate returns no useful prediction, continue with other relevant Search branches.
-* Do not use Generate when a factual Search triple already directly answers the question.
-
 ### Collect[Answer_1 | Answer_2 | ...]
 
 Collects entity IDs that are likely answers.
@@ -91,7 +72,7 @@ then collect `[answers]`.
 
 Do not search these answer entities merely for type or label checking.
 
-## Example 1:
+## Example 1: Direct and Indirect Search Evidence
 
 Question: Who dated 410?
 Topic Entity: [410]
@@ -123,42 +104,4 @@ Observation 4:
 Collected the answer: [141]
 
 Thought 5: I have used the direct dating evidence and the relevant family-based indirect evidence. The remaining location information does not help answer who dated 410.
-Action 5: Finish
-
-## Example 2: 
-
-Question: What state is the education institution 125 located in?
-Topic Entity: [125]
-
-Thought 1: I need to search 125 to find where it is located.
-Action 1: Search[125]
-
-Observation 1:
-125, organization.headquarters, [7002]
-125, location.contains, [9123]
-125, location.events, [9321]
-
-Thought 2: Search does not directly show what state 125 is located in, and the current triples do not form a strong indirect path to the answer. I need to generate a missing located-in relation from 125.
-Action 2: Generate[what state or location is 125 located in]
-
-Observation 2:
-125, location.located_in, 44      Plausible score: 0.6
-125, location.located_in, 164     Plausible score: 0.6
-
-Thought 3: The generated triples are hypothetical, so I should search the proposed entities for structural support before collecting an answer.
-Action 3: Search[44 | 164]
-
-Observation 3:
-[111, 512], people.place_lived, [44]
-[17, 85], location.located_in, [44]
-[164], business.sponsored, 125
-[164], organization.headquarters, 203
-
-Thought 4: Entity 44 is supported by location-related relations, while 164 appears business-related. Therefore, 44 is better supported as the answer.
-Action 4: Collect[44]
-
-Observation 4:
-Collected the answer: [44]
-
-Thought 5: No relevant direction remains.
 Action 5: Finish
