@@ -1,0 +1,121 @@
+For every step, you must first generate a `Thought` that decomposes the current state of the question, followed immediately by exactly one `Action`.
+
+Your goal is to answer the question using entity IDs from the KG.
+
+## Actions
+
+### Search[EntityID_1 | EntityID_2 | ...]
+
+Retrieves factual triples from the KG.
+
+Rules:
+
+* The first action must be `Search` on the topic entity.
+* Do not repeat the same Search with the same arguments.
+* Do not search an answer entity only to identify its label, because entity labels are masked.
+* Search another entity only if its relations may help answer the question.
+
+### Generate[Query]
+
+Generates hypothetical triples with confidence scores in `[0, 1]`.
+
+Use Generate only when:
+
+* Search does not provide direct evidence.
+* Search does not provide a strong indirect reasoning path.
+* A missing relation around a specific entity would help continue reasoning.
+
+Rules:
+
+* The Query must clearly describe the missing relation or attribute around a specific entity.
+* Generated triples are not factual KG evidence.
+* Use generated triples as supplementary evidence.
+* If a generated triple proposes candidate answers, support them with Search when possible.
+* If Generate returns no useful prediction, continue with other relevant Search branches.
+* Do not use Generate when a factual Search triple already directly answers the question.
+
+
+### Finish[Answer_1 | Answer_2 | ...]
+
+Concludes the task and returns the final answers.
+
+Rule:
+
+* Answers must match the exact entity id present in the retrieved or generated triples. If no logical answer can be derived, output: Finish[unknown]. Separate multiple answers with a pipe character (|).
+
+## Important Context
+
+* Each triple has the form `(subject, relation, object)`.
+* The relation is directed from subject to object.
+* Entity labels are masked; reason from relations and graph structure only.
+* Do not try to identify real-world labels.
+* Do not repeat the same action with the same arguments.
+
+## Evidence Policy
+
+Use this policy when deciding what to do:
+
+1. No supported answer yet
+   Continue only through actions that may produce evidence relevant to the question. Avoid searching entities whose relations do not help answer the question.
+
+## Direct Answer Rule
+
+If the question asks for the object of a relation from entity `E`, and Search returns:
+
+`E, relevant_relation, [answers]`
+
+If the question asks for the subject pointing to entity `E`, and Search returns:
+
+`[answers], relevant_relation, E`
+
+Can use them to answer and Do not search these answer entities merely for type or label checking.
+
+## Example 1:
+
+Question: What state is the education institution that has sports team 561 in?
+Topic Entity: [561]
+
+Thought 1: I need to search 561 to find the education institution that has it.
+Action 1: Search[561]
+
+Observation 1: 561, school_sports_team.school, 125
+561, sports_team.sport, 930
+901, athletics_brand.teams, 561
+
+Thought 2: Base on the relations directly connect with 561, I can induce that 125 seems to be the education institution that has the sport team 561. Now I need to find which state the educational institution 125 is in.
+Action 2: Search[125]
+
+Observation 2: 125, organization.headquarters, 7002
+125, location.contains, 9123
+125, location.events, 9321
+
+Thought 3: I don't see any specific location that education institution 125 is in, so I need to use Generate tool to inspect more triples to connect 125 to a location.
+Action 3: Generate[where is 125 located at]
+
+Observation 3:
+125, location.located_in, 44
+
+Thought 4: It seems like 125 is located in a location represent with id 44. This is enough data to answer the question
+Action 4: Finish[44]
+
+## Example 2: 
+
+Question: Who dated the performer who headlined the concert tour 300?
+Topic Entity: [300]
+
+Thought 1: I need to find the performer who headlined 300 and then find out who dated them.
+Action 1: Search[300]
+
+Observation 1: 300, concert_tour.artist, 410
+
+Thought 2: 410 an artist who perform in 300, let find who does 410 have dated with
+Action 2: Search[410]
+
+Observation 2: 901, celebrity.dated, 410
+902, celebrity.dated, 410
+903, celebrity.dated, 410
+
+Thought 3: Based on the relation involved, 901, 902, and 903 are identified as celebrities and are the people who have dated with the artist 410. This is enough for the question
+Action 3: Finish[901 | 902 | 903]
+
+Here is the question.

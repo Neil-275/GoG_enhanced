@@ -70,7 +70,7 @@ def write_results(data, env: KGEnv, prediction, args, error: str = None):
         )
 
 
-def find_answer(process_idx, idxes_to_process, args, datas, env):
+def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
     logger.debug(f"{process_idx}, {idxes_to_process[0]}")
 
     # if args.wiki:
@@ -81,13 +81,39 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
     #     instruction = format_prompt(read_file("prompts2/instruction"))
 
     # instruction = format_prompt(read_file("prompts2/instruction"))
+
+    # First of all, determine the base prompt path matched with the current arguments
+    example_path: Path = Path(args.prompt_dir)
     if args.no_kg:
-        example = format_prompt(read_file(f"{args.prompt_dir}/examples_no-kg"))
+        example_path /= "examples_no-kg"
+    elif args.ablate_collect:
+        example_path /= "examples_no-collect"
+    elif args.ablate:
+        example_path /= "ablate_examples.txt"
     else:
-        if args.ablate:
-            example = format_prompt(read_file(f"{args.prompt_dir}/ablate_examples.txt"))
-        else:
-            example = format_prompt(read_file(f"{args.prompt_dir}/examples"))
+        example_path /= "examples"
+
+    if not example_path:
+        raise ValueError("Cannot determine prompt path with current arguments.")
+
+    if not example_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {example_path}")
+
+    example = format_prompt(read_file(str(example_path)))
+    
+    # if args.no_kg:
+    #     example = format_prompt(read_file(f"{args.prompt_dir}/examples_no-kg"))
+    # else:
+    #     if args.ablate:
+    #         if args.ablate_collect:
+    #             example = format_prompt(read_file(f"{args.prompt_dir}/ablate_collect_examples.txt"))
+    #         else:
+    #             example = format_prompt(read_file(f"{args.prompt_dir}/ablate_examples.txt"))
+    #     else:
+    #         if args.ablate_collect:
+    #             example = format_prompt(read_file(f"{args.prompt_dir}/ablate_collect_examples.txt"))
+    #         else:
+    #             example = format_prompt(read_file(f"{args.prompt_dir}/examples"))
 
     t1 = time.time()
     for n, idx in enumerate(idxes_to_process):
@@ -180,17 +206,18 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 logger.debug(f"Thought {i}: {thought}")
                 logger.debug(f"Action {i}: {action}")
 
-                obs = None
-                match = re.search(r"Collect(?:ed)?(\[.*\])", action)
-                
-                if match:
-                    logger.debug("Match  ", match)
-                    prediction = match.group(1)
-                    prediction_pool.extend(parse_llm_output_to_list(prediction))
-                    obs = f"Collected the answers: {prediction}"
-                    logger.info(f"Collected the answers: {prediction}")
-                    is_collect = 1
-               
+                if not args.ablate_collect:
+                    obs = None
+                    match = re.search(r"Collect(?:ed)?(\[.*\])", action)
+
+                    if match:
+                        logger.debug("Match  ", match)
+                        prediction = match.group(1)
+                        prediction_pool.extend(parse_llm_output_to_list(prediction))
+                        obs = f"Collected the answers: {prediction}"
+                        logger.info(f"Collected the answers: {prediction}")
+                        is_collect = 1
+
                 finish_match = re.search("Finish", action)
                 if finish_match:
                     prediction_match = re.search(r"Finish(\[.*\])", action)
@@ -228,13 +255,11 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 env.records.append({"i": i, "thought": thought, "action": action})
                 if done:
                     env.records[-1]["observation"] = obs
-                    # logger.info(
-                    #     f"Finish query {idx} with KG, prediction: {prediction_pool} ..."
-                    # )
-                    # write_results(data, env, prediction_pool, args)
                     break
-                if not is_collect: # Search or Generate
-                    obs = env.step(action)
+                if args.ablate_collect and action.lower().startswith("collect"):
+                    obs = "Collect disabled."
+                elif not is_collect:
+                    obs = env.step(action, collect_enabled=not args.ablate_collect)
                 obs = obs.replace("\\n", "")
                 env.records[-1]["observation"] = obs
 
@@ -248,11 +273,8 @@ def find_answer(process_idx, idxes_to_process, args, datas, env):
                 prediction_pool = list(set(prediction_pool))
                 logger.info(f"Finish query {idx} with KG, prediction: {prediction_pool} ...")
                 write_results(data, env, prediction_pool, args)
-
             else:
-                logger.warning(
-                    f"Finish query {idx} without KG..."
-                )
+                logger.warning(f"Finish query {idx} without KG...")
                 prediction = answer_question_without_kg(env, prompt, args)
                 write_results(data, env, prediction, args)
 
@@ -329,9 +351,10 @@ if __name__ == "__main__":
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--test", action="store_true",
                         help="save results to test_predictions.jsonl (overwrites on each run).")
-    parser.add_argument("--run_fail_case", default = None)
+    parser.add_argument("--run_fail_case", default=None)
     parser.add_argument("--hard_only", action="store_true", help="prune all ez answer in each query")
     parser.add_argument("--ablate", action="store_true", help="ablate the generation module")
+    parser.add_argument("--ablate_collect", action="store_true", help="ablate the collect module")
     parser.add_argument("--ver", default=None, type=str, help="version identifier for the experiment")
     # parser.add_argument("start_idx", type=int, default=0, help="the start index of the dataset to process.")
 
@@ -358,24 +381,34 @@ if __name__ == "__main__":
             if type(data[k]) == str and data[k].startswith("[") and data[k].endswith("]"):
                 data[k] = literal_eval(data[k])
         # print(data)
-                
+         
     postfix = '_no-kb' if args.no_kg else ""
     dataset_name = args.dataset.split("/")[1]
-    
+
     # if args.test:
     #     output_file = Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}/test_predictions.jsonl")
     # else:
     if args.ver is not None:
+        output_prefix: Path = Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
+        output_prefix.mkdir(parents=True, exist_ok=True)
         if args.ablate:
-            output_file = (
-                Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
-                / f"{args.ver}_ablate_2_predictions.jsonl"
-            )
+            # output_file = (
+            #     Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
+            #     / f"{args.ver}_ablate_2_predictions.jsonl"
+            # )
+            if args.ablate_collect:
+                output_file = output_prefix / f"{args.ver}_no-collect_no-gnn.jsonl"
+            else:
+                output_file = output_prefix / f"{args.ver}_ablate_2_predictions.jsonl"
         else:
-            output_file = (
-                Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
-                / f"{args.ver}_2_predictions.jsonl"
-            )
+            # output_file = (
+            #     Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
+            #     / f"{args.ver}_2_predictions.jsonl"
+            # )
+            if args.ablate_collect:
+                output_file = output_prefix / f"{args.ver}_no-collect_predictions.jsonl"
+            else:
+                output_file = output_prefix / f"{args.ver}_predictions.jsonl"
     else:
         output_file = (
             Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")

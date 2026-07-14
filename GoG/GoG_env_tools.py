@@ -213,7 +213,7 @@ class KGEnv:
     def last_action(self):
         return self.records[-1]["action"]
 
-    def step(self, action_str=None):
+    def step(self, action_str=None, *, collect_enabled: bool = False):
         logger.debug(action_str)
 
         pattern = r"(\w+)(\[.+\])"
@@ -237,7 +237,10 @@ class KGEnv:
             self.generate_call_count += 1
             return self.generate(parameter)
         elif action == "collect":
-            return f"Collected {parameter}"
+            if collect_enabled:
+                return f"Collected {parameter}"
+            else:
+                raise ValueError("Action 'collect' is not enabled")
 
         raise ValueError(f"Unsupported action: {action_str}")
 
@@ -380,8 +383,10 @@ class KGEnv:
         #     relation_text = item.get("relation")
         #     if relation_text not in selected_relations:
         #         print(f"Relation {relation_text} is in parsed_generations but not in selected_relations")
-        return parsed_generations, candidate_relations
-        verify_candidates = []
+
+        # return parsed_generations, candidate_relations
+
+        # verify_candidates = []
         # for item in parsed_generations:
         #     relation = item.get("relation")
         #     direction = item.get("direction")
