@@ -1,0 +1,88 @@
+[25D2-KL-TTNT05][GoG-SP] HƯỚNG DẪN SỬ DỤNG
+
+Tiên quyết:
+	- Thực hiện các cài đặt ở file HuongDanCaiDat.txt
+	- Actviate môi trường chạy
+	
+Lưu ý:
+	- Các câu lệnh trên terminal được viết cho hệ điều hành Linux.
+	- Hệ điều hành Windows có thể sử dụng Window Subsystem for Linux
+	- Các file chạy đều có cấu hình argument CLI với mô tả cụ thể trong file code
+
+--------------------------------------------------------------------------------------------------
+
+
+PHẦN 1. HƯỚNG DẪN TỔ CHỨC DỮ LIỆU
+	1.1. Tải dữ liệu
+	   - Dữ liệu được lưu trữ tại https://drive.google.com/drive/folders/1ZKhpe0bxlIqoINedD_lSvTEpR7Zdg1iP?usp=drive_link
+	   - Thư mục data bao gồm 02 thư mục con (brink_dataset và data_for_LP)
+	   - Tải dữ liệu về, giải nén và đặt hai thư mục con ngay trong thư mục src
+	   	src/
+		|-------brink_dataset/
+		|	|-------family/
+		|	|-------fb15k-237/
+		|
+		|-------data_for_LP/
+		|	|-------id_processed/
+		|	|	|-------family/
+		|	|	|-------fb15k-237/
+		|
+		|...
+
+	1.2. Giải nén các file PPR score ở `data_for_LP/id_processed/family/ppr_scores/` và `data_for_LP/id_processed/fb15k-237/ppr_scores/`
+
+
+PHẦN 2. HƯỚNG DẪN TRAIN, FINETUNE MODEL GNN
+
+	- Chuyển thư mục đến thư mục one_shot_subgraph: `cd src/one_shot_subgraph`
+	- Thực hiện train GNN:
+		- Cho đồ thị Family:
+			python train_auto.py \
+			--data_path ../data_for_LP/id_processed/family \
+			--output_dir ../data_for_LP/id_processed/family/pretrain_model
+		- Cho đồ thị FB15k-237:
+			python train_auto.py \
+			 --data_path ../data_for_LP/id_processed/fb15k_237 \
+			--output_dir ../data_for_LP/id_processed/fb15k_237/pretrain_model
+	- Thực hiện finetune GNN:
+		- Cho đồ thị Family:
+			python train_auto.py \
+			--data_path ../data_for_LP/id_processed/family \
+			--output_dir ../data_for_LP/id_processed/family/finetune_model \
+			--weight ../data_for_LP/id_processed/family/pretrain_model/pretrain_model.pt \
+			--brink
+		- Cho đồ thị Fb15K-237:
+			python train_auto.py \
+			 --data_path ../data_for_LP/id_processed/fb15k_237 \
+			--output_dir ../data_for_LP/id_processed/fb15k_237/finetune_model \
+			--weight ../data_for_LP/id_processed/fb15k_237/pretrain_model/pretrain_model.pt \
+			--brink
+
+	- Kết thúc phần này, các file weight sẽ đươc lưu vào output_dir tương ứng trên 
+
+
+PHẦN 3. HƯỚNG DẪN CHẠY INFERENCE GoG-SP
+Cần đảm bảo lúc này đã có đầy đủ dữ liệu và weight GNN theo phần 1 và 2
+	3.0. Chuyển đến thư mục src.
+	3.1. Cấu hình các đường dẫn dữ liệu
+		- Cấu hình trong file `src/GoG/kg_interface.py` ở các class FB15k_237_Config và FamilyConfig
+		- Nội dung cấu hình bao gồm: đường dẫn đến file đồ thị đầy đủ và không đầy đủ,
+	3.2. Chạy inference:
+		- Trên Family: 
+			python -m GoG.GoG --dataset ./brink_dataset/family/test.tsv
+		- Trên Fb15k-237:
+			python -m GoG.GoG --dataset ./brink_datasetfb15k_237/private_id/test.tsv
+	3.3. Chạy ablation Generate
+		- Trên Family: 
+			python -m GoG.GoG --dataset ./brink_dataset/family/test.tsv --ablate
+		- Trên Fb15k-237:
+			python -m GoG.GoG --dataset ./brink_datasetfb15k_237/private_id/test.tsv --ablate
+	3.4. Chạy ablation Collect
+		- Trên Family: 
+			python -m GoG.GoG --dataset ./brink_dataset/family/test.tsv --ablate_collect
+		- Trên Fb15k-237:
+			python -m GoG.GoG --dataset ./brink_datasetfb15k_237/private_id/test.tsv --ablate_collect
+			
+			
+			 
+

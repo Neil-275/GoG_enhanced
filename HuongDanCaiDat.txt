@@ -1,0 +1,16 @@
+[25D2-KL-TTNT05][GoG-SP] HƯỚNG DẪN CÀI ĐẶT
+
+--------------------------------------------------------------------------------------------------
+
+1. Cấu hình phần cứng, môi trường chạy
+   - Python >= 3.11
+   - RAM >= 32 GB
+   - GPU:
+   	- Phần train GNN: NVDIA RTX 3090 hoặc tương đương
+   	- Phần inference: Any GPU
+
+2. Cài đặt các package cần thiết
+   - Mã nguồn sử dụng Miniconda để quản lý các thư viện sử dụng (Tham khảo cài đặt Miniconda tại https://www.anaconda.com/docs/getting-started/installation)
+   - File cấu hình thư viện được đặt tại src/hybkgqa.yaml
+   - Thực hiện cài đặt thư viện bằng lệnh `conda env create -f hybkgqa.yaml`
+   - Activate môi trường chạy bằng lệnh `conda activate hybkgqa`
