@@ -1,7 +1,6 @@
-from dotenv import load_dotenv
-load_dotenv()
-
+import argparse
 from ast import literal_eval
+from dotenv import load_dotenv
 import multiprocessing
 from multiprocessing import Pool
 import os
@@ -9,35 +8,25 @@ from pathlib import Path
 import random
 import re
 import time
-from tqdm import tqdm
 import json
-import argparse
-# from environment import FreeBaseEnv
-from GoG.GoG_env_tools import KGEnv
 import pandas as pd
-# from FlagEmbedding import FlagReranker
-# from sentence_transformers import SentenceTransformer
-
-# from evaluate import eval_results
-# from kb_interface.freebase_func import convert_name_to_id
-from GoG.GoG_llms import run_llm
 from threading import Lock
-# from datasets import load_dataset
+from loguru import logger
+import sys
+
+from GoG.GoG_env_tools import KGEnv
+from GoG.GoG_llms import run_llm
 from GoG.utils import (
     format_prompt,
     parse_llm_output_to_list,
-    read_file,
-    proxy_load_dataset,
-    convert_list_to_str,
+    read_file
 )
-from loguru import logger
-import traceback
-import sys
 from postprocess_predictions import postprocess_prediction_jsonl
 
 
-multiprocessing.set_start_method('spawn', force=True)
+load_dotenv()
 
+multiprocessing.set_start_method('spawn', force=True)
 lock = Lock()
 
 
@@ -56,7 +45,6 @@ def write_results(data, env: KGEnv, prediction, args, error: str = None):
                 "prediction": prediction,
                 "answers": data["answer"],
                 "hard_answer": data['hard_answer'],
-                # "ground_truth": list(set(data["answer"] + data['hard_answer'])),
                 "generate_call_count": env.generate_call_count,
                 "records": env.records,
                 "error": error,
@@ -73,14 +61,13 @@ def write_results(data, env: KGEnv, prediction, args, error: str = None):
 def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
     logger.debug(f"{process_idx}, {idxes_to_process[0]}")
 
+    # Skip due to Wikidata-5m skipped
     # if args.wiki:
     #     instruction = format_prompt(read_file("prompts2/instruction_wiki"))
     #     example = format_prompt(read_file("prompts2/examples_wiki"))
     # else:
     #     instruction = format_prompt(read_file("prompts2/instruction"))
     #     instruction = format_prompt(read_file("prompts2/instruction"))
-
-    # instruction = format_prompt(read_file("prompts2/instruction"))
 
     # First of all, determine the base prompt path matched with the current arguments
     example_path: Path = Path(args.prompt_dir)
@@ -100,25 +87,9 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
         raise FileNotFoundError(f"Prompt file not found: {example_path}")
 
     example = format_prompt(read_file(str(example_path)))
-    
-    # if args.no_kg:
-    #     example = format_prompt(read_file(f"{args.prompt_dir}/examples_no-kg"))
-    # else:
-    #     if args.ablate:
-    #         if args.ablate_collect:
-    #             example = format_prompt(read_file(f"{args.prompt_dir}/ablate_collect_examples.txt"))
-    #         else:
-    #             example = format_prompt(read_file(f"{args.prompt_dir}/ablate_examples.txt"))
-    #     else:
-    #         if args.ablate_collect:
-    #             example = format_prompt(read_file(f"{args.prompt_dir}/ablate_collect_examples.txt"))
-    #         else:
-    #             example = format_prompt(read_file(f"{args.prompt_dir}/examples"))
 
     t1 = time.time()
     for n, idx in enumerate(idxes_to_process):
-        # if n > 9: 
-        #     break
         if (n + 1) % 10 == 0:
             t2 = time.time()
             logger.debug(f"{process_idx}: {n / len(idxes_to_process)}, {t2 - t1}")
@@ -128,7 +99,6 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
             logger.info("-----------")
             logger.info(f"Process query {idx} ...")
             data = datas[idx]
-            # print("data: ", data)
             if "question" not in data:
                 data["question"] = data["ProcessedQuestion"]
 
@@ -140,12 +110,9 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
                 + f'Question: {data["question"]}\nTopic Entity: {topic_entity_names_str}\n'
             )
 
-            # print("base_prompt: ", base_prompt)
-            # exit()
             logger.info(f"Question: {data['question']}")
 
             env.assign_query(data)
-            # env.mid_crucial_triples = data["mid_crucial_triples"]
 
             n_calls, n_badcalls, n_expand = 0, 0, 0
             done = False
@@ -180,7 +147,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
 
                     try:
                         thought_action = f"Thought {i}: " + thought_action
-                        
+
                         thought_pattern = r'Thought \d+: (.+)'
                         action_pattern = r'Action \d+: (.+)'
 
@@ -230,27 +197,6 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
                     else:
                         obs = "Finished the search."
                     done = True
-                    # print("prediction: ", prediction)
-                    # done = True
-                    # if prediction[0].lower() == "unknown":
-                    #     # Finish["unkown"]
-                    #     # not enough information even after generation
-                    #     # expand to 2-hop sub-graph
-                    #     logger.debug("roll back and expand")
-                    #     while "generate" in env.last_action.lower():
-                    #         env.records.pop()
-                    #     assert "search" in env.last_action.lower()
-
-                    #     i = len(env.records) + 1
-
-                    #     action = "Search[ALL]"
-                    #     n_expand += 1
-                    #     if n_expand >= args.max_n_expand:
-                    #         logger.debug("max n_expand, break")
-                    #         prediction = answer_question_without_kg(env, base_prompt, args)
-                    #         done = True
-                    # else:
-                        # done = True
 
                 env.records.append({"i": i, "thought": thought, "action": action})
                 if done:
@@ -280,11 +226,6 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
 
             logger.info(f"ground truth: {data['answer']}")
         except Exception as e:
-            # logger.error(f"{traceback.print_exc()}, trying get answer without kg")
-            # prediction = answer_question_without_kg(env, base_prompt, args)
-            # write_results(data, env, prediction, args)
-            # stack_trace = traceback.format_exc()
-            # print(stack_trace)
             write_results(data, env, None, args, error=str(e))
             logger.exception(f"Error processing query {idx} and leave it missing: {e}")
 
@@ -378,10 +319,9 @@ if __name__ == "__main__":
     datas = pd.read_csv(args.dataset, sep="\t").to_dict(orient="records")
     for data in datas:
         for k in data.keys():
-            if type(data[k]) == str and data[k].startswith("[") and data[k].endswith("]"):
+            if isinstance(data[k], str) and data[k].startswith("[") and data[k].endswith("]"):
                 data[k] = literal_eval(data[k])
-        # print(data)
-         
+
     postfix = '_no-kb' if args.no_kg else ""
     dataset_name = args.dataset.split("/")[1]
 
@@ -392,19 +332,11 @@ if __name__ == "__main__":
         output_prefix: Path = Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
         output_prefix.mkdir(parents=True, exist_ok=True)
         if args.ablate:
-            # output_file = (
-            #     Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
-            #     / f"{args.ver}_ablate_2_predictions.jsonl"
-            # )
             if args.ablate_collect:
                 output_file = output_prefix / f"{args.ver}_no-collect_no-gnn.jsonl"
             else:
                 output_file = output_prefix / f"{args.ver}_ablate_2_predictions.jsonl"
         else:
-            # output_file = (
-            #     Path(f"./{args.output_dir}/{args.LLM_type.split('/')[-1]}/{dataset_name}")
-            #     / f"{args.ver}_2_predictions.jsonl"
-            # )
             if args.ablate_collect:
                 output_file = output_prefix / f"{args.ver}_no-collect_predictions.jsonl"
             else:
@@ -416,15 +348,12 @@ if __name__ == "__main__":
         )
 
     args.output_file = output_file
-
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
     logger.add(
         sink=output_file.parent / f"{args.temperature}_{Path(args.dataset).stem}.log",
         mode="w",
     )
-
-    # print(output_file)
 
     if args.test:
         # In test mode, always overwrite the file
@@ -442,23 +371,12 @@ if __name__ == "__main__":
         with open(output_file, "w") as f:
             pass
 
-    
-    #REMOVE LATER
-    # failed_cases = []
-    # k = 0
-    # f = json.load(open("failed_cases.json", "r"))
-    # for q in f:
-    #     failed_cases.append(q["index"])
-    #     # k += 1
-    #     # if k >= 10:  # Limit to first 10 failed cases
-    #     #     break
-    # datas = [data for data in datas if data['id'] in failed_cases]
     seed = 42
     random.seed(seed)
     random.shuffle(datas)
     if args.test:
         val_id = [1053, 2745, 5144, 3717, 869, 4464, 1589, 2767]
-        # datas = random.sample(datas, min(1, len(datas)))  # Randomly sample 3 cases for testing 
+        # datas = random.sample(datas, min(1, len(datas)))  # Randomly sample 3 cases for testing
         datas = [data for data in datas if data['id'] in val_id]
         # datas = datas[35:23]  # Limit to first 3 cases for testing
     if args.run_fail_case:
@@ -472,19 +390,11 @@ if __name__ == "__main__":
     print(f"Number of datas to process: {len(datas)}")
     idxes_to_process = range(len(datas))
 
-
-
     num_samples = len(idxes_to_process)
     logger.debug(num_samples)
 
     n_process = min(args.n_process, num_samples)
     logger.debug(n_process)
-
-    ## Produce a sample_args file
-    # import pickle as pkl
-    # print("Saving sample_args to sample_args_finetune_family.pkl")
-    # with open("sampled_args/sample_args_finetune_family.pkl", "wb") as f:
-    #     pkl.dump(args, f)
 
     env = KGEnv(args)
 
@@ -502,7 +412,6 @@ if __name__ == "__main__":
 
             results = pool.starmap(find_answer, jobs)
     elif n_process == 1:
-        
         find_answer(0, idxes_to_process, args, datas, env)
 
     try:
