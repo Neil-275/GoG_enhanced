@@ -33,7 +33,7 @@ class PredictionEntry(BaseModel):
 
     @property
     def hits_hard(self) -> bool:
-        return bool(self.prediction.intersection(self.hard_answer))
+        return bool(self.overlap.intersection(self.hard_answer))
 
     @property
     def precision(self) -> float:
