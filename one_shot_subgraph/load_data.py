@@ -87,7 +87,16 @@ class DataLoader(Dataset):
             self.len = len(self.valid_q)
         else:
             self.len = len(self.test_q)
-                
+            
+        if self.args.topic_ent_file is not None:
+            with open(self.args.topic_ent_file, "r") as file:
+                    entity_names = [line.strip() for line in file]
+
+            self.topic_entities = [
+                self.entity2id[entity]
+                for entity in entity_names
+            ]
+
     def addSampler(self, sampler):
         self.sampler = sampler
         self.getOneSubgraph = self.sampler.getOneSubgraph
@@ -136,8 +145,8 @@ class DataLoader(Dataset):
                 h, r, t = line.strip().split()
                 h, r, t = self.entity2id[h], self.relation2id[r], self.entity2id[t]
                 triples.append([h,r,t])
-                self.filters[(h,r)].add(t)
-                self.filters[(t,r+self.n_rel)].add(h)
+                self.filters[(h, r)].add(t)
+                self.filters[(t, r+self.n_rel)].add(h)
         return triples
 
     def double_triple(self, triples):

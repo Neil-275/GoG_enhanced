@@ -25,11 +25,13 @@ parser.add_argument('--add_manual_edges', action='store_true')
 parser.add_argument('--remove_1hop_edges', default=True)
 parser.add_argument('--only_eval', action='store_true')
 parser.add_argument('--not_shuffle_train', default=True)
-parser.add_argument('--ppr_k', type=int, default=0, help='k for k-hop localized PPR')
+parser.add_argument('--local_ppr', action='store_true', help='Use local PPR for sampling subgraphs')
 parser.add_argument('--drop_graph', action='store_true', help='Drop NetworkX graph after building samplers')
 parser.add_argument('--brink', action='store_true', help='Use Brink dataset')
 parser.add_argument('--output_dir', type=str, default=None,
                     help='Directory for generated logs, checkpoints, and PPR scores. Defaults to data_path.')
+parser.add_argument('--topic_ent_file', type=str, default=None,
+                    help='File that handle the topic entities that needs to be generated')
 args = parser.parse_args()
 
 class Options(object):
@@ -67,11 +69,16 @@ if __name__ == '__main__':
     test_loader = DataLoader(args, mode='test')
     opts.n_ent = loader.n_ent
     opts.n_rel = loader.n_rel
+
     
+
     # build ppr sampler here
     # number of sampled entities
     args.n_samp_ent = int(args.topk * loader.n_ent)
     args.n_samp_edge = int(args.topm * len(loader.fact_data)) if args.topm > 0  else -1
+    if hasattr(loader, 'topic_entities') and loader.topic_entities is not None:
+        args.topic_entities = loader.topic_entities
+        print(f'==> using topic entities from {args.topic_ent_file}, #topic entities: {len(args.topic_entities)}')
     print(f'==> #sampled entities:{args.n_samp_ent}, #sampled edges:{args.n_samp_edge}')
     
     # sampler for testing
@@ -173,9 +180,9 @@ if __name__ == '__main__':
         params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9, 'lamb': 0.001, 'dropout': 0.2}
         # params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 6, 'act': 'relu', 'initializer': 'relation', 'concatHidden': False, 'shortcut': True, 'readout': 'linear', 'decay_rate': 0.9429713470775948, 'lamb': 0.000946516892415447, 'dropout': 0.19456805575101324}
     elif dataset == 'family':
-        params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9, 'lamb': 0.0001, 'dropout': 0.2}
+        params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 5, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9, 'lamb': 0.0001, 'dropout': 0.2}
     elif dataset == "wikidata5m":
-        params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 8, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9, 'lamb': 0.001, 'dropout': 0.2}
+        params = {'lr': 0.0003, 'hidden_dim': 64, 'attn_dim': 4, 'n_layer': 5, 'act': 'relu', 'initializer': 'binary', 'concatHidden': True, 'shortcut': False, 'readout': 'linear', 'decay_rate': 0.9, 'lamb': 0.001, 'dropout': 0.2}
     else:
         exit()    
     run_model(params)
