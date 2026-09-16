@@ -11,17 +11,13 @@ import asyncio
 from loguru import logger
 from GoG.kg_interface import KGInterface
 from GoG.utils import (
-    convert_list_to_str,
     format_prompt,
     get_edges,
     parse_json_list,
     parse_llm_output_to_list,
     read_file,
-    shorten_relation,
-    convert_triples_to_str,
     extract_numbers_from_string,
     parse_generated_relation_directions,
-    shorten_triple_list
 )
 from GoG.GoG_llms import run_llm
 from GoG.gnn_interface import OneShotInterface
@@ -77,9 +73,6 @@ class KGEnv:
 
         self.records = []
 
-        
-        self.abbr_rel_to_rel = {}
-
         self.id_to_name = {}
         self.name_to_id = {}
         # use self.kg.entities to update name_to_id and id_to_name
@@ -95,6 +88,10 @@ class KGEnv:
 
         self.explored_entities = set()
         self.explored_triples = []
+        # entity_id -> {parent_entity_id, relation, direction, step_index}.
+        # Written at first production only; see _record_provenance.
+        self.provenance = {}
+        self.topic_entity_set = set()
         self.mid_crucial_triples = None
         self.n_related_triples = self.args.n_related_triples
         # only used in answer without kg
@@ -133,8 +130,11 @@ class KGEnv:
         self.records = []
 
         self.explored_triples = []
-        self.abbr_rel_to_rel = {}
         self.explored_entities = set()
+        self.provenance = {}
+        # Path tracing terminates at any topic entity: they are the roots and
+        # carry no provenance record.
+        self.topic_entity_set = {str(entity) for entity in self.topic_entities}
 
         if self.args.hard_only:
             self.crucial_rel = self.find_crucial_rel(data)
@@ -225,17 +225,13 @@ class KGEnv:
 
         logger.info(f"Action: {action}, Parameter: {parameter}")
 
-        if action == "search":
-            if parameter == "[ALL]":
-                # repeat last search, but search two-hop
-                self.records[-1]["thought"] = self.records[-2]["thought"]
-                entity_str = convert_list_to_str(self.records[-2]["new_entities"])
-                return self.search(entity_str)
-            else:
-                return self.search(parameter)
-        elif action == "generate":
+        if action == "propose":
+            # Kept as `generate_call_count` on purpose: it is a declared field
+            # of PredictionEntry in evaluation.py, and renaming it would make
+            # new result files structurally incomparable with existing ones.
+            # It now counts Propose calls.
             self.generate_call_count += 1
-            return self.generate(parameter)
+            return self.propose_action(parameter)
         elif action == "collect":
             if collect_enabled:
                 return f"Collected {parameter}"
@@ -245,26 +241,40 @@ class KGEnv:
         raise ValueError(f"Unsupported action: {action_str}")
 
     def construct_neighbor_relation_set(self, entities, thought):
+        """Fetch the 1-hop schema around `entities` from G_inc.
+
+        Returns the relevance-filtered local-context relations for each
+        direction (spec 2/2a), the start entity, and `observed_index`: a
+        (relation, direction) -> [far-end entity id] map built from the *same*
+        G_inc snapshot, so the local context and the observed candidates of
+        spec 3 step 1 can never disagree. Direction is relative to the entity:
+        outgoing means it is the head and the far end is the tail.
+        """
         related_triples_df = [
             (str(entity_id), self.kg.get_1hop_triples(str(entity_id)))
             for entity_id in entities if str(entity_id) in self.kg.entities
         ]
         outgoing_neighbor_relation_set = set()
         incoming_neighbor_relation_set = set()
+        observed_index = defaultdict(list)
         for entity_id, df in related_triples_df:
             for triple in df.values.tolist():
                 if len(triple) == 2:
                     direction, wrapped_triple = triple
                     if direction == 0:
                         outgoing_neighbor_relation_set.add(wrapped_triple[1])
+                        observed_index[(wrapped_triple[1], "outgoing")].append(str(wrapped_triple[2]))
                     elif direction == 1:
                         incoming_neighbor_relation_set.add(wrapped_triple[1])
+                        observed_index[(wrapped_triple[1], "incoming")].append(str(wrapped_triple[0]))
                 elif len(triple) == 3:
                     head, relation, tail = triple
                     if str(head) == entity_id:
                         outgoing_neighbor_relation_set.add(relation)
+                        observed_index[(relation, "outgoing")].append(str(tail))
                     if str(tail) == entity_id:
                         incoming_neighbor_relation_set.add(relation)
+                        observed_index[(relation, "incoming")].append(str(head))
         start_entity = entities[0]
         outgoing_related_relations = self.kg.get_best_relation_match(
             thought, rel_set=list(outgoing_neighbor_relation_set), k=5, threshold=0.1
@@ -272,7 +282,7 @@ class KGEnv:
         incoming_related_relations = self.kg.get_best_relation_match(
             thought, rel_set=list(incoming_neighbor_relation_set), k=5, threshold=0.1
         ) if self.kg.rels and incoming_neighbor_relation_set else []
-        return outgoing_related_relations, incoming_related_relations, start_entity
+        return outgoing_related_relations, incoming_related_relations, start_entity, dict(observed_index)
 
     def parse_json_list_responses(self, responses):
         if isinstance(responses, str):
@@ -289,18 +299,18 @@ class KGEnv:
                 )
         return parsed_items
 
-    def generate(self, thought):
-        # [...]
-        if thought.startswith("["):
-            thought = thought[1:-1]
+    def propose(self, q_sub, e_current):
+        """Relation selection + direction specification for one entity.
 
-        entities = extract_numbers_from_string(thought)
-        outgoing_related_relations, incoming_related_relations, start_entity = self.construct_neighbor_relation_set(entities, thought)
-        
-        
-        # related_triples = [triple for df in related_triples_df for triple in df.values.tolist()]
-        # related_triples = random.sample(related_triples, k=min(len(related_triples), 3))
-        # related_triple_str = convert_triples_to_str(related_triples)
+        `e_current` arrives already parsed by the caller, so `q_sub` is the
+        clean sub-question: the entity id is no longer glued to the front of
+        the text fed to the bi-encoder and the two sub-prompts. This method
+        does not call Predict -- the action wrapper does that per relation.
+        """
+        thought = q_sub
+        outgoing_related_relations, incoming_related_relations, start_entity, observed_index = \
+            self.construct_neighbor_relation_set([e_current], thought)
+
         relation_selection_prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/relation_selection.txt")
         relation_selection_prompt = format_prompt(relation_selection_prompt_path)
 
@@ -329,8 +339,8 @@ class KGEnv:
             stop=None,
             n=n
         )
-        print("Relation selection LLM responses:")
-        print(relation_selection_responses)
+        # print("Relation selection LLM responses:")
+        # print(relation_selection_responses)
 
         selected_relation_items = self.parse_json_list_responses(relation_selection_responses)
         selected_relations = []
@@ -346,9 +356,21 @@ class KGEnv:
             if relation and relation not in selected_relations:
                 selected_relations.append(relation)
                 updated_selected_relation_items.append({"relation": relation})
+        # Predict now runs once per selected relation, so the number of
+        # relations is the GNN cost multiplier -- cap it.
+        max_relations = self.args.max_selected_relations 
+        if len(selected_relations) > max_relations:
+            logger.debug(
+                f"Capping selected relations {selected_relations} to first {max_relations}"
+            )
+            selected_relations = selected_relations[:max_relations]
+            updated_selected_relation_items = updated_selected_relation_items[:max_relations]
         selected_relation_items = updated_selected_relation_items
         ## recreate selected_relation_items with updated relations
-        
+
+        if not selected_relations:
+            logger.debug("Relation selection returned no relations; skipping direction step.")
+            return [], [], start_entity, observed_index, outgoing_related_relations, incoming_related_relations
 
         direction_specification_prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/direction_specification.txt")
         direction_specification_prompt = format_prompt(direction_specification_prompt_path)
@@ -358,6 +380,9 @@ class KGEnv:
         direction_specification_prompt = (
             direction_specification_prompt.format(
                 thought=thought,
+                topic_entity=str(start_entity),
+                outgoing_neighboring_relations="[" + ", ".join(outgoing_related_relations) + "]",
+                incoming_neighboring_relations="[" + ", ".join(incoming_related_relations) + "]",
                 selected_relations=selected_relations_str,
             )
             + "\nAnswer: "
@@ -373,67 +398,103 @@ class KGEnv:
             stop=None,
             n=n
         )
-        print("Direction specification LLM responses:")
-        print(direction_specification_responses)
+        # print("Direction specification LLM responses:")
+        # print(direction_specification_responses)
 
         parsed_generations = self.parse_json_list_responses(direction_specification_responses)
         logger.debug(f"Parsed direction specifications: {parsed_generations}")
-        # check if relations in parsed_generatations are the same in selected_relations
-        # for item in parsed_generations:
-        #     relation_text = item.get("relation")
-        #     if relation_text not in selected_relations:
-        #         print(f"Relation {relation_text} is in parsed_generations but not in selected_relations")
+        return (
+            selected_relations,
+            parsed_generations,
+            start_entity,
+            observed_index,
+            outgoing_related_relations,
+            incoming_related_relations,
+        )
 
-        # return parsed_generations, candidate_relations
+    def predict(self, start_entity, relation, direction):
+        candidates = self.gnn.predict_topk(
+            str(start_entity), relation, direction, k=self.args.predict_topk, known=False
+        )
+        return candidates
 
-        # verify_candidates = []
-        # for item in parsed_generations:
-        #     relation = item.get("relation")
-        #     direction = item.get("direction")
-        #     # relation, _ = self.kg.get_best_relation_match(relation_text)
-        #     if not relation:
-        #         continue
-        #     # print(f"Found: {start_entity}: {relation}: {direction}")
-            
-        #     candidates = self.gnn.predict_topk(start_entity, relation, direction, k=3, known=False)
-            # print("candidates:", candidates)
-            # verify_candidate = {}
-            # for candidate in candidates: ## Loop through the candidates of GNNs
-            #     if direction == "outgoing":
-            #         cand_relation_paths = self.kg.get_shortest_path_with_relations(str(start_entity), str(candidate))
-            #     if direction == "incoming":
-            #         cand_relation_paths = self.kg.get_shortest_path_with_relations(str(candidate), str(start_entity))
-            #     if cand_relation_paths == None:
-            #         continue
-            #     cand_paths = []
-            #     for relation_path in cand_relation_paths:
-            #         relation_path_str = ""
-            #         # print(relation_path)
-            #         for i, ent, rel, direc in zip(range(len(relation_path["relations"])), relation_path["path"], relation_path["relations"], relation_path["directions"]):
-            #             rel = shorten_relation(rel)
-            #             next_ent = relation_path["path"][i+1]
-            #             if direc == "forward":
-            #                 relation_path_str +=  f"({convert_triples_to_str([[ent, rel, next_ent]])})"
-            #             else:
-            #                 relation_path_str += f"({convert_triples_to_str([[next_ent, rel, ent]])})"
-            #             if i < len(relation_path["relations"]) - 1:
-            #                 relation_path_str += "; "
-            #         relation_path_str = "[" + relation_path_str + "]"
-            #         cand_paths.append(relation_path_str)
-            #     # print(cand_path)
-            #     verify_candidate = {
-            #         "relation": relation_text,
-            #         "evidence": cand_paths,
-            #         "candidate_id": candidate,
-            #         "direction": direction,
-            #     }
-        #     verify_candidates.append(verify_candidate)
-        # verified_candidates = self.verify(start_entity, thought, verify_candidates)
-        verified_candidates = []
+    @staticmethod
+    def _entity_sort_key(entity_id):
+        """Deterministic ordering for capping. Numeric ids sort numerically."""
+        text = str(entity_id)
+        return (0, int(text), "") if text.lstrip("-").isdigit() else (1, 0, text)
+
+    @staticmethod
+    def _format_triple(start_entity, relation, direction, other):
+        if direction == "outgoing":
+            return f"{start_entity}, {relation}, {other}"
+        return f"{other}, {relation}, {start_entity}"
+
+    def parse_propose_argument(self, parameter):
+        """Parse the argument of `Propose[e_current | q_sub]`.
+
+        Falls back to the pre-Propose behaviour (pull the first number out of
+        the whole string) when the delimiter is missing, because the driver's
+        retry loop never re-prompts on a parse failure -- erroring here would
+        burn a trajectory step with no way to recover.
+        """
+        text = str(parameter).strip()
+        if text.startswith("[") and text.endswith("]"):
+            text = text[1:-1]
+        text = text.strip()
+
+        if "|" in text:
+            e_current, _, q_sub = text.partition("|")
+            return e_current.strip(), q_sub.strip()
+
+        entities = extract_numbers_from_string(text)
+        logger.warning(
+            f"Propose argument has no '|' delimiter: {parameter!r}; "
+            f"falling back to number extraction"
+        )
+        return (str(entities[0]) if entities else ""), text
+
+    def propose_action(self, parameter):
+        """Handle one `Propose[e_current | q_sub]` action.
+
+        Runs relation selection + direction specification for a single entity,
+        then -- unconditionally, with no activation policy -- looks up observed
+        edges and runs Predict for every selected relation, and renders both
+        groups with explicit labels.
+        """
+        e_current, q_sub = self.parse_propose_argument(parameter)
+        # return (self.propose(q_sub, e_current))
+        (
+            selected_relations,
+            parsed_generations,
+            start_entity,
+            observed_index,
+            outgoing_context,
+            incoming_context,
+        ) = self.propose(q_sub, e_current)
+
+        record = self.records[-1]
+        record["e_current"] = str(start_entity)
+        record["q_sub"] = q_sub
+        record["local_context"] = {
+            "outgoing": list(outgoing_context),
+            "incoming": list(incoming_context),
+        }
+
+        lines = [
+            f"Local context for {start_entity}:",
+            "  outgoing: [" + ", ".join(outgoing_context) + "]",
+            "  incoming: [" + ", ".join(incoming_context) + "]",
+        ]
+
+        selected_log = []
+        observed_log = []
+        predicted_log = []
+        cap = self.args.n_related_triples
+
         for item in parsed_generations:
             relation = item.get("relation")
             direction = item.get("direction")
-            # relation, _ = self.kg.get_best_relation_match(relation_text)
             if not relation:
                 logger.debug(f"Skipping parsed generation without relation: {item}")
                 continue
@@ -455,36 +516,293 @@ class KGEnv:
             if direction not in {"incoming", "outgoing"}:
                 logger.debug(f"Skipping parsed generation with invalid direction: {item}")
                 continue
-            print(f"Found: {start_entity}: {relation}: {direction}")
-            # print(type(start_entity))
-            candidates = self.gnn.predict_topk(str(start_entity), relation, direction, k=3, known=False)
-            # print("candidates:", candidates)
+
+            selected_log.append({"relation": relation, "direction": direction})
+            lines.append("")
+            lines.append(f"Selected: {relation} ({direction})")
+
+            # --- observed: direct edges already in G_inc ---
+            observed_entities = sorted(
+                set(observed_index.get((relation, direction), [])),
+                key=self._entity_sort_key,
+            )
+            kept, suppressed = [], 0
+            for other in observed_entities:
+                triple = self._format_triple(start_entity, relation, direction, other)
+                if triple in self.explored_triples:
+                    suppressed += 1
+                    continue
+                kept.append((other, triple))
+            kept = kept[:cap]
+            for other, triple in kept:
+                self.explored_triples.append(triple)
+                self.explored_entities.add(str(other))
+                self._record_provenance(other, start_entity, relation, direction)
+            observed_log.append({
+                "relation": relation,
+                "direction": direction,
+                "entities": [other for other, _ in kept],
+                "suppressed_as_already_shown": suppressed,
+            })
+
+            if kept:
+                lines.extend(self._render_group("(observed, direct edge)", [t for _, t in kept]))
+            elif suppressed:
+                lines.append(
+                    f"  (observed, direct edge):     all {suppressed} observed edge(s) already shown above"
+                )
+            else:
+                lines.append("  (observed, direct edge):     none")
+
+            # --- predicted: GNN candidates, existence-filtered ---
+            candidates = self.predict(start_entity, relation, direction)
             if not candidates:
                 logger.debug(
                     f"No GNN candidates for entity={start_entity}, relation={relation}, direction={direction}"
                 )
+            observed_set = set(observed_entities)
+            overlap = [c for c in candidates if str(c) in observed_set]
+            if overlap:
+                # Commit 1 makes predict_topk filter these out; if any survive,
+                # the observed/predicted labels would be lying.
+                logger.warning(
+                    f"Predicted candidates overlap observed edges for "
+                    f"({start_entity}, {relation}, {direction}): {overlap}"
+                )
+            candidates = [c for c in candidates if str(c) not in observed_set]
+            # Provenance is recorded for predicted candidates too: the
+            # observed/predicted distinction is applied at collect time, by
+            # whether the path can be replayed against G_inc, not here.
             for candidate in candidates:
-                verified_candidates.append({
-                    "triple": [str(start_entity), relation, str(candidate)] if direction == "outgoing" else [str(candidate), relation, str(start_entity)],
-                    "score": 0.6
-                })
-        result = []
-        for candidate in verified_candidates:
-            # print(123)
-            triple = candidate['triple']
-            triple_str = convert_triples_to_str([triple])
-            triple_str = triple_str + "\tPlausible score:" + str(candidate['score'])
-            # print("Generated triple: ", triple_str)
-            self.records[-1]["generated_triples"] = triple_str
-            result.append(triple_str)
-                
-        if len(result) == 0:
-            # print("No valid triples generated.")
-            self.records[-1]["verified_candidates"] = []
-            return "No plausible triples generated."
-        # print("Generated triples:")
-        # print("\n".join(result))
-        return "\n".join(result)
+                self._record_provenance(candidate, start_entity, relation, direction)
+            predicted_log.append({
+                "relation": relation,
+                "direction": direction,
+                "entities": [str(c) for c in candidates],
+            })
+
+            if candidates:
+                lines.extend(self._render_group(
+                    "(predicted, unverified)",
+                    [self._format_triple(start_entity, relation, direction, c) for c in candidates],
+                ))
+            else:
+                lines.append("  (predicted, unverified):     none")
+
+        record["selected_relations"] = selected_log
+        record["observed"] = observed_log
+        record["predicted"] = predicted_log
+
+        if not selected_log:
+            lines.append("")
+            lines.append("No relation was selected for this entity.")
+
+        return "\n".join(lines)
+
+    @staticmethod
+    def _render_group(label, triples):
+        """Render a labelled group, aligning continuation lines under the first."""
+        prefix = f"  {label}:".ljust(31)
+        rendered = [prefix + triples[0]]
+        rendered.extend(" " * 31 + triple for triple in triples[1:])
+        return rendered
+
+    # ------------------------------------------------------------------
+    # Collect: relation-path fan-out
+    # ------------------------------------------------------------------
+
+    def _record_provenance(self, entity, parent_entity, relation, direction):
+        """Persist the triple that first produced `entity`.
+
+        First production wins: a later re-appearance via a different path must
+        not overwrite the record, because that is what makes path tracing
+        well-defined. Topic entities are roots and never get a record.
+        """
+        entity = str(entity)
+        parent_entity = str(parent_entity)
+        if entity in self.provenance or entity in self.topic_entity_set:
+            return
+        if entity == parent_entity:
+            # A self-loop would make trace_path non-terminating.
+            logger.debug(f"Skipping self-referential provenance for {entity}")
+            return
+        self.provenance[entity] = {
+            "parent_entity_id": parent_entity,
+            "relation": relation,
+            "direction": direction,
+            "step_index": self.records[-1]["i"] if self.records else None,
+        }
+
+    def _trace_path(self, entity):
+        """Walk provenance back to a root, returning (path, root).
+
+        `path` is the ordered list of (relation, direction) pairs from root to
+        `entity` -- relation *types* only, with the specific intermediate
+        entities deliberately discarded. Returns (None, None) if the chain
+        cycles. An entity with no provenance record is its own root, which
+        yields an empty path and collapses to a single-entity collect.
+        """
+        entity = str(entity)
+        path = []
+        current = entity
+        visited = {current}
+        while current not in self.topic_entity_set:
+            prov = self.provenance.get(current)
+            if prov is None:
+                break
+            path.insert(0, (prov["relation"], prov["direction"]))
+            current = str(prov["parent_entity_id"])
+            if current in visited:
+                logger.warning(f"Cycle in provenance chain while tracing {entity}")
+                return None, None
+            visited.add(current)
+        return path, current
+
+    def _observed_neighbors(self, node, relation, direction):
+        """Far ends of real G_inc edges matching (relation, direction) at `node`.
+
+        Direction is relative to `node`: outgoing means it is the head. Reads
+        the same incomplete graph that `observed_index` is built from, so a
+        hop that was surfaced as observed always replays here.
+        """
+        graph = self.kg.incomplete_graph_nx
+        node = str(node)
+        if node not in graph:
+            return set()
+        adjacency = graph.succ[node] if direction == "outgoing" else graph.pred[node]
+        return {
+            str(neighbor)
+            for neighbor, edges in adjacency.items()
+            for edge_data in edges.values()
+            if edge_data.get("relation") == relation
+        }
+
+    def _replay_path(self, root, path):
+        """Fan a relation-type path out from `root` across G_inc.
+
+        Returns (frontier, log). `frontier` is None when the replay fails and
+        the caller must fall back to a single-entity collect. Depends only on
+        (root, path), so `collect_action` caches it: entities sharing a traced
+        path replay once.
+        """
+        max_hops = getattr(self.args, "collect_fanout_max_hops", 0) or 0
+        if max_hops > 0 and len(path) > max_hops:
+            return None, {"reason": "path_longer_than_max_hops", "n_hops": len(path)}
+
+        max_entities = getattr(self.args, "collect_fanout_max_entities", 0) or 0
+        frontier = {str(root)}
+        hop_sizes = []
+        for relation, direction in path:
+            next_frontier = set()
+            for node in frontier:
+                next_frontier |= self._observed_neighbors(node, relation, direction)
+            if not next_frontier:
+                # No real edge realises this hop from anywhere in the frontier:
+                # the signal that it was Predict-derived rather than observed.
+                return None, {
+                    "reason": "unreplayable_hop",
+                    "failed_hop": [relation, direction],
+                    "hop_sizes": hop_sizes,
+                }
+            if max_entities > 0 and len(next_frontier) > max_entities:
+                logger.warning(
+                    f"Fan-out frontier hit {len(next_frontier)} entities at "
+                    f"({relation}, {direction}), over collect_fanout_max_entities="
+                    f"{max_entities}; falling back to single-entity collect"
+                )
+                return None, {
+                    "reason": "frontier_over_max_entities",
+                    "frontier_size": len(next_frontier),
+                    "hop_sizes": hop_sizes,
+                }
+            frontier = next_frontier
+            hop_sizes.append(len(frontier))
+        return frontier, {"hop_sizes": hop_sizes}
+
+    def _collect_one(self, entity, replay_cache=None):
+        """Expand one collected entity into the full set to add to R_t.
+
+        Replays `entity`'s relation-type path from its root, fanning out across
+        the whole frontier at every hop rather than following the specific
+        intermediates that produced `entity`. Any replay failure falls back to
+        collecting `entity` alone.
+        """
+        entity = str(entity)
+        path, root = self._trace_path(entity)
+        if path is None:
+            return {entity}, {"entity": entity, "fan_out": False, "reason": "cycle"}
+
+        key = (root, tuple(path))
+        if replay_cache is not None and key in replay_cache:
+            frontier, log = replay_cache[key]
+        else:
+            frontier, log = self._replay_path(root, path)
+            if replay_cache is not None:
+                replay_cache[key] = (frontier, log)
+
+        if frontier is None:
+            logger.debug(f"Fan-out for {entity} failed ({log['reason']}); collecting it alone")
+            return {entity}, dict(log, entity=entity, fan_out=False, path=path)
+
+        if entity not in frontier:
+            # The path replayed, but not onto `entity` itself -- possible when
+            # the final hop was predicted while other real edges of the same
+            # type exist. Keep `entity`: dropping the answer the agent actually
+            # named would be a regression against the old Collect.
+            logger.warning(
+                f"Collected entity {entity} is not in its own replayed frontier "
+                f"(path={path}); keeping it alongside the fan-out"
+            )
+            frontier = frontier | {entity}
+
+        return frontier, dict(
+            log,
+            entity=entity,
+            fan_out=len(path) > 0,
+            path=path,
+            root=root,
+            n_collected=len(frontier),
+        )
+
+    def collect_action(self, action_str):
+        """Handle one `Collect[...]` action, returning (entities, observation).
+
+        The agent's interface is unchanged -- it still just names entities it
+        judges to be answers. R_t itself stays owned by the driver; this
+        returns the expanded set for it to union in.
+        """
+        match = re.search(r"Collect(?:ed)?(\[.*\])", action_str)
+        parameter = match.group(1) if match else str(action_str)
+        requested = parse_llm_output_to_list(parameter) or []
+        requested = [str(entity).strip() for entity in requested if str(entity).strip()]
+
+        collected = []
+        seen = set()
+        logs = []
+        # Entities that trace to the same (root, path) share one replay.
+        replay_cache = {}
+        for entity in requested:
+            entities, log = self._collect_one(entity, replay_cache)
+            logs.append(log)
+            for collected_entity in sorted(entities, key=self._entity_sort_key):
+                if collected_entity not in seen:
+                    seen.add(collected_entity)
+                    collected.append(collected_entity)
+
+        if self.records:
+            self.records[-1]["collect"] = logs
+
+        # The fan-out members are deliberately not listed back to the agent:
+        # they go into R_t only, and must not become candidates for a future
+        # e_current. Only the ids the agent already named are echoed.
+        lines = [f"Collected the answers: {parameter}"]
+        extra = len(seen) - len({entity for entity in requested})
+        if extra > 0:
+            lines.append(
+                f"Also recorded {extra} further answer(s) reachable from the topic "
+                f"entity by the same relation path."
+            )
+        return collected, "\n".join(lines)
 
     def get_template_variables(self, template_string):
     # Field names can be None for raw text chunks, so filter those out
@@ -565,180 +883,6 @@ class KGEnv:
 
         return filtered_triples, relations
 
-    def search(self, start_entities):
-        # print(f"Search entity names: {start_entities}", type(start_entities))
-        start_entities = parse_llm_output_to_list(start_entities)
-
-        all_related_triples = []
-        for entity_name in start_entities:
-            entity_id = self.convert_name_to_id(entity_name)
-            # Use KGInterface to get 1-hop triples
-            if self.kg:
-                try:
-                    # outgoing, incoming = self.kg.get_1hop_triples(entity_id)
-                    # # Convert DataFrames to list format: [head, relation, tail]
-                    # incoming_triples = incoming.values.tolist() if len(incoming) > 0 else []
-                    # outgoing_triples = outgoing.values.tolist() if len(outgoing) > 0 else []
-                    # incoming_triples = [(1, triple) for triple in incoming_triples]  # Mark incoming triples with 1
-                    # outgoing_triples = [(0, triple) for triple in outgoing_triples]  # Mark outgoing triples with 0
-                    # triples = incoming_triples + outgoing_triples
-                    # relations = list(set([triple[1][1] for triple in triples]))
-                    triples_df = self.kg.get_1hop_triples(entity_id)
-                    if self.crucial_rel is not None and not self.crucial_rel.empty:
-                        edge_cols = ["head", "relation", "tail"]
-                        triples_df = triples_df.merge(
-                            self.crucial_rel[edge_cols].drop_duplicates(),
-                            on=edge_cols,
-                            how="left",
-                            indicator=True,
-                        )
-                        triples_df = triples_df[triples_df["_merge"] == "left_only"]
-                        triples_df = triples_df[edge_cols].reset_index(drop=True)
-
-                    # Convert DataFrame to list format: [head, relation, tail]
-                    triples = triples_df.values.tolist() if len(triples_df) > 0 else []
-                    ### Filter out crucial triples if they exist
-                    
-                    relations = list(set([triple[1] for triple in triples]))
-                    # logger.debug(f"Relations after get_1hop_triples: {relations}")
-                except Exception as e:
-                    logger.error(f"Failed to get 1-hop triples for {entity_id}: {e}")
-                    triples = []
-                    relations = []
-            else:
-                triples = []
-                relations = []
-            
-            # logger.debug(f"Relations after filter_crucial_triples: {relations}")
-
-            for i in range(len(relations)):
-                # only remain the last two parts
-                # abbr_rel = shorten_relation(relations[i])
-                abbr_rel = relations[i]
-                self.abbr_rel_to_rel[abbr_rel] = relations[i]
-                relations[i] = abbr_rel
-
-            for i in range(len(triples)):
-                if len(triples[i]) == 2:
-                    # abbr_rel = shorten_relation(triples[i][1][1])
-                    abbr_rel = triples[i][1][1]
-                    self.abbr_rel_to_rel[abbr_rel] = triples[i][1][1]
-                    triples[i][1][1] = abbr_rel
-                elif len(triples[i]) == 3:
-                    # abbr_rel = shorten_relation(triples[i][1])
-                    abbr_rel = triples[i][1]
-                    self.abbr_rel_to_rel[abbr_rel] = triples[i][1]
-                    triples[i][1] = abbr_rel
-
-            relations = sorted(relations)
-            # logger.debug(f"Relations after abbreviation and sorting: {relations}")
-            # print(f"Relations after abbreviation and sorting: {relations}")
-            ## Call LLM to filter relations for each entity
-            filtered_relations = self.filter_relations(entity_name, relations, self.last_thought)
-            # logger.debug(f"Relations after filter_relations (LLM filtered): {filtered_relations}")
-            # print(f"Relations after filter_relations (LLM filtered): {filtered_relations}")
-
-            related_triples = self.sample_triples_by_relation(triples, filtered_relations)
-            # print(f"Related triples for entity {entity_name}:")
-            # Extract relations from sampled triples
-            # sampled_relations = sorted(list(set([triple[1] for triple in related_triples])))
-
-            all_related_triples.extend(related_triples)
-
-        all_related_triples = sorted(all_related_triples)
-        # print("All related triples:")
-        # for triple in all_related_triples:
-        #     print(f"  {triple}")
-
-        tmp = []
-        for triple in all_related_triples:
-            if triple not in self.explored_triples:
-                self.explored_triples.append(triple)
-                tmp.append(triple)
-
-        all_related_triples = tmp
-        # self.explored_triples.extend(deepcopy(all_related_triples))
-
-        # self.records[-1]["triples"] = all_related_triples
-        # self.records[-1]["start_entities"] = start_entities
-        # self.records[-1]["one_hop_relations"] = filtered_relations
-
-        new_entities = set()
-        for triple in all_related_triples:
-            if len(triple) == 2:
-                if triple[1][0].lower() in self.name_to_id:
-                    new_entities.add(triple[1][0])
-                if triple[1][2].lower() in self.name_to_id:
-                    new_entities.add(triple[1][2])
-            elif len(triple) == 3:
-                if triple[0].lower() in self.name_to_id:
-                    new_entities.add(triple[0])
-                if triple[2].lower() in self.name_to_id:
-                    new_entities.add(triple[2])
-        explored_entities = set(self.explored_entities)
-        new_entities -= explored_entities
-        self.records[-1]["new_entities"] = list(new_entities)
-
-        explored_entities.update(new_entities)
-        self.explored_entities = explored_entities
-        
-
-        all_related_triples = shorten_triple_list(all_related_triples, start_entities)
-
-        return convert_triples_to_str(all_related_triples)
-
-    def filter_relations(self, entity_name, relations, thought):
-        # logger.debug(f"{thought}\n{entity_name}")
-
-        prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/filter_relations")
-        prompt = format_prompt(prompt_path)
-        random.shuffle(relations)
-        relation_set = set(relations)
-        # relations = sorted(relations)
-        # logger.debug(f"original relations {relations}")
-
-        prompt = (
-            prompt + f"Thought: {thought}\n"
-            f"Entity: {entity_name}\n"
-            f"Relation: [{', '.join(relation_set)}]\n"
-            f"Answer: "
-        )
-        # print(f"Prompt: {prompt}")
-        response = run_llm(
-            prompt,
-            self.args.temperature,
-            self.args.max_length,
-            self.args.opeani_api_keys,
-            self.args.LLM_type,
-            stop=None,
-        )
-        # print("filtered_relations: " + response)
-        # filtered_relations = [rel.strip() for rel in filtered_relations.split(",")]
-        # TODO: could generate relations not appeared in the relation list
-        filtered_relations = parse_llm_output_to_list(response, sep=', ') if response else None
-        grounded_relations = []
-        for relation in filtered_relations:
-            if relation not in relation_set:
-                for gd_relation in relation_set:
-                    if relation in gd_relation:
-                        relation = gd_relation
-                        break
-            grounded_relations.append(relation)
-        filtered_relations = grounded_relations
-        filtered_relations = [
-            relation for relation in filtered_relations
-            if relation in relation_set
-        ]
-
-        if not filtered_relations:
-            # logger.warning(
-            #     f"Filtered relations for entity {entity_name} did not match candidates. "
-            #     f"LLM response: {response!r}, while len(relation_set) = {len(relation_set)}. Falling back to candidate relations."
-            # )
-            # return relations[:3]
-            filtered_relations = []
-        return filtered_relations
-
     def select_entity_id_by_types(self, question, entity_name, id_to_types):
         # Note: This method uses id_to_types which requires retrieve_id2types_by_name
         # That function is not available in the new KGInterface
@@ -777,27 +921,6 @@ class KGEnv:
         except Exception as e:
             logger.error(f"Failed to select entity ID: {e}. Returning entity_name as fallback")
             return entity_name
-
-    def sample_triples_by_relation(self, triples, filtered_relations):
-        # only remain related triples
-        relation_to_triples = defaultdict(list)
-        for triple in triples:
-            # print(f"Processing triple: {triple}")
-            if len(triple) == 2:
-                relation = triple[1][1]
-                if relation in filtered_relations:
-                    relation_to_triples[relation].append(triple)
-            elif len(triple) == 3:
-                relation = triple[1]
-                if relation in filtered_relations:
-                    relation_to_triples[relation].append(triple)
-
-        related_triples = []
-        for rel, triples in relation_to_triples.items():
-            if len(triples) >= 5:
-                relation_to_triples[rel] = random.sample(triples, k=5)
-            related_triples.extend(relation_to_triples[rel])
-        return related_triples
 
     def convert_name_to_id(self, entity_name):
         if entity_name.lower() in self.name_to_id:

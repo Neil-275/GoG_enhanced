@@ -4,7 +4,7 @@ from GoG.kg_interface import KGInterface
 from one_shot_subgraph.model import GNN_auto
 from one_shot_subgraph.PPR_sampler import pprSampler
 import os
-from gnn_config import nbfnet_config, one_shot_subgraph_config
+from gnn_config import one_shot_subgraph_config
 import types
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
@@ -86,7 +86,7 @@ class OneShotInterface:
         ).to(self.args.device)
         # print("HAHAHAHAHAAHAHAH")
         weight_path = self.args.checkpoint
-        # print("weight_path:", weight_path)
+        print("weight_path:", weight_path)
         if weight_path is not None:
 
             checkpoint = torch.load(weight_path, map_location=self.args.device)
@@ -175,6 +175,14 @@ class OneShotInterface:
         hid = _to_id(head, self.entity2id, 'entity')
         rid = _to_id(relation, self.relation2id, 'relation')
         # print("Entity ID for '13162':", _to_id('13162', self.entity2id, 'entity'))
+        # Two id spaces live in this method and must not be mixed up:
+        #   `base_rid` in [0, n_rel)   -> the graph space of `self.edge_index`,
+        #                                 which is snapshotted in assign_graph()
+        #                                 *before* inverse edges are appended.
+        #   `rid`      in [0, 2*n_rel) -> the model/sampler space, where the
+        #                                 inverse of r is a relation of its own.
+        # Rule: offset id -> model; base id + column choice -> graph.
+        base_rid = rid
         if direction == "incoming":
             rid = rid + self.kg.n_rel
         # print("rid:", rid)
@@ -188,8 +196,8 @@ class OneShotInterface:
         # if scoring_mode != 'local':
         #     values = self.model.inference(q_sub, q_rel, subgraph_data)
         #     maxx = values.max().item()
-        #     neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == rid)]
-        #     neighbors = np.concatenate([neighbors, self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == rid)]], axis=0)
+        #     neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == base_rid)]
+        #     neighbors = np.concatenate([neighbors, self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == base_rid)]], axis=0)
         #     ent_neighbors = set(neighbors[:, 2]).union(set(neighbors[:, 0])).difference({hid})
         #     if known and ent_neighbors:
         #         values[0, list(ent_neighbors)] = maxx + 1.0
@@ -224,10 +232,14 @@ class OneShotInterface:
             target_score = cand_scores[target_pos]
             rank = int((cand_scores > target_score).sum().item()) + 1
             return rank
-        if rid < self.n_rel:
-            neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == rid)]
+        # Look up edges that already exist in G_inc for this (head, relation,
+        # direction). `self.edge_index` is forward-only, so direction is
+        # expressed by which column `hid` is matched against -- never by an
+        # offset relation id, which cannot appear in this array.
+        if direction == "outgoing":
+            neighbors = self.edge_index[(self.edge_index[:, 0] == hid) & (self.edge_index[:, 1] == base_rid)]
         else:
-            neighbors = self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == rid)]
+            neighbors = self.edge_index[(self.edge_index[:, 2] == hid) & (self.edge_index[:, 1] == base_rid)]
         # print("neighbors: ", neighbors)
         # for neighbor in neighbors:
         #     print("Neighbor:", self.id2entity[int(neighbor[2])])

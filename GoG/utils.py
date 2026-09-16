@@ -313,9 +313,15 @@ def parse_generated_relations(text):
 def parse_json_list(text):
     response_text = text.strip()
 
+    parsed_response = None
     if response_text != "None":
-        if "[" in response_text and "]" in response_text:
+        fence_match = re.search(r"```(?:json)?\s*(.*?)\s*```", response_text, re.DOTALL | re.IGNORECASE)
+        if fence_match:
+            response_text = fence_match.group(1).strip()
+        elif "[" in response_text and "]" in response_text:
             response_text = response_text[response_text.index("["):response_text.rindex("]") + 1]
+        elif "{" in response_text and "}" in response_text:
+            response_text = response_text[response_text.index("{"):response_text.rindex("}") + 1]
 
         try:
             parsed_response = json.loads(response_text)

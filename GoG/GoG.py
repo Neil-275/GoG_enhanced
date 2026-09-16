@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
-
+import pickle as pkl
 from ast import literal_eval
 import multiprocessing
 from multiprocessing import Pool
@@ -156,7 +156,7 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
                 write_results(data, env, prediction, args)
                 continue
             prediction_pool = []
-            for _ in range(6):
+            for _ in range(args.max_steps):
                 i = len(env.records) + 1
 
                 n_calls += 1
@@ -206,16 +206,11 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
                 logger.debug(f"Thought {i}: {thought}")
                 logger.debug(f"Action {i}: {action}")
 
+                obs = None
                 if not args.ablate_collect:
-                    obs = None
-                    match = re.search(r"Collect(?:ed)?(\[.*\])", action)
-
-                    if match:
-                        logger.debug("Match  ", match)
-                        prediction = match.group(1)
-                        prediction_pool.extend(parse_llm_output_to_list(prediction))
-                        obs = f"Collected the answers: {prediction}"
-                        logger.info(f"Collected the answers: {prediction}")
+                    # Detect only -- the collect itself runs after the record is
+                    # appended, so KGEnv can attach its fan-out log to it.
+                    if re.search(r"Collect(?:ed)?(\[.*\])", action):
                         is_collect = 1
 
                 finish_match = re.search("Finish", action)
@@ -253,6 +248,15 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
                         # done = True
 
                 env.records.append({"i": i, "thought": thought, "action": action})
+
+                if is_collect:
+                    collected, collect_obs = env.collect_action(action)
+                    prediction_pool.extend(collected)
+                    logger.info(f"Collected the answers: {collected}")
+                    # A Finish on the same action keeps its own observation.
+                    if not done:
+                        obs = collect_obs
+
                 if done:
                     env.records[-1]["observation"] = obs
                     break
@@ -296,7 +300,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dataset",
         type=str,
-        default="brink_dataset/family/test_is_collect.tsv",
+        default="brink_dataset/family/test.tsv",
         help="choose the dataset.",
     )
     parser.add_argument(
@@ -342,10 +346,27 @@ if __name__ == "__main__":
     parser.add_argument("--no_kg", action="store_true")
     parser.add_argument("--output_dir", default="results")
     parser.add_argument("--max_n_expand", default=3)
-    parser.add_argument("--n_related_triples", type=int, default=10)
+    parser.add_argument("--n_related_triples", type=int, default=10,
+                        help="cap on observed (direct-edge) candidates shown per selected relation.")
+    parser.add_argument("--predict_topk", type=int, default=3,
+                        help="number of GNN-predicted candidates per selected relation.")
+    parser.add_argument("--max_selected_relations", type=int, default=3,
+                        help="cap on relations Propose may select per call; Predict runs once per relation.")
+    parser.add_argument("--max_steps", type=int, default=6,
+                        help="maximum Thought/Action/Observation iterations per question.")
+    parser.add_argument("--collect_fanout_max_hops", type=int, default=0,
+                        help="max relation-path length Collect will fan out over; 0 = unlimited "
+                             "(spec default). Set to 1 to fan out only 1-hop paths, which "
+                             "measured F1-positive on family where 2-hop did not.")
+    parser.add_argument("--collect_fanout_max_entities", type=int, default=0,
+                        help="if a fan-out frontier exceeds this many entities, fall back to "
+                             "single-entity collect; 0 = no cap (spec default). Safety valve "
+                             "for hub entities on fb15k_237 / wikidata5m.")
     parser.add_argument("--wiki", action="store_true")
     parser.add_argument("--wiki_num", default=3, type=int)
-    parser.add_argument("--prompt_dir", default='GoG/prompts_v3', type=str)
+    parser.add_argument("--prompt_dir", default='GoG/prompts_v4', type=str,
+                        help="prompts_v4 is the Propose/Collect/Finish set; prompts_v3 is the "
+                             "archived Search/Generate set and no longer matches the dispatcher.")
     parser.add_argument("--sc_num", type=int, default=1,
                         help="choose the number of self-consistency check.")
     parser.add_argument("--debug", action="store_true")
@@ -359,7 +380,10 @@ if __name__ == "__main__":
     # parser.add_argument("start_idx", type=int, default=0, help="the start index of the dataset to process.")
 
     args = parser.parse_args()
+    with open("sampled_args/sample_args_finetune_family_2.pkl", "wb") as f: 
+        pkl.dump(args, f)
 
+    exit(0)
     LOG_LEVEL = "DEBUG" if args.debug else "INFO"
     os.environ["LOG_LEVEL"] = LOG_LEVEL
     logger.remove()

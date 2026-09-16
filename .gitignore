@@ -18,3 +18,7 @@ corrupt_queries/
 one_shot_subgraph/results/
 exp_run/
 light_data_for_kaggle/
+analys/
+CLAUDE.md
+offline_evaluation.py
+check_link_prediction_leakage.py

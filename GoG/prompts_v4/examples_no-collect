@@ -1,0 +1,147 @@
+For every step, you must first generate a `Thought` that decomposes the current state of the question, followed immediately by exactly one `Action`.
+
+Your goal is to answer the question using entity IDs from the KG.
+
+## Actions
+
+### Propose[Current entity | Query]
+
+Examines one entity in the KG. It returns:
+
+* `Local context` — the relation types recorded around that entity, split into
+  outgoing and incoming. This shows you the shape of the graph around the
+  entity. It lists relation names only, not entities.
+* For each relation it judges relevant to your Query, two labelled groups:
+  * `(observed, direct edge)` — triples that are actually recorded in the KG.
+  * `(predicted, unverified)` — triples proposed by a link predictor. These are
+    not recorded in the KG. They are informed guesses about edges that may be
+    missing.
+
+Rules:
+
+* The first action must be `Propose` on the topic entity.
+* Propose takes exactly one entity. Do not pass several entities at once.
+* The Query must clearly state what information you want about that entity.
+* Do not repeat the same Propose with the same arguments.
+
+### Finish[Answer_1 | Answer_2 | ...]
+
+Concludes the task and returns the final answers.
+
+Rule:
+
+* Answers must match the exact entity id present in the observed or predicted triples. If no logical answer can be derived, output: Finish[unknown]. Separate multiple answers with a pipe character (|).
+
+## Choosing the next entity
+
+Each Propose gives you new entity IDs. The next entity you Propose on may be
+**any entity ID that has appeared anywhere earlier in this trajectory** — the
+topic entity, an entity from any previous Observation, or an entity you have
+already identified as an answer. You are not restricted to the most recent
+Observation. If an entity from an earlier step is the better lead, go back to it.
+
+Observed entities are stronger evidence for continuing exploration than
+predicted ones, because observed triples are recorded in the KG while predicted
+triples are not. Prefer to continue through an observed entity when one fits.
+Predicted entities are still usable when they match the question better than any
+observed entity — treat them as leads to be corroborated rather than as
+established facts.
+
+## Important Context
+
+* Each triple has the form `(subject, relation, object)`.
+* The relation is directed from subject to object. `X son_of Y` means X is the son of Y.
+* Entity labels are masked; reason from relations and graph structure only.
+* Do not try to identify real-world labels.
+* Do not repeat the same action with the same arguments.
+
+## Example 1:
+
+Question: Who is 262's child?
+Topic Entity: [262]
+
+Thought 1: I need to find the children of 262. A child of 262 would be recorded as someone who is a son or daughter of 262, so I should look at the relations around 262 that connect it to its children.
+Action 1: Propose[262 | who are the children of 262]
+
+Observation 1:
+Local context for 262:
+  outgoing: [son_of, father_of, uncle_of, nephew_of]
+  incoming: [son_of, wife_of, sister_of, aunt_of, uncle_of]
+
+Selected: son_of (incoming)
+  (observed, direct edge):     264, son_of, 262
+                               265, son_of, 262
+                               266, son_of, 262
+  (predicted, unverified):     263, son_of, 262
+                               132, son_of, 262
+
+Selected: father_of (outgoing)
+  (observed, direct edge):     262, father_of, 266
+  (predicted, unverified):     262, father_of, 265
+                               262, father_of, 264
+
+Thought 2: The observed triples show 264, 265 and 266 are each recorded as son_of 262, which directly answers the question. The father_of predictions point at the same entities, which is consistent. No further exploration is needed.
+Action 2: Finish[264 | 265 | 266]
+
+## Example 2:
+
+Question: Who is 2083's aunt?
+Topic Entity: [2083]
+
+Thought 1: I need to find the aunt of 2083. An aunt would be recorded as someone who is aunt_of 2083. If that edge is not recorded, I can instead reach an aunt through 2083's parents, since an aunt is a sister of a parent. I should look at 2083 and ask for both.
+Action 1: Propose[2083 | who is the aunt or the parent of 2083]
+
+Observation 1:
+Local context for 2083:
+  outgoing: [son_of, nephew_of, brother_of]
+  incoming: [father_of, mother_of, sister_of, uncle_of, brother_of]
+
+Selected: aunt_of (incoming)
+  (observed, direct edge):     none
+  (predicted, unverified):     2079, aunt_of, 2083
+                               1465, aunt_of, 2083
+                               1333, aunt_of, 2083
+
+Selected: father_of (incoming)
+  (observed, direct edge):     1335, father_of, 2083
+  (predicted, unverified):     1329, father_of, 2083
+
+Selected: sister_of (incoming)
+  (observed, direct edge):     2086, sister_of, 2083
+                               2087, sister_of, 2083
+  (predicted, unverified):     2081, sister_of, 2083
+
+Thought 2: No aunt_of edge is recorded for 2083, so the aunt is not directly observable. The predictor proposes 2079, 1465 and 1333, but these are unverified. There is a strong observed lead: 1335 is recorded as the father of 2083. An aunt of 2083 would be a sister of 1335, so I can test the predictions by examining 1335's sisters.
+Action 2: Propose[1335 | who are the sisters of 1335]
+
+Observation 2:
+Local context for 1335:
+  outgoing: [father_of, son_of, brother_of, husband_of, nephew_of]
+  incoming: [sister_of, daughter_of, son_of, wife_of, aunt_of]
+
+Selected: sister_of (incoming)
+  (observed, direct edge):     1465, sister_of, 1335
+                               2079, sister_of, 1335
+  (predicted, unverified):     1331, sister_of, 1335
+
+Selected: brother_of (outgoing)
+  (observed, direct edge):     1335, brother_of, 1333
+                               1335, brother_of, 1334
+  (predicted, unverified):     1335, brother_of, 1329
+
+Thought 3: 2079 is observed as a sister of 1335, and 1335 is observed as the father of 2083. A sister of a parent is an aunt, so 2079 is an aunt of 2083. 1333 was also predicted as an aunt, but 1333 is observed as a brother of 1335, so 1333 is an uncle and must be excluded. I can confirm 2079 using an entity from Observation 1 rather than the most recent one: 2087 was observed there as a sister of 2083, so 2087 shares the same aunts.
+Action 3: Propose[2087 | who is the aunt of 2087]
+
+Observation 3:
+Local context for 2087:
+  outgoing: [daughter_of, sister_of, niece_of, wife_of]
+  incoming: [aunt_of, father_of, mother_of, sister_of, uncle_of]
+
+Selected: aunt_of (incoming)
+  (observed, direct edge):     2079, aunt_of, 2087
+  (predicted, unverified):     1333, aunt_of, 2087
+
+Thought 4: 2079 is directly observed as the aunt of 2087, and 2087 is a sister of 2083, so 2079 is confirmed as an aunt of 2083. The other predicted candidates were ruled out.
+Action 4: Finish[2079]
+
+Here is the question.

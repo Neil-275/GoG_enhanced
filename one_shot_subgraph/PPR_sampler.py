@@ -89,7 +89,7 @@ class pprSampler():
         # Use matrix method for GPU acceleration if specified
         self.use_gpu_ppr = getattr(args, 'use_gpu_ppr', True)
         # Use localized k-hop PPR when a positive k is provided.
-        self.ppr_method = 'local_push' if self.args.local_ppr else ('matrix' if self.use_gpu_ppr else 'nx')
+        self.ppr_method = 'local_push' if hasattr(self.args, 'local_ppr') and self.args.local_ppr else ('matrix' if self.use_gpu_ppr else 'nx')
 
         
         if self.ppr_method == 'matrix':

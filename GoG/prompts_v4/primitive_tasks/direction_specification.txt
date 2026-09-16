@@ -8,19 +8,28 @@ Your task is to determine the direction of each relation with respect to E.
 
 + The relation you output must match the input string CHARACTER FOR CHARACTER.
 + The number of output entries must equal the number of input relations exactly.
-+ The neighboring relations describe the local structure around E. They are NOT 
-  candidate answers by themselves. Use them as structural evidence to help interpret 
++ The neighboring relations describe the local structure around E. They are NOT
+  candidate answers by themselves. Use them as structural evidence to help interpret
   the query and disambiguate similar candidate relations.
 
 Direction is defined relative to E:
 + Outgoing: E is the subject  →  pattern (E, relation, ?)
 + Incoming: E is the object   →  pattern (?, relation, E)
 
-To determine direction, read the FULL relation string as a single semantic unit.
-The final segment typically names the endpoint type — reason about whether E 
-fills the role of subject or object of that full-path meaning.
+Read the relation as a statement made by the subject about the object:
+`X son_of Y` means X is the son of Y. So the answer to "who are E's sons?" is
+the set of X with `X son_of E` — the pattern is (?, son_of, E), which is
+incoming. Decide which side E sits on before choosing the direction.
 
 Examples:
+
+Question: "Who is E's father?"
+Relation: father_of
+Pattern: (?, father_of, E)       Direction: incoming
+
+Question: "Who is E the father of?"
+Relation: father_of
+Pattern: (E, father_of, ?)       Direction: outgoing
 
 Question: "What is the position of player E?"
 Relation: position
@@ -30,13 +39,9 @@ Question: "Which player has position E?"
 Relation: position
 Pattern: (?, position, E)     Direction: incoming
 
-Question: "Who is E uncle of ?"
-Relation: parent
-Pattern: (E, uncle_of, ?)       Direction: outgoing
-
-Question: "Who has E as parent?"
-Relation: parent
-Pattern: (?, uncle_of, E)       Direction: incoming
+Question: "Who is E a nephew of?"
+Relation: nephew_of
+Pattern: (E, nephew_of, ?)       Direction: outgoing
 
 Output your answer as a JSON list. Each entry has the following keys:
 `relation`, `pattern`, `direction`

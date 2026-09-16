@@ -1,0 +1,61 @@
+You are given:
+
+* A query and its topic entity E.
+* A JSON list of relations that have already been selected as relevant to the query.
+
+Your task is to determine the direction of each relation with respect to E.
+
+IMPORTANT:
+
+* Preserve every relation string exactly as provided, character for character.
+* Do not modify, shorten, normalize, or reorder the relations.
+* The number and order of output entries must exactly match the input relation list.
+* Determine the direction from the query semantics and the full relation string.
+* Do not use external knowledge or assume graph facts that are not provided.
+
+Direction is defined relative to E:
+
+* `outgoing`: E is the subject of the triple.
+
+  Pattern: `(E, relation, ?)`
+
+* `incoming`: E is the object of the triple.
+
+  Pattern: `(?, relation, E)`
+
+Read the full relation string as a single semantic unit. For multi-segment relations, do not determine the direction from an isolated segment. Interpret the complete path and identify the role that E must fill for the relation to produce the information requested by the query.
+
+Examples:
+
+Question: "What is the position of player E?"
+Relation: `position`
+Pattern: `(E, position, ?)`
+Direction: `outgoing`
+
+Question: "Which player has position E?"
+Relation: `position`
+Pattern: `(?, position, E)`
+Direction: `incoming`
+
+Question: "Who is the parent of E?"
+Relation: `parent`
+Pattern: `(E, parent, ?)`
+Direction: `outgoing`
+
+Question: "Who has E as parent?"
+Relation: `parent`
+Pattern: `(?, parent, E)`
+Direction: `incoming`
+
+Output a JSON list only. Each entry must contain:
+
+* `relation`: the original relation string copied exactly from the input.
+* `pattern`: either `(E, relation, ?)` or `(?, relation, E)`.
+* `direction`: either `outgoing` or `incoming`.
+
+Question: {thought}
+
+Topic entity: {topic_entity}
+
+Relations:
+{selected_relations}

@@ -1,0 +1,30 @@
+You are given:
+- A query containing an entity E.
+- Relevance-filtered outgoing neighboring relations connected from E.
+- Relevance-filtered incoming neighboring relations connected to E.
+- A list of candidate relations seperated by commas
+
+Your task is to select up to 3 relations from the candidate list that could answer the query.
+Select none if no candidate relation is relevant to the query.
+
+IMPORTANT:
++ Select fewer relations when fewer are relevant. Selecting a relation that is
+  not relevant to the query wastes a prediction and adds noise to the evidence.
++ Order matters: put the relation most likely to answer the query first.
++ A relation may be worth selecting even if it does not appear in the
+  neighboring relations. Those relations describe what is already recorded
+  around E, and the query may concern a relation that is missing.
++ The neighboring relations describe the local structure around E. They are NOT
+  candidate answers by themselves. Use them as structural evidence to help interpret
+  the query and disambiguate similar candidate relations.
++ Return relations that appear verbatim in the Relation list
+
+Output your answer as a JSON list. Each entry has the following key:
+`relation`
+Return an empty list `[]` if no candidate relation is relevant.
+
+Query: {thought}
+Outgoing neighboring relations: {outgoing_neighboring_relations}
+Incoming neighboring relations: {incoming_neighboring_relations}
+Candidate relations:
+{candidate_relations}

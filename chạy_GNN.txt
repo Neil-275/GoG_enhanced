@@ -1,0 +1,37 @@
+
+cd one_shot_subgraph
+
+Pretrain:
+Family:
+python train_auto.py \
+ --data_path ../data_for_LP/id_processed/family \
+--output_dir ../data_for_LP/id_processed/family/pretrain_model \
+--local_ppr \
+--cpu 3
+FB15K_237
+python train_auto.py \
+ --data_path ../data_for_LP/id_processed/fb15k_237 \
+--output_dir ../data_for_LP/id_processed/fb15k_237/pretrain_model
+
+Wikidata5m:
+python train_auto.py \
+ --data_path ../data_for_LP/id_processed/wikidata5m \
+--output_dir ../data_for_LP/id_processed/wikidata5m/pretrain_model \
+--local_ppr \
+--brink \
+--cpu 2 \
+-- topic_ent_file ../data_for_LP/id_processed/wikidata5m/topic_entities.txt
+
+Finetune: 
+Family:
+python train_auto.py \
+--data_path ../data_for_LP/id_processed/family \
+--output_dir ../data_for_LP/id_processed/family/finetune_model \
+--weight ../data_for_LP/id_processed/family/pretrain_model/pretrain_model.pt \
+--brink
+FB15K_237:
+python train_auto.py \
+ --data_path ../data_for_LP/id_processed/fb15k_237 \
+--output_dir ../data_for_LP/id_processed/fb15k_237/finetune_model \
+--weight ../data_for_LP/id_processed/fb15k_237/pretrain_model/pretrain_model.pt \
+--brink

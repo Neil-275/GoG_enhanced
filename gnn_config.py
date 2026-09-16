@@ -23,7 +23,7 @@ one_shot_subgraph_config: dict = {
             # "n_ent": 
             "add_manual_edges": False,
             "use_gpu_ppr": True,
-            "n_layer": 8,
+            "n_layer": 5,
             "hidden_dim": 64,
             "attn_dim": 4,
             "dropout": 0.0,
@@ -37,7 +37,8 @@ one_shot_subgraph_config: dict = {
             "add_inverse_edges": True,
             "add_idd_edges": True,
             # "checkpoint": "data_for_LP/id_processed/family/saveModel/topk_0.1_layer_8_ValMRR_0.462.pt",
-            "checkpoint": "data_for_LP/id_processed/family/finetuneModel/epoch_3_ValMRR_0.746.pt",
+            # "checkpoint": "data_for_LP/id_processed/family/finetuneModel/epoch_3_ValMRR_0.746.pt",
+            "checkpoint": "data_for_LP/weights/family/brink_only_layer_5.pt"
         },
     },
     "fb15k_237": {
@@ -62,7 +63,8 @@ one_shot_subgraph_config: dict = {
             "add_inverse_edges": True,
             "add_idd_edges": True,
             # "checkpoint": "data_for_LP/id_processed/fb15k_237/saveModel/topk_0.1_layer_8_ValMRR_0.423.pt"
-            "checkpoint": "data_for_LP/id_processed/fb15k_237/finetuneModel/epoch_3_ValMRR_0.568.pt"
+            # "checkpoint": "data_for_LP/id_processed/fb15k_237/finetuneModel/epoch_3_ValMRR_0.568.pt"
+            "checkpoint": "data_for_LP/weights/fb15k_237/pretrain_layer_5.pt"
         },
     },
     "wikidata5m": {

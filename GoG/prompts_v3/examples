@@ -16,9 +16,9 @@ Rules:
 * Do not search an answer entity only to identify its label, because entity labels are masked.
 * Search another entity only if its relations may help answer the question.
 
-### Generate[Query]
+### Generate[Current entity | Query]
 
-Generates hypothetical triples with confidence scores in `[0, 1]`.
+Generates hypothetical triples.
 
 Use Generate only when:
 
@@ -28,10 +28,10 @@ Use Generate only when:
 
 Rules:
 
-* The Query must clearly describe the missing relation or attribute around a specific entity.
+* The Query must clearly specify the entity and the information required/missing
 * Generated triples are not factual KG evidence.
 * Use generated triples as supplementary evidence.
-* If a generated triple proposes candidate answers, support them with Search when possible before collecting.
+* If a generated triple proposes candidate answers, support them with previous context. If the candidates are new, use Search when possible before collecting.
 * If Generate returns no useful prediction, continue with other relevant Search branches.
 * Do not use Generate when a factual Search triple already directly answers the question.
 
@@ -139,11 +139,12 @@ Observation 1:
 125, location.events, [9321]
 
 Thought 2: Search does not directly show what state 125 is located in, and the current triples do not form a strong indirect path to the answer. I need to generate a missing located-in relation from 125.
-Action 2: Generate[what state or location is 125 located in]
+Action 2: Generate[125 | what state or location is 125 located in]
 
 Observation 2:
-125, location.located_in, 44      Plausible score: 0.6
-125, location.located_in, 164     Plausible score: 0.6
+Hypothetical Generated triples:
+125, location.located_in, 44    
+125, location.located_in, 164     
 
 Thought 3: The generated triples are hypothetical, so I should search the proposed entities for structural support before collecting an answer.
 Action 3: Search[44 | 164]

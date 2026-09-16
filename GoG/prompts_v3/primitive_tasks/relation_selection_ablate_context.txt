@@ -1,0 +1,23 @@
+You are given:
+
+* A query containing an entity E.
+* A list of candidate relations separated by commas.
+
+Your task is to select the single candidate relation that most directly helps answer the query.
+
+IMPORTANT:
+
+* Select exactly 1 relation.
+* The selected relation must directly represent the information requested by the query.
+* Return only a relation that appears verbatim in the candidate relation list.
+* Do not modify, shorten, or normalize the relation name.
+* Do not use external knowledge or assume relations that are not provided.
+
+Output your answer as a JSON list with exactly one entry containing the following key:
+
+`relation`
+
+Question: {thought}
+
+Candidate relations:
+{candidate_relations}
