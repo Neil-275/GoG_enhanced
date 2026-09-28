@@ -1,6 +1,15 @@
 import torch
 import torch.nn as nn
-from torch_scatter import scatter
+try:
+    from torch_scatter import scatter
+except ImportError:
+    def scatter(src, index, dim=0, dim_size=None, reduce='sum'):
+        """Small sum-scatter fallback for environments without torch-scatter."""
+        if dim != 0 or reduce != 'sum':
+            raise NotImplementedError('fallback scatter supports dim=0, reduce=sum only')
+        size = int(dim_size) if dim_size is not None else int(index.max()) + 1
+        out = src.new_zeros((size,) + src.shape[1:])
+        return out.index_add_(0, index, src)
 
 class GNNLayer(torch.nn.Module):
     def __init__(self, in_dim, out_dim, attn_dim, n_rel, act=lambda x:x):
@@ -23,7 +32,10 @@ class GNNLayer(torch.nn.Module):
         rel = edges[:,1]
         obj = edges[:,2]
         hs = hidden[sub]
-        hr = self.rela_embed(rel) # relation embedding of each edge
+        # Manual sampler edges use two structural relation IDs beyond the learned
+        # relation table. Map them to the existing structural/self-loop embedding
+        # so checkpoint parameter shapes remain unchanged.
+        hr = self.rela_embed(rel.clamp_max(2 * self.n_rel)) # relation embedding of each edge
         h_qr = self.rela_embed(q_rel)[r_idx] # use batch_idx to get the query relation
         
         # message aggregation
@@ -69,7 +81,8 @@ class GNN_auto(torch.nn.Module):
     def forward(self, q_sub, q_rel, subgraph_data, mode='train'):
         ''' forward with extra propagation '''
         n = len(q_sub)
-        batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_sampled_edges = subgraph_data
+        batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_sampled_edges = subgraph_data[:5]
+        node_ptr = subgraph_data[5] if len(subgraph_data) > 5 else None
         n_node = len(batch_idxs)
         param = next(self.parameters())
         h0 = torch.zeros((1, n_node, self.hidden_dim), device=param.device, dtype=param.dtype)
@@ -109,7 +122,13 @@ class GNN_auto(torch.nn.Module):
             if self.params.concatHidden: hidden = torch.cat(hidden_list, dim=-1)
             scores = torch.sum(hidden * hidden[query_sub_idxs][batch_idxs], dim=-1)
         
-        # re-indexing
+        if getattr(self.params, 'local_ppr', False):
+            if node_ptr is None:
+                counts = torch.bincount(batch_idxs, minlength=n)
+                node_ptr = torch.cat((counts.new_zeros(1), counts.cumsum(0)))
+            return {'node_scores': scores, 'abs_idxs': abs_idxs, 'node_ptr': node_ptr}
+
+        # legacy dense re-indexing
         scores_all = scores.new_zeros((n, self.params.n_ent))
         scores_all[batch_idxs, abs_idxs] = scores
 
@@ -137,19 +156,31 @@ class GNN_auto(torch.nn.Module):
         if isinstance(q_rel, torch.Tensor):
             q_rel = q_rel.to(device)
 
-        batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_sampled_edges = subgraph_data
+        batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_sampled_edges = subgraph_data[:5]
+        node_ptr = subgraph_data[5] if len(subgraph_data) > 5 else None
         batch_idxs = batch_idxs.to(device)
         abs_idxs = abs_idxs.to(device)
         query_sub_idxs = query_sub_idxs.to(device)
         edge_batch_idxs = edge_batch_idxs.to(device)
         batch_sampled_edges = batch_sampled_edges.to(device)
 
-        scores_all = self.forward(
+        output = self.forward(
             q_sub,
             q_rel,
-            (batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_sampled_edges),
+            (batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_sampled_edges, node_ptr),
             mode='test',
         )
         if topk is None:
-            return scores_all
-        return torch.topk(scores_all, k=topk, dim=1)
+            return output
+        if isinstance(output, dict):
+            all_values, all_ids = [], []
+            for i in range(len(output['node_ptr']) - 1):
+                start, end = int(output['node_ptr'][i]), int(output['node_ptr'][i + 1])
+                scores, ids = output['node_scores'][start:end], output['abs_idxs'][start:end]
+                order = sorted(range(len(scores)), key=lambda j: (-float(scores[j]), int(ids[j])))
+                take = torch.as_tensor(order[:min(int(topk), len(order))], device=scores.device)
+                all_values.append(scores[take]); all_ids.append(ids[take])
+            if len(all_values) == 1:
+                return all_values[0].unsqueeze(0), all_ids[0].unsqueeze(0)
+            return all_values, all_ids
+        return torch.topk(output, k=min(int(topk), output.shape[1]), dim=1)

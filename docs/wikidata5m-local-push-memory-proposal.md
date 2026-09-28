@@ -137,7 +137,7 @@ Do not equate score zero with a missing candidate. Sampled nodes can legitimatel
 
 Candidate-only ranks are a different metric. They should not be presented as full-vocabulary filtered MRR. In particular, optimistic zero-score ties can make missing answers look deceptively strong; report answer coverage alongside ranking metrics.
 
-For inference, global top-k must also account for implicit zero scores: unsampled zeros can outrank negative sampled scores. Preserve that behavior with a bounded selection of eligible unsampled IDs and a defined tie rule. Returning only sampled candidates should be an explicit alternative API. Retain dense output only as an explicit compatibility option for callers that require it.
+For inference, use candidate-only top-k over sampled nodes. Return their original global entity IDs through `abs_idxs`; local indices must never escape the model/sampler boundary. This deliberately avoids arbitrary unsampled zero-score entities when sampled scores are negative. It changes inference ranking semantics from the dense global tensor, so document it in the API and report candidate coverage separately. Exact implicit-global top-k and dense output are outside the first implementation.
 
 ### 7. Restrict preprocessing and manage cache validity
 
@@ -173,15 +173,115 @@ After establishing the compact global-scoring baseline, candidate-only softmax c
 
 The current `scoring_mode='local'` branch is not ready to enable: it expects candidate scores, an `OTHER` logit, and a six-element subgraph contract, while the model and preparation path supply different outputs. It also leaves later training code dependent on `pos_scores` from the global branch. Complete and validate that path before using it.
 
-## Implementation stages and acceptance criteria
+## Implementation plan
 
-1. **Compact sampling:** retain sparse PPR support, add absolute budgets, and replace dense node maps. Verify head inclusion, deterministic ties, empty support, candidate membership, endpoint remapping, and bounded sample sizes.
-2. **Compact evaluation labels:** change loader, collation, preparation, and evaluator together. Verify multi-answer queries, inverse queries, and unchanged target/filter membership.
-3. **Compact global scoring:** change model output, loss, ranking, and inference consumers. Compare against an explicit dense reference on small synthetic graphs. Check losses and gradients with a correctly shaped reference; test missing targets, negative and zero scores, filtered unsampled entities, ties, and `K = N`.
-4. **Cache lifecycle:** align selected heads and cache coverage, define graph update policy, and verify stale caches are rejected or regenerated.
-5. **Benchmark:** compare configurations on a fixed query set and graph. Record CPU/GPU peak memory, sampling and batch latency, local-push support size, sampled nodes/edges, answer coverage, MRR, and Hits@K.
+### Locked decisions and compatibility boundary
 
-Acceptance requires no per-query length-`N` PPR vectors, node maps, answer vectors, or filter vectors in the local-push path, and no `[B, N]` tensors in normal training/evaluation. For fixed sampled graphs, compact loss and ranking must match their intended dense reference within numerical tolerance. Benchmark any candidate-selection changes separately because they can affect quality.
+The first implementation applies only when `--local_ppr` is enabled. Matrix and NetworkX PPR retain their current fractional `topk`/`topm`, dense score, and inference behavior so existing small-dataset experiments remain usable. The local-push path uses these defaults:
+
+```text
+max_nodes_per_query = 1024
+max_edges_per_query = 10000
+local_ppr_alpha = 0.85
+local_ppr_epsilon = 1e-6
+```
+
+Add corresponding CLI arguments to training, HPO, and standalone inference entry points. Positive absolute limits take precedence in local-push mode; `topk` and `topm` remain accepted but are ignored there with one startup message. Reject non-positive node limits and edge limits other than `-1` or a positive integer. Use `-1` to disable the edge cap explicitly.
+
+Local-push training uses a frozen fact graph. If `--local_ppr` is combined with training-time fact reshuffling, fail at startup with a clear message requiring `not_shuffle_train=True`. Do not silently reuse PPR computed for a different graph. Checkpoints remain compatible because model parameter shapes and names do not change.
+
+### Phase 1: compact local-push sampling and cache lifecycle
+
+Implement a local-push-specific compact path in `PPR_sampler.py`:
+
+1. Represent PPR output as aligned `int64` global entity IDs and `float32` scores. `getPPRscores` converts legacy dictionary/tuple/dense cache payloads to that compact in-memory form without allocating a length-`N` array. New local-push cache files store versioned compact arrays.
+2. Select up to `max_nodes_per_query` positive-score nodes using the order `(score descending, global ID ascending)`. Reserve a slot for the query head, insert it if absent, deduplicate IDs, then sort selected global IDs ascending for deterministic local indexing. If `cand` is supplied, pin the requested candidate after the head and fill remaining slots by PPR rank; reject a candidate outside `[0, N)`.
+3. Build the induced edge set from those IDs. When it exceeds `max_edges_per_query`, retain edges by `(PPR(head) + PPR(tail)) descending`, then `(head, relation, tail)` ascending. Add manual edges only after ordinary-edge truncation and include them in the final 10,000-edge limit by reserving their required capacity; reject configurations where mandatory manual edges alone exceed the limit.
+4. Replace the dense global-to-local vector with `searchsorted` over the sorted selected IDs. Validate every retained endpoint before remapping. Store edges with local endpoints immediately so batching only adds an offset and never mutates global/cached edge tensors.
+5. Change one-subgraph output to `(global_node_ids, local_edges, query_local_idx)`. Change batched output to `(batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_edges, node_ptr)`, where `node_ptr` has `B + 1` entries and `abs_idxs` always contains original global IDs.
+
+For local-push mode, compute cache misses lazily in `getPPRscores`. If `topic_ent_file` is supplied, retain eager parallel preprocessing for that finite list; otherwise do not enumerate all entities at sampler construction. Use a versioned directory derived from split, PPR parameters, and a SHA-256 fingerprint of canonical CSR adjacency arrays plus `N`; old cache directories remain untouched. Write one metadata JSON file with schema version, fingerprint, entity count, alpha, epsilon, and algorithm name. Atomic per-head writes use a temporary file followed by rename so interrupted jobs cannot leave valid-looking partial entries.
+
+The train and test samplers have independent graph fingerprints and cache namespaces. `updateEdges` raises in local-push mode because the selected frozen-graph policy makes an in-place graph replacement invalid. Add cache hit/miss and PPR support-size counters for benchmark output; a process-local LRU is optional only after profiling and is not required for correctness.
+
+### Phase 2: compact labels and batch/device contract
+
+Update `load_data.py` so training samples continue to return one global target ID, while validation/test samples return a one-dimensional tensor of global answer IDs. In `collate_fn`, stack training targets but retain evaluation answers as a list of variable-length tensors. Append `node_ptr` to the sampler fields returned by the collator.
+
+Update `BaseModel.prepareData` to branch on target representation: move the stacked training target tensor to the model device, and preserve evaluation answers as per-query ID tensors. Move only tensors needed by GNN propagation to the model device. Keep `abs_idxs` and `node_ptr` available to all loss, evaluation, and inference consumers. Use device-neutral `.to(device)` calls rather than hardcoded `.cuda()` so CPU tests and inference remain valid.
+
+The invariant at this boundary is: entity IDs are global in targets and `abs_idxs`; edge endpoints and `query_sub_idxs` are batch-local; `node_ptr[i]:node_ptr[i+1]` selects exactly query `i`'s nodes and scores.
+
+### Phase 3: compact model output and global training objective
+
+In local-push mode, `GNN_auto.forward` stops creating `scores_all`. It returns a mapping with:
+
+```python
+{
+    "node_scores": Tensor[sum_K],
+    "abs_idxs": LongTensor[sum_K],
+    "node_ptr": LongTensor[B + 1],
+}
+```
+
+Keep the existing dense tensor return for non-local PPR modes. Add small shared helpers in `base_model.py` to find a global ID within one query segment, calculate compact global-softmax loss, and calculate filtered rank. Avoid duplicating this logic across train/validation/test loops.
+
+For each training query, compute the exact implicit-global loss for the sampled graph:
+
+```text
+sampled_log_Z = logsumexp(sampled_scores)
+outside_log_Z = log(N - K), or -infinity when K == N
+log_Z = logaddexp(sampled_log_Z, outside_log_Z)
+target_score = sampled score if target is present, otherwise 0
+query_loss = log_Z - target_score
+batch_loss = sum(query_loss)
+```
+
+Assert unique `abs_idxs` per segment and `0 < K <= N`. Determine answer coverage by target-ID membership, never by `target_score == 0`. Remove the unfinished `scoring_mode='local'`/`OTHER` branch from this execution path; candidate-only inference does not change the global training objective.
+
+### Phase 4: compact filtered evaluation
+
+Unify train/validation/test rank calculation around one helper. Given query segment `C`, answer `t`, and unique filter set `F`, use strict-greater ranking to match the current evaluator:
+
+```text
+target_score = sampled score for t, or 0 when t is outside C
+sampled_higher = count(v in C and v not in F where score(v) > target_score)
+outside_unfiltered = N - |C| - |F outside C|
+rank = 1 + sampled_higher + outside_unfiltered * indicator(0 > target_score)
+```
+
+Validate and deduplicate filter IDs before counting them, and ignore IDs outside `[0, N)`. Evaluate every answer ID in a multi-answer query. Preserve existing MRR/Hits calculations and optional mean-rank collection. Add candidate answer coverage to the evaluation output for train, validation, and test. Remove dense label, filter, and score allocations from the local-push branch.
+
+### Phase 5: candidate-only inference with stable global IDs
+
+Make local-push `GNN_auto.inference` return the compact mapping. Update `BaseModel.predict_topk`, `one_shot_subgraph/inference_engine.py`, and `GoG/gnn_interface.py` to select top-k only within each sampled segment and map positions through `abs_idxs`.
+
+Preserve each wrapper's external return type: score/ID wrappers return scores plus global integer entity IDs, while the GoG wrapper resolves those global IDs through `id2entity`. Cap requested `k` at candidate count and return an empty result only for an empty segment, which should be impossible because the query head is mandatory. Resolve equal scores by global entity ID ascending. Known-neighbor promotion/filtering in the GoG wrapper continues to operate on global IDs after candidate extraction.
+
+Update CLI help and inference docstrings to state that local-push top-k is candidate-only. Add `max_nodes_per_query`, `max_edges_per_query`, alpha, and epsilon to inference configuration so it uses the same sampling contract as training. Local indices remain internal and are never serialized or returned.
+
+### Phase 6: tests and benchmarking
+
+Add focused pytest coverage under `tests/one_shot_subgraph/` using small synthetic graphs:
+
+- Sparse cache conversion, lazy cache miss, version/fingerprint isolation, truncated-cache recovery, and refusal to update a frozen local-push graph.
+- Deterministic candidate and edge selection; query-head and pinned-candidate inclusion; empty support; isolated heads; invalid candidates; manual-edge capacity; unique nodes; and correct local endpoint remapping.
+- Collation of variable-length multi-answer labels and exact `node_ptr`, `abs_idxs`, batch offsets, and device behavior on CPU and CUDA when available.
+- Compact loss values and gradients versus a correctly shaped dense reference for present/missing targets, negative/zero scores, `K=1`, and `K=N`.
+- Compact filtered ranks versus a dense strict-greater reference, including filtered IDs inside/outside the sample, zero-score ties, missing answers, duplicate filters, and multi-answer queries.
+- Candidate-only inference returns original global IDs, deterministic ties, fewer than requested candidates, and correct GoG name resolution/filtering.
+- Non-local PPR smoke tests confirm the legacy five-field subgraph contract and dense model output still work.
+
+Add a Wikidata5m benchmark command or script that records peak host/GPU memory, PPR cache hit rate, support-size percentiles, sampled node/edge percentiles, sampler and batch latency, answer coverage, MRR, and Hits@1/10. Run the fixed 1,024/10,000 baseline on a fixed query subset and compare it with at least 256/2,500, 512/5,000, and 2,048/20,000. Store the command, graph fingerprint, query IDs or query-file fingerprint, seed, and all PPR parameters with the results.
+
+Acceptance requires:
+
+- No per-query length-`N` PPR vectors, node maps, answer vectors, or filter vectors in local-push mode.
+- No `[B, N]` score tensor in local-push training, evaluation, or inference.
+- Compact loss and filtered ranks match dense references within numerical tolerance for identical sampled graphs.
+- Inference returns unchanged global entity IDs and never exposes local indices.
+- Peak memory stays within the selected 1,024-node/10,000-edge bound apart from shared graph storage and model activations.
+- Existing checkpoints load without parameter migration, and non-local PPR behavior passes regression smoke tests.
 
 ## References
 

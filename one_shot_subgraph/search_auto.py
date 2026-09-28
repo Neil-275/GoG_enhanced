@@ -48,6 +48,14 @@ parser.add_argument('--search', action='store_true')
 parser.add_argument('--finetune', action='store_true')
 parser.add_argument('--finetune_config', type=str, default='')
 parser.add_argument('--not_shuffle_train', action='store_true')
+parser.add_argument('--local_ppr', action='store_true')
+parser.add_argument('--max_nodes_per_query', type=int, default=1024)
+parser.add_argument('--max_edges_per_query', type=int, default=10000)
+parser.add_argument('--local_ppr_alpha', type=float, default=0.85)
+parser.add_argument('--local_ppr_epsilon', type=float, default=1e-6)
+parser.add_argument('--drop_graph', action='store_true')
+parser.add_argument('--brink', action='store_true')
+parser.add_argument('--topic_ent_file', default=None)
 args = parser.parse_args()
 
 if __name__ == '__main__':
@@ -90,8 +98,10 @@ if __name__ == '__main__':
     test_loader = DataLoader(args, mode='test')
     args.n_ent = loader.n_ent
     args.n_rel = loader.n_rel
-    args.n_samp_ent = int(args.topk * loader.n_ent)
-    args.n_samp_edge = int(args.topm * len(loader.fact_data)) if args.topm > 0  else -1
+    if args.local_ppr and not args.not_shuffle_train:
+        parser.error('--local_ppr requires --not_shuffle_train (frozen fact graph)')
+    args.n_samp_ent = args.max_nodes_per_query if args.local_ppr else int(args.topk * loader.n_ent)
+    args.n_samp_edge = args.max_edges_per_query if args.local_ppr else (int(args.topm * len(loader.fact_data)) if args.topm > 0 else -1)
     
     # sampler for testing
     test_data = loader.double_triple(loader.all_triple)
@@ -222,6 +232,5 @@ if __name__ == '__main__':
             print(idx, param)
             if idx == -1: break
             run_model(param, finetune_idx=idx)
-
 
 

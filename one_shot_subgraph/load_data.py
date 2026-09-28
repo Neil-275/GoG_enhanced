@@ -119,8 +119,11 @@ class DataLoader(Dataset):
                 query, answer = self.test_q, self.test_a
             sub, rel = query[idx]
             sub, rel = torch.LongTensor([sub]), torch.LongTensor([rel])
-            obj = torch.zeros((self.n_ent)).long()
-            obj[answer[idx]] = 1
+            if self.sampler.ppr_method == 'local_push':
+                obj = torch.as_tensor(answer[idx], dtype=torch.long)
+            else:
+                obj = torch.zeros((self.n_ent), dtype=torch.long)
+                obj[answer[idx]] = 1
                     
         # subgraph sampling
         subgraph = self.getOneSubgraph(int(sub))
@@ -129,14 +132,16 @@ class DataLoader(Dataset):
     def collate_fn(self, data):
         subs = torch.stack([_[0] for _ in data], dim=0)
         rels = torch.stack([_[1] for _ in data], dim=0)
-        objs = torch.stack([_[2] for _ in data], dim=0)
+        if self.mode == 'train' or self.sampler.ppr_method != 'local_push':
+            objs = torch.stack([_[2] for _ in data], dim=0)
+        else:
+            objs = [_[2] for _ in data]
         subgraph_list = [_[3] for _ in data]
         batch_subgraph = self.getBatchSubgraph(subgraph_list)
         
         # NOTE: we can not return sparse tensor here
         # thus, we return its indices and values which are dense tensor.
-        batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_sampled_edges = batch_subgraph
-        return subs, rels, objs, batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_sampled_edges
+        return (subs, rels, objs, *batch_subgraph)
 
     def read_triples(self, filename):
         triples = []

@@ -108,6 +108,11 @@ class OneShotInterface:
             self.args.add_manual_edges = False
         if not hasattr(self.args, 'use_gpu_ppr'):
             self.args.use_gpu_ppr = True
+        self.args.local_ppr = bool(getattr(self.args, 'local_ppr', False))
+        self.args.max_nodes_per_query = int(getattr(self.args, 'max_nodes_per_query', 1024))
+        self.args.max_edges_per_query = int(getattr(self.args, 'max_edges_per_query', 10000))
+        self.args.local_ppr_alpha = float(getattr(self.args, 'local_ppr_alpha', 0.85))
+        self.args.local_ppr_epsilon = float(getattr(self.args, 'local_ppr_epsilon', 1e-6))
         
 
         self.topk_ratio = float(getattr(self.args, 'topk', 0.1))
@@ -135,8 +140,8 @@ class OneShotInterface:
             idd = np.stack([np.arange(self.n_ent), 2 * self.n_rel * np.ones(self.n_ent), np.arange(self.n_ent)], axis=1)
             edge_index = np.concatenate([edge_index, idd.astype(np.int64)], axis=0)
 
-        n_samp_ent = int(max(1, round(self.topk_ratio * self.n_ent)))
-        n_samp_edge = int(self.topm_ratio * edge_index.shape[0]) if self.topm_ratio > 0 else -1
+        n_samp_ent = self.args.max_nodes_per_query if self.args.local_ppr else int(max(1, round(self.topk_ratio * self.n_ent)))
+        n_samp_edge = self.args.max_edges_per_query if self.args.local_ppr else (int(self.topm_ratio * edge_index.shape[0]) if self.topm_ratio > 0 else -1)
         self.args.n_samp_ent = n_samp_ent
         self.args.n_samp_edge = n_samp_edge
         homo_edges = list(set([(int(h), int(t)) for (h, _, t) in edge_index]))
