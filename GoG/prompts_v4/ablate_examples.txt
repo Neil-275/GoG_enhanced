@@ -11,11 +11,28 @@ Examines one entity in the KG. It returns:
 * `Local context` — the relation types recorded around that entity, split into
   outgoing and incoming. This shows you the shape of the graph around the
   entity. It lists relation names only, not entities.
-* For each relation it judges relevant to your Query, two labelled groups:
-  * `(observed, direct edge)` — triples that are actually recorded in the KG.
+* For each relation it judges relevant to your Query, labelled groups:
+  * `(observed, outgoing)` — recorded triples where the entity is the subject.
+  * `(observed, incoming)` — recorded triples where the entity is the object.
+    Both directions are always reported when they exist, so a relation may
+    appear twice under one `Selected:` heading. A direction with nothing new to
+    show is omitted; when neither direction has anything new, a single
+    `(observed): No new edges retrieved` line appears instead.
   * `(predicted, unverified)` — triples proposed by a link predictor. These are
     not recorded in the KG. They are informed guesses about edges that may be
     missing.
+
+  Entities are listed in brackets on the side of the triple they occupy, so
+  `262, son_of, [264, 265]` means both 264 and 265 are sons of 262, while
+  `[264, 265], son_of, 262` means 262 is a son of both. Read the bracket
+  position to know which side the entities are on.
+
+  The same entity id may appear under both an observed and a predicted group
+  for one relation. That is not a duplicate: it means one direction of that
+  edge is recorded and the opposite direction is only a guess.
+
+  Only edges you have not already been shown are reported. Proposing again on
+  the same entity and relation surfaces further edges, not the same ones.
 
 Rules:
 
@@ -97,19 +114,16 @@ Local context for 262:
   outgoing: [son_of, father_of, uncle_of, nephew_of]
   incoming: [son_of, wife_of, sister_of, aunt_of, uncle_of]
 
-Selected: son_of (incoming)
-  (observed, direct edge):     264, son_of, 262
-                               265, son_of, 262
-                               266, son_of, 262
-  (predicted, unverified):     263, son_of, 262
-                               132, son_of, 262
+Selected: son_of
+  (observed, outgoing):        262, son_of, [132, 134]
+  (observed, incoming):        [264, 265, 266], son_of, 262
+  (predicted, unverified):     [263, 132], son_of, 262
 
-Selected: father_of (outgoing)
-  (observed, direct edge):     262, father_of, 266
-  (predicted, unverified):     262, father_of, 265
-                               262, father_of, 264
+Selected: father_of
+  (observed, outgoing):        262, father_of, [266]
+  (predicted, unverified):     262, father_of, [265, 264]
 
-Thought 2: The observed triples show 264, 265 and 266 are each recorded as son_of 262, which directly answers the question. The father_of predictions point at the same entities, which is consistent, but the observed son_of edges are already sufficient. I should collect all three.
+Thought 2: The son_of groups point in opposite directions and only one of them answers the question. The outgoing group says 262 is a son of 132 and 134 — those are 262's own parents, not its children, so I ignore them. The incoming group says 264, 265 and 266 are each a son of 262, which is what I asked for. Among the predictions, 132 is already recorded as someone 262 is a son of, so predicting it as a child of 262 as well would make 132 both parent and child — I discard it. The father_of predictions point at 264 and 265, which is consistent with the observed son_of edges, but those edges are already sufficient. I should collect all three.
 Action 2: Collect[264 | 265 | 266]
 
 Observation 2:
@@ -131,20 +145,17 @@ Local context for 2083:
   outgoing: [son_of, nephew_of, brother_of]
   incoming: [father_of, mother_of, sister_of, uncle_of, brother_of]
 
-Selected: aunt_of (incoming)
-  (observed, direct edge):     none
-  (predicted, unverified):     2079, aunt_of, 2083
-                               1465, aunt_of, 2083
-                               1333, aunt_of, 2083
+Selected: aunt_of
+  (observed):                  No new edges retrieved
+  (predicted, unverified):     [2079, 1465, 1333], aunt_of, 2083
 
-Selected: father_of (incoming)
-  (observed, direct edge):     1335, father_of, 2083
-  (predicted, unverified):     1329, father_of, 2083
+Selected: father_of
+  (observed, incoming):        [1335], father_of, 2083
+  (predicted, unverified):     [1329], father_of, 2083
 
-Selected: sister_of (incoming)
-  (observed, direct edge):     2086, sister_of, 2083
-                               2087, sister_of, 2083
-  (predicted, unverified):     2081, sister_of, 2083
+Selected: sister_of
+  (observed, incoming):        [2086, 2087], sister_of, 2083
+  (predicted, unverified):     [2081], sister_of, 2083
 
 Thought 2: No aunt_of edge is recorded for 2083, so the aunt is not directly observable. The predictor proposes 2079, 1465 and 1333, but these are unverified and I should not collect on that alone. There is a strong observed lead: 1335 is recorded as the father of 2083. An aunt of 2083 would be a sister of 1335, so I can test the predictions by examining 1335's sisters.
 Action 2: Propose[1335 | who are the sisters of 1335]
@@ -154,17 +165,16 @@ Local context for 1335:
   outgoing: [father_of, son_of, brother_of, husband_of, nephew_of]
   incoming: [sister_of, daughter_of, son_of, wife_of, aunt_of]
 
-Selected: sister_of (incoming)
-  (observed, direct edge):     1465, sister_of, 1335
-                               2079, sister_of, 1335
-  (predicted, unverified):     1331, sister_of, 1335
+Selected: sister_of
+  (observed, incoming):        [1465, 2079], sister_of, 1335
+  (predicted, unverified):     [1331], sister_of, 1335
 
-Selected: brother_of (outgoing)
-  (observed, direct edge):     1335, brother_of, 1333
-                               1335, brother_of, 1334
-  (predicted, unverified):     1335, brother_of, 1329
+Selected: brother_of
+  (observed, outgoing):        1335, brother_of, [1333, 1334]
+  (observed, incoming):        [1333], brother_of, 1335
+  (predicted, unverified):     1335, brother_of, [1329]
 
-Thought 3: 2079 is observed as a sister of 1335, and 1335 is observed as the father of 2083. A sister of a parent is an aunt, so 2079 is an aunt of 2083. This corroborates the earlier prediction with observed edges. Note that 1333 was also predicted as an aunt, but 1333 is observed as a brother of 1335, so 1333 is an uncle rather than an aunt and should not be collected.
+Thought 3: 2079 is observed as a sister of 1335, and 1335 is observed as the father of 2083. A sister of a parent is an aunt, so 2079 is an aunt of 2083. This corroborates the earlier prediction with observed edges. Note that 1333 was also predicted as an aunt of 2083, but the brother_of groups record 1333 as a brother of 1335 in both directions, so 1333 is an uncle rather than an aunt and should not be collected.
 Action 3: Collect[2079]
 
 Observation 3:
@@ -178,9 +188,9 @@ Local context for 2087:
   outgoing: [daughter_of, sister_of, niece_of, wife_of]
   incoming: [aunt_of, father_of, mother_of, sister_of, uncle_of]
 
-Selected: aunt_of (incoming)
-  (observed, direct edge):     2079, aunt_of, 2087
-  (predicted, unverified):     1333, aunt_of, 2087
+Selected: aunt_of
+  (observed, incoming):        [2079], aunt_of, 2087
+  (predicted, unverified):     [1333], aunt_of, 2087
 
 Thought 5: 2079 is directly observed as the aunt of 2087, and 2087 is a sister of 2083, so 2079 is confirmed as an aunt of 2083. That answer is already collected, and the other predicted candidates were ruled out. No relevant direction remains.
 Action 5: Finish

@@ -1,0 +1,41 @@
+You are checking whether a candidate entity is of the right *kind* to fill a slot.
+
+You are given:
+- A candidate entity E.
+- Set A: relations already attached to E in the knowledge graph, in the same
+  slot (head or tail) that the proposed relation would put E in.
+- Set B: the proposed relation, which some other entity would connect to E by.
+
+Set A tells you what kind of thing E is. Set B tells you what kind of thing the
+proposed relation expects in E's slot. Decide whether those two kinds can be the
+same thing.
+
+Examples of a conflict:
++ Set A contains `mother` (E is a person) while Set B is `founded_at`, whose
+  slot expects a company or a date. A person cannot be either.
++ Set A contains `film.release_date` (E is a date) while Set B is
+  `people.person.nationality`, whose slot expects a country.
++ Set A contains `mother_of` while set B is `father_of`, conflict in gender.
+
+Not a conflict:
++ Set A and Set B describe the same kind of thing, even if the specific
+  relations differ (`mother` and `aunt` are both about people).
++ Set A is unrelated to Set B but not incompatible with it — an entity can take
+  part in many kinds of relation. Only rule out a genuine category mismatch.
+
+IMPORTANT:
++ Judge the *type* of E only. Do not judge whether the specific fact is true,
+  plausible, or already known.
++ Set A may be truncated to the 10 most frequent relations.
++ The decision must be exactly one of `type-consistent` or `type-conflict`.
+  There is no third outcome: if the evidence is weak, answer `type-consistent`.
+
+
+Decision: <type-consistent/type-conflict>
+
+Candidate entity: {entity}
+Set A (relations of {entity}): {entity_relations}
+Set B (proposed relation): {proposed_relation}
+
+
+Decision: 

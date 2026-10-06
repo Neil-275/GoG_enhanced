@@ -64,7 +64,7 @@ one_shot_subgraph_config: dict = {
             "add_idd_edges": True,
             # "checkpoint": "data_for_LP/id_processed/fb15k_237/saveModel/topk_0.1_layer_8_ValMRR_0.423.pt"
             # "checkpoint": "data_for_LP/id_processed/fb15k_237/finetuneModel/epoch_3_ValMRR_0.568.pt"
-            "checkpoint": "data_for_LP/weights/fb15k_237/pretrain_layer_5.pt"
+            "checkpoint": "data_for_LP/weights/fb15k_237/brink_only_layer_5.pt"
         },
     },
     "wikidata5m": {

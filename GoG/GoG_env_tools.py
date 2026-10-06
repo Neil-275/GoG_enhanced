@@ -1,11 +1,9 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
-from logging import Formatter
 import json
 import random
 import re
 # import spacy
-from string import Formatter
 import traceback
 import asyncio
 from loguru import logger
@@ -16,8 +14,18 @@ from GoG.utils import (
     parse_json_list,
     parse_llm_output_to_list,
     read_file,
-    extract_numbers_from_string,
     parse_generated_relation_directions,
+)
+from GoG.GoG_env_utils import (
+    entity_sort_key,
+    format_triple,
+    format_triple_group,
+    observed_neighbors,
+    parse_json_list_responses,
+    parse_propose_argument,
+    render_group,
+    replay_path,
+    trace_path,
 )
 from GoG.GoG_llms import run_llm
 from GoG.gnn_interface import OneShotInterface
@@ -284,21 +292,6 @@ class KGEnv:
         ) if self.kg.rels and incoming_neighbor_relation_set else []
         return outgoing_related_relations, incoming_related_relations, start_entity, dict(observed_index)
 
-    def parse_json_list_responses(self, responses):
-        if isinstance(responses, str):
-            responses = [responses]
-
-        parsed_items = []
-        for response in responses:
-            if not response:
-                continue
-            parsed_response = parse_json_list(response)
-            if isinstance(parsed_response, list):
-                parsed_items.extend(
-                    item for item in parsed_response if isinstance(item, dict)
-                )
-        return parsed_items
-
     def propose(self, q_sub, e_current):
         """Relation selection + direction specification for one entity.
 
@@ -342,13 +335,25 @@ class KGEnv:
         # print("Relation selection LLM responses:")
         # print(relation_selection_responses)
 
-        selected_relation_items = self.parse_json_list_responses(relation_selection_responses)
+        selected_relation_items = parse_json_list_responses(relation_selection_responses)
         selected_relations = []
         updated_selected_relation_items = []
 
+        # Snapping targets are the global bi-encoder candidates *plus* every
+        # relation actually adjacent to e_current. The local labels matter
+        # because propose_action tests relation membership exactly: a relation
+        # the LLM read off the local context but that no global candidate
+        # matches would otherwise stay un-snapped and be dropped there.
+        local_relation_labels = {relation for relation, _ in observed_index}
+        snap_targets = list(candidate_relations) + sorted(
+            label for label in local_relation_labels if label not in candidate_relations
+        )
+
         for item in selected_relation_items:
             relation = item.get("relation")
-            for gd_relation in candidate_relations:
+            if not relation:
+                continue
+            for gd_relation in snap_targets:
                 # print("gd_relation:", gd_relation, "relation:", relation)
                 if relation in gd_relation:
                     relation = gd_relation
@@ -401,7 +406,7 @@ class KGEnv:
         # print("Direction specification LLM responses:")
         # print(direction_specification_responses)
 
-        parsed_generations = self.parse_json_list_responses(direction_specification_responses)
+        parsed_generations = parse_json_list_responses(direction_specification_responses)
         logger.debug(f"Parsed direction specifications: {parsed_generations}")
         return (
             selected_relations,
@@ -418,43 +423,137 @@ class KGEnv:
         )
         return candidates
 
-    @staticmethod
-    def _entity_sort_key(entity_id):
-        """Deterministic ordering for capping. Numeric ids sort numerically."""
-        text = str(entity_id)
-        return (0, int(text), "") if text.lstrip("-").isdigit() else (1, 0, text)
+    # ------------------------------------------------------------------
+    # Type consistency: filter predicted candidates by entity type
+    # ------------------------------------------------------------------
 
-    @staticmethod
-    def _format_triple(start_entity, relation, direction, other):
-        if direction == "outgoing":
-            return f"{start_entity}, {relation}, {other}"
-        return f"{other}, {relation}, {start_entity}"
+    TYPE_CHECK_MAX_RELATIONS = 20
 
-    def parse_propose_argument(self, parameter):
-        """Parse the argument of `Propose[e_current | q_sub]`.
+    def _relation_labels_around(self, entity):
+        """Relation labels adjacent to `entity` in G_inc, split by direction.
 
-        Falls back to the pre-Propose behaviour (pull the first number out of
-        the whole string) when the delimiter is missing, because the driver's
-        retry loop never re-prompts on a parse failure -- erroring here would
-        burn a trajectory step with no way to recover.
+        Direction is relative to `entity`: outgoing means it is the head. Counts
+        rather than sets, so the cap in `check_type_consistency` can keep the
+        most frequent labels instead of an arbitrary slice.
         """
-        text = str(parameter).strip()
-        if text.startswith("[") and text.endswith("]"):
-            text = text[1:-1]
-        text = text.strip()
+        entity = str(entity)
+        outgoing, incoming = Counter(), Counter()
+        if entity not in self.kg.entities:
+            return outgoing, incoming
+        for triple in self.kg.get_1hop_triples(entity).values.tolist():
+            if len(triple) == 2:
+                direction, wrapped_triple = triple
+                if direction == 0:
+                    outgoing[wrapped_triple[1]] += 1
+                elif direction == 1:
+                    incoming[wrapped_triple[1]] += 1
+            elif len(triple) == 3:
+                head, relation, tail = triple
+                if str(head) == entity:
+                    outgoing[relation] += 1
+                if str(tail) == entity:
+                    incoming[relation] += 1
+        return outgoing, incoming
 
-        if "|" in text:
-            e_current, _, q_sub = text.partition("|")
-            return e_current.strip(), q_sub.strip()
+    def check_type_consistency(self, candidate, relation, direction):
+        """Decide whether a predicted `candidate` is the right *kind* of entity.
 
-        entities = extract_numbers_from_string(text)
-        logger.warning(
-            f"Propose argument has no '|' delimiter: {parameter!r}; "
-            f"falling back to number extraction"
+        Set A is the candidate's own relations, read in the slot the producing
+        edge puts it in. The frame correction is the point: `direction` is
+        relative to `start_entity`, so an *outgoing* edge makes the candidate the
+        tail, and its own *incoming* relations are the ones describing the same
+        type slot. Comparing against its outgoing relations instead would judge
+        the opposite slot -- the head-role/tail-role confusion this check exists
+        to catch. Set B is the bare relation label; direction is spent choosing
+        A's half and is never shown to the LLM.
+
+        Returns `(keep, verdict, reasoning)`. `keep` is False only on an explicit
+        `type-conflict`: an empty Set A or an unparseable response keeps the
+        candidate, because a dropped hard answer is the more expensive failure.
+        """
+        outgoing, incoming = self._relation_labels_around(candidate)
+        labels = incoming if direction == "outgoing" else outgoing
+        if not labels:
+            # Nothing to conflict against -- the call would buy a decision with
+            # no evidence behind it. Not a fallback to the other direction:
+            # that half describes the opposite type slot.
+            return True, "no_context", ""
+
+        top = [label for label, _ in labels.most_common(self.TYPE_CHECK_MAX_RELATIONS)]
+        relations_str = "[{}]".format(", ".join(top))
+        # if len(labels) > len(top):
+            # relations_str += (
+            #     f" (truncated to the {len(top)} most frequent of {len(labels)})"
+            # )
+
+        prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/type_consistency.txt")
+        prompt = format_prompt(prompt_path).format(
+            entity=str(candidate),
+            entity_relations=relations_str,
+            proposed_relation=relation,
         )
-        return (str(entities[0]) if entities else ""), text
+        # print(prompt)
+        output = run_llm(
+            prompt,
+            self.args.temperature,
+            self.args.max_length,
+            self.args.opeani_api_keys,
+            self.args.LLM_type,
+            stop=None,
+        ) or ""
+        logger.debug(f"Type consistency output for {candidate} / {relation}: {output}")
 
-    def propose_action(self, parameter):
+        # Prefer the labelled decision line; fall back to the last bare label so
+        # a missing "Decision:" prefix does not cost a verdict. Last, not first:
+        # the reasoning sentence often names the label it then rules out.
+        matches = re.findall(r"Decision:\s*(type-consistent|type-conflict)", output, re.IGNORECASE)
+        if not matches:
+            matches = re.findall(r"type-consistent|type-conflict", output, re.IGNORECASE)
+
+        reasoning_match = re.search(r"Reasoning:\s*(.+)", output)
+        reasoning = reasoning_match.group(1).strip() if reasoning_match else output.strip()
+
+        if not matches:
+            # The prompt forbids a third outcome, so this is an infrastructure
+            # fault, not a judgement. Counted in the records as `unparsed`: if it
+            # is frequent, the prompt needs fixing, not the filter.
+            logger.warning(
+                f"Unparseable type-consistency verdict for candidate={candidate}, "
+                f"relation={relation}, direction={direction}: {output!r}"
+            )
+            return True, "unparsed", reasoning
+
+        verdict = matches[-1].lower()
+        return verdict == "type-consistent", verdict, reasoning
+
+    def filter_type_consistent(self, candidates, start_entity, relation, direction):
+        """Drop the type-conflicting candidates, one LLM call per candidate.
+
+        Returns `(kept, log)`. The rejection is silent to the agent -- the
+        Observation renders the survivors exactly as it would have rendered the
+        whole set -- so every rejected id is recorded here or lost.
+        """
+        kept, log = [], []
+        for candidate in candidates:
+            consistent, verdict, reasoning = self.check_type_consistency(
+                candidate, relation, direction
+            )
+            log.append({
+                "entity": str(candidate),
+                "verdict": verdict,
+                "reasoning": reasoning,
+            })
+            if consistent:
+                kept.append(candidate)
+            else:
+                pass
+                # logger.info(
+                #     f"Type-conflict: dropping predicted {candidate} for "
+                #     f"({start_entity}, {relation}, {direction})"
+                # )
+        return kept, log
+
+    def propose_action(self, parameter, **kwargs):
         """Handle one `Propose[e_current | q_sub]` action.
 
         Runs relation selection + direction specification for a single entity,
@@ -462,8 +561,8 @@ class KGEnv:
         edges and runs Predict for every selected relation, and renders both
         groups with explicit labels.
         """
-        e_current, q_sub = self.parse_propose_argument(parameter)
-        # return (self.propose(q_sub, e_current))
+        e_current, q_sub = parse_propose_argument(parameter)
+        return (self.propose(q_sub, e_current)) ## Uncomment this line for testing propose alone
         (
             selected_relations,
             parsed_generations,
@@ -473,19 +572,20 @@ class KGEnv:
             incoming_context,
         ) = self.propose(q_sub, e_current)
 
-        record = self.records[-1]
-        record["e_current"] = str(start_entity)
-        record["q_sub"] = q_sub
-        record["local_context"] = {
-            "outgoing": list(outgoing_context),
-            "incoming": list(incoming_context),
-        }
+        # record = self.records[-1]
+        # record["e_current"] = str(start_entity)
+        # record["q_sub"] = q_sub
+        # record["local_context"] = {
+        #     "outgoing": list(outgoing_context),
+        #     "incoming": list(incoming_context),
+        # }
 
-        lines = [
-            f"Local context for {start_entity}:",
-            "  outgoing: [" + ", ".join(outgoing_context) + "]",
-            "  incoming: [" + ", ".join(incoming_context) + "]",
-        ]
+        # lines = [
+        #     f"Local context for {start_entity}:",
+        #     "  outgoing: [" + ", ".join(outgoing_context) + "]",
+        #     "  incoming: [" + ", ".join(incoming_context) + "]",
+        # ]
+        lines = []
 
         selected_log = []
         observed_log = []
@@ -519,40 +619,66 @@ class KGEnv:
 
             selected_log.append({"relation": relation, "direction": direction})
             lines.append("")
-            lines.append(f"Selected: {relation} ({direction})")
+            lines.append(f"Selected: {relation}")
 
             # --- observed: direct edges already in G_inc ---
-            observed_entities = sorted(
-                set(observed_index.get((relation, direction), [])),
-                key=self._entity_sort_key,
-            )
-            kept, suppressed = [], 0
-            for other in observed_entities:
-                triple = self._format_triple(start_entity, relation, direction, other)
-                if triple in self.explored_triples:
-                    suppressed += 1
-                    continue
-                kept.append((other, triple))
-            kept = kept[:cap]
-            for other, triple in kept:
-                self.explored_triples.append(triple)
-                self.explored_entities.add(str(other))
-                self._record_provenance(other, start_entity, relation, direction)
-            observed_log.append({
-                "relation": relation,
-                "direction": direction,
-                "entities": [other for other, _ in kept],
-                "suppressed_as_already_shown": suppressed,
-            })
-
-            if kept:
-                lines.extend(self._render_group("(observed, direct edge)", [t for _, t in kept]))
-            elif suppressed:
-                lines.append(
-                    f"  (observed, direct edge):     all {suppressed} observed edge(s) already shown above"
-                )
+            # Direction-blind by default: the LLM's direction steers Predict
+            # only, so both orientations are retrieved and labelled separately.
+            # A relation the LLM guessed the wrong way round still surfaces its
+            # real edges. --no-direction_blind_observed restores the old
+            # direction-gated retrieval as the ablation arm.
+            # getattr: notebooks/ load pickled args Namespaces snapshotted
+            # before this flag existed; they get the default behaviour.
+            if getattr(self.args, "direction_blind_observed", True):
+                observed_directions = ("outgoing", "incoming")
             else:
-                lines.append("  (observed, direct edge):     none")
+                observed_directions = (direction,)
+
+            observed_entry = {"relation": relation, "outgoing": [], "incoming": []}
+            suppressed_entry = {"outgoing": 0, "incoming": 0}
+            observed_rendered = []
+
+            for obs_direction in observed_directions:
+                observed_entities = sorted(
+                    set(observed_index.get((relation, obs_direction), [])),
+                    key=entity_sort_key,
+                )
+                # Suppress first, then cap: a repeat Propose on the same
+                # entity/relation surfaces the *next* `cap` edges rather than
+                # repeating the ones already in the trajectory.
+                kept = []
+                for other in observed_entities:
+                    triple = format_triple(start_entity, relation, obs_direction, other)
+                    if triple in self.explored_triples:
+                        suppressed_entry[obs_direction] += 1
+                        continue
+                    kept.append((other, triple))
+                    if len(kept) >= cap:
+                        break
+                for other, triple in kept:
+                    self.explored_triples.append(triple)
+                    self.explored_entities.add(str(other))
+                    self._record_provenance(other, start_entity, relation, obs_direction)
+                observed_entry[obs_direction] = [str(other) for other, _ in kept]
+
+                if kept:
+                    observed_rendered.append(render_group(
+                        f"(observed, {obs_direction})",
+                        format_triple_group(
+                            start_entity, relation, obs_direction,
+                            [other for other, _ in kept],
+                        ),
+                    ))
+
+            observed_entry["suppressed_as_already_shown"] = suppressed_entry
+            observed_log.append(observed_entry)
+
+            # Empty sub-groups are omitted; a single line stands in only when
+            # neither direction produced anything new.
+            if observed_rendered:
+                lines.extend(observed_rendered)
+            else:
+                lines.append(render_group("(observed)", "No edges retrieved"))
 
             # --- predicted: GNN candidates, existence-filtered ---
             candidates = self.predict(start_entity, relation, direction)
@@ -560,34 +686,75 @@ class KGEnv:
                 logger.debug(
                     f"No GNN candidates for entity={start_entity}, relation={relation}, direction={direction}"
                 )
-            observed_set = set(observed_entities)
+            # Filtered against the SAME-direction observed set only. An entity
+            # observed as a head of this relation is a different triple from the
+            # same entity predicted as a tail, so the union would suppress a
+            # genuinely novel edge.
+            observed_set = {
+                str(other) for other in observed_index.get((relation, direction), [])
+            }
             overlap = [c for c in candidates if str(c) in observed_set]
             if overlap:
-                # Commit 1 makes predict_topk filter these out; if any survive,
-                # the observed/predicted labels would be lying.
+                # predict_topk filters these out; if any survive, the
+                # observed/predicted labels would be lying.
                 logger.warning(
                     f"Predicted candidates overlap observed edges for "
                     f"({start_entity}, {relation}, {direction}): {overlap}"
                 )
             candidates = [c for c in candidates if str(c) not in observed_set]
-            # Provenance is recorded for predicted candidates too: the
-            # observed/predicted distinction is applied at collect time, by
-            # whether the path can be replayed against G_inc, not here.
+
+            # --- type consistency: drop candidates of the wrong kind ---
+            # Runs before the two state writes below, so a rejected candidate
+            # leaves no trace at all: no provenance record (it must never enter
+            # a Collect fan-out path) and no explored_triples entry (so it is
+            # not silently suppressed from a later, differently-framed Propose).
+            type_check_log = None
+            # print(kwargs, hasattr(kwargs, "type_check"))
+            if getattr(self.args, "type_check", False) or kwargs.get("type_check", False) and candidates:
+                # print(123)
+                type_check_candidates, type_check_log = self.filter_type_consistent(
+                    candidates, start_entity, relation, direction
+                )
+                return type_check_candidates
+            return candidates ## Uncomment this line for testing type-checking
+        
+            # Predicted candidates are suppressed once shown, same as observed
+            # ones -- the agent is told "new edges only", and applying that to
+            # one group but not the other makes trajectories hard to read.
+            # Provenance is still recorded for them: the observed/predicted
+            # distinction is applied at collect time, by whether the path can be
+            # replayed against G_inc, not here.
+            kept_predictions = []
             for candidate in candidates:
+                triple = format_triple(start_entity, relation, direction, candidate)
+                if triple in self.explored_triples:
+                    continue
+                self.explored_triples.append(triple)
+                kept_predictions.append(candidate)
                 self._record_provenance(candidate, start_entity, relation, direction)
-            predicted_log.append({
+            predicted_entry = {
                 "relation": relation,
                 "direction": direction,
-                "entities": [str(c) for c in candidates],
-            })
+                "entities": [str(c) for c in kept_predictions],
+            }
+            if type_check_log is not None:
+                # Only key present when the filter ran, so its absence in an
+                # older result file is unambiguous rather than "ran, found
+                # nothing". The rejected ids exist nowhere else.
+                predicted_entry["type_check"] = type_check_log
+            predicted_log.append(predicted_entry)
 
-            if candidates:
-                lines.extend(self._render_group(
+            if kept_predictions:
+                lines.append(render_group(
                     "(predicted, unverified)",
-                    [self._format_triple(start_entity, relation, direction, c) for c in candidates],
+                    format_triple_group(
+                        start_entity, relation, direction, kept_predictions
+                    ),
                 ))
             else:
-                lines.append("  (predicted, unverified):     none")
+                lines.append(render_group(
+                    "(predicted, unverified)", "No new edges retrieved"
+                ))
 
         record["selected_relations"] = selected_log
         record["observed"] = observed_log
@@ -598,14 +765,6 @@ class KGEnv:
             lines.append("No relation was selected for this entity.")
 
         return "\n".join(lines)
-
-    @staticmethod
-    def _render_group(label, triples):
-        """Render a labelled group, aligning continuation lines under the first."""
-        prefix = f"  {label}:".ljust(31)
-        rendered = [prefix + triples[0]]
-        rendered.extend(" " * 31 + triple for triple in triples[1:])
-        return rendered
 
     # ------------------------------------------------------------------
     # Collect: relation-path fan-out
@@ -634,90 +793,24 @@ class KGEnv:
         }
 
     def _trace_path(self, entity):
-        """Walk provenance back to a root, returning (path, root).
-
-        `path` is the ordered list of (relation, direction) pairs from root to
-        `entity` -- relation *types* only, with the specific intermediate
-        entities deliberately discarded. Returns (None, None) if the chain
-        cycles. An entity with no provenance record is its own root, which
-        yields an empty path and collapses to a single-entity collect.
-        """
-        entity = str(entity)
-        path = []
-        current = entity
-        visited = {current}
-        while current not in self.topic_entity_set:
-            prov = self.provenance.get(current)
-            if prov is None:
-                break
-            path.insert(0, (prov["relation"], prov["direction"]))
-            current = str(prov["parent_entity_id"])
-            if current in visited:
-                logger.warning(f"Cycle in provenance chain while tracing {entity}")
-                return None, None
-            visited.add(current)
-        return path, current
+        """Walk provenance back to a root -- see `GoG_env_utils.trace_path`."""
+        return trace_path(self.provenance, self.topic_entity_set, entity)
 
     def _observed_neighbors(self, node, relation, direction):
-        """Far ends of real G_inc edges matching (relation, direction) at `node`.
-
-        Direction is relative to `node`: outgoing means it is the head. Reads
-        the same incomplete graph that `observed_index` is built from, so a
-        hop that was surfaced as observed always replays here.
-        """
-        graph = self.kg.incomplete_graph_nx
-        node = str(node)
-        if node not in graph:
-            return set()
-        adjacency = graph.succ[node] if direction == "outgoing" else graph.pred[node]
-        return {
-            str(neighbor)
-            for neighbor, edges in adjacency.items()
-            for edge_data in edges.values()
-            if edge_data.get("relation") == relation
-        }
+        """Far ends of real G_inc edges matching (relation, direction) at `node`."""
+        return observed_neighbors(
+            self.kg.incomplete_graph_nx, node, relation, direction
+        )
 
     def _replay_path(self, root, path):
-        """Fan a relation-type path out from `root` across G_inc.
-
-        Returns (frontier, log). `frontier` is None when the replay fails and
-        the caller must fall back to a single-entity collect. Depends only on
-        (root, path), so `collect_action` caches it: entities sharing a traced
-        path replay once.
-        """
-        max_hops = getattr(self.args, "collect_fanout_max_hops", 0) or 0
-        if max_hops > 0 and len(path) > max_hops:
-            return None, {"reason": "path_longer_than_max_hops", "n_hops": len(path)}
-
-        max_entities = getattr(self.args, "collect_fanout_max_entities", 0) or 0
-        frontier = {str(root)}
-        hop_sizes = []
-        for relation, direction in path:
-            next_frontier = set()
-            for node in frontier:
-                next_frontier |= self._observed_neighbors(node, relation, direction)
-            if not next_frontier:
-                # No real edge realises this hop from anywhere in the frontier:
-                # the signal that it was Predict-derived rather than observed.
-                return None, {
-                    "reason": "unreplayable_hop",
-                    "failed_hop": [relation, direction],
-                    "hop_sizes": hop_sizes,
-                }
-            if max_entities > 0 and len(next_frontier) > max_entities:
-                logger.warning(
-                    f"Fan-out frontier hit {len(next_frontier)} entities at "
-                    f"({relation}, {direction}), over collect_fanout_max_entities="
-                    f"{max_entities}; falling back to single-entity collect"
-                )
-                return None, {
-                    "reason": "frontier_over_max_entities",
-                    "frontier_size": len(next_frontier),
-                    "hop_sizes": hop_sizes,
-                }
-            frontier = next_frontier
-            hop_sizes.append(len(frontier))
-        return frontier, {"hop_sizes": hop_sizes}
+        """Fan a relation-type path out from `root` -- see `GoG_env_utils.replay_path`."""
+        return replay_path(
+            self.kg.incomplete_graph_nx,
+            root,
+            path,
+            max_hops=getattr(self.args, "collect_fanout_max_hops", 0),
+            max_entities=getattr(self.args, "collect_fanout_max_entities", 0),
+        )
 
     def _collect_one(self, entity, replay_cache=None):
         """Expand one collected entity into the full set to add to R_t.
@@ -784,7 +877,7 @@ class KGEnv:
         for entity in requested:
             entities, log = self._collect_one(entity, replay_cache)
             logs.append(log)
-            for collected_entity in sorted(entities, key=self._entity_sort_key):
+            for collected_entity in sorted(entities, key=entity_sort_key):
                 if collected_entity not in seen:
                     seen.add(collected_entity)
                     collected.append(collected_entity)
@@ -804,15 +897,11 @@ class KGEnv:
             )
         return collected, "\n".join(lines)
 
-    def get_template_variables(self, template_string):
-    # Field names can be None for raw text chunks, so filter those out
-        return [field_name for _, field_name, _, _ in Formatter().parse(template_string) if field_name is not None]
-
     def verify(self, topic_entity, question,  verify_candidates, threshold=0.5):
         prompt_path = read_file(f"{self.args.prompt_dir}/primitive_tasks/verify_triples")
         prompt = format_prompt(prompt_path)
         # print("type of prompt:", type(prompt))
-        # print("Format str:", self.get_template_variables(prompt))
+        # print("Format str:", get_template_variables(prompt))
         for cand in verify_candidates:
             if cand["direction"] == "outgoing":
                 # print(f"Verifying candidate triples for: {topic_entity} -[{relation}]-> ?")
@@ -928,54 +1017,6 @@ class KGEnv:
         else:
             logger.warning(f"Entity name {entity_name} not found in name_to_id mapping, returning original name")
             return entity_name
-    # def expand(self):
-    #     # from one-hop to two hop
-    #     entity_names = self.records[-2]["entity_names"]
-    #     one_hop_relations = self.records[-2]["one_hop_relations"]
-
-    #     all_triples, all_relations = [], []
-
-    #     for entity_name in entity_names:
-    #         id = self.convert_name_to_id(entity_name)
-    #         triples, relations = get_2hop_triples(
-    #             id, [self.abbr_rel_to_rel[rel] for rel in one_hop_relations]
-    #         )
-
-    #         all_triples.extend(triples)
-    #         all_relations.extend(relations)
-
-    #     for i in range(len(all_relations)):
-    #         # only remain the last two parts
-    #         abbr_rel = shorten_relation(all_relations[i])
-    #         self.abbr_rel_to_rel[abbr_rel] = all_relations[i]
-    #         all_relations[i] = abbr_rel
-
-    #     # drop relations that have been considered
-    #     relations = list(set(all_relations) - set(one_hop_relations))
-    #     relations = sorted(relations)
-
-    #     two_hop_relations = self.filter_relations(entity_names, relations, self.last_thought)
-    #     self.records[-1]["two_hop_relations"] = two_hop_relations
-
-    #     for i in range(len(all_triples)):
-    #         abbr_rel = shorten_relation(all_triples[i][1])
-    #         self.abbr_rel_to_rel[abbr_rel] = all_triples[i][1]
-    #         all_triples[i][1] = abbr_rel
-
-    #     related_triples = self.sample_triples_by_relation(
-    #         all_triples, one_hop_relations + two_hop_relations
-    #     )
-
-    #     related_triples, id_to_label = convert_id_to_name_in_triples(
-    #         related_triples, return_map=True
-    #     )
-    #     self.update_id_to_name(id_to_label)
-
-    #     related_triples = sorted(related_triples)
-    #     self.records[-1]["triples"] = related_triples
-
-    #     return convert_triples_to_str(related_triples)
-
 
 if __name__ == "__main__":
     id2types = retrieve_id2types_by_name(

@@ -60,6 +60,11 @@ def write_results(data, env: KGEnv, prediction, args, error: str = None):
                 "generate_call_count": env.generate_call_count,
                 "records": env.records,
                 "error": error,
+                # Stamped per entry rather than into the filename: the output
+                # filename is a fixed 5-field pattern postprocess_predictions.py
+                # parses. Without this the two arms merge silently, the way
+                # --ablate runs already do.
+                "type_check": getattr(args, "type_check", False),
             }
             if env.llm_output:
                 res["llm_output"] = env.llm_output
@@ -346,10 +351,26 @@ if __name__ == "__main__":
     parser.add_argument("--no_kg", action="store_true")
     parser.add_argument("--output_dir", default="results")
     parser.add_argument("--max_n_expand", default=3)
-    parser.add_argument("--n_related_triples", type=int, default=10,
-                        help="cap on observed (direct-edge) candidates shown per selected relation.")
+    parser.add_argument("--n_related_triples", type=int, default=5,
+                        help="cap on observed (direct-edge) candidates shown per selected relation "
+                             "*per direction*. Applied after already-shown triples are suppressed, "
+                             "so a repeat Propose surfaces this many further edges.")
+    parser.add_argument("--direction_blind_observed", action=argparse.BooleanOptionalAction,
+                        default=True,
+                        help="retrieve observed edges for a selected relation in both directions, "
+                             "using the LLM's direction only to steer Predict. "
+                             "--no-direction_blind_observed restores direction-gated retrieval "
+                             "(the ablation arm).")
     parser.add_argument("--predict_topk", type=int, default=3,
                         help="number of GNN-predicted candidates per selected relation.")
+    parser.add_argument("--type_check", action=argparse.BooleanOptionalAction,
+                        default=False,
+                        help="filter GNN-predicted candidates by entity type: one LLM call per "
+                             "predicted entity compares its own relations against the proposed "
+                             "relation and drops type-conflicting ones (silently to the agent; "
+                             "verdicts land in records[*].predicted[*].type_check). Off by "
+                             "default -- it cannot help single-type KGs like family, and it "
+                             "multiplies LLM calls per Propose.")
     parser.add_argument("--max_selected_relations", type=int, default=3,
                         help="cap on relations Propose may select per call; Predict runs once per relation.")
     parser.add_argument("--max_steps", type=int, default=6,
@@ -380,10 +401,10 @@ if __name__ == "__main__":
     # parser.add_argument("start_idx", type=int, default=0, help="the start index of the dataset to process.")
 
     args = parser.parse_args()
-    with open("sampled_args/sample_args_finetune_family_2.pkl", "wb") as f: 
-        pkl.dump(args, f)
+    # with open("sampled_args/sample_args_finetune_fb15k_237_2.pkl", "wb") as f: 
+    #     pkl.dump(args, f)
 
-    exit(0)
+    # exit(0)
     LOG_LEVEL = "DEBUG" if args.debug else "INFO"
     os.environ["LOG_LEVEL"] = LOG_LEVEL
     logger.remove()
@@ -477,14 +498,12 @@ if __name__ == "__main__":
     #     # if k >= 10:  # Limit to first 10 failed cases
     #     #     break
     # datas = [data for data in datas if data['id'] in failed_cases]
-    seed = 42
-    random.seed(seed)
-    random.shuffle(datas)
+    # seed = 42
+    # random.seed(seed)
+    # random.shuffle(datas)
     if args.test:
-        val_id = [1053, 2745, 5144, 3717, 869, 4464, 1589, 2767]
-        # datas = random.sample(datas, min(1, len(datas)))  # Randomly sample 3 cases for testing 
-        datas = [data for data in datas if data['id'] in val_id]
-        # datas = datas[35:23]  # Limit to first 3 cases for testing
+        # datas = random.sample(datas, min(3, len(datas)))  # Randomly sample 3 cases for testing 
+        datas = datas[:3]  # Limit to first 3 cases for testing
     if args.run_fail_case:
         failed_cases = []
 

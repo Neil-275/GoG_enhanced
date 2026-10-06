@@ -70,6 +70,40 @@ def _entry_sets(entry: dict) -> tuple[set[str], set[str], set[str]]:
     return prediction, answers, hard_answer
 
 
+def _group_entities(group: dict) -> set[str]:
+    """Entity ids in one observed/predicted group of a Propose record.
+
+    Two layouts exist across results/: older runs store a flat `entities` list,
+    current ones split observed groups into `outgoing`/`incoming`.
+    """
+    entities = set()
+    for key in ("entities", "outgoing", "incoming"):
+        entities |= _as_set(group.get(key)) if isinstance(group.get(key), list) else set()
+    return entities
+
+
+def _evidence_sets(entry: dict) -> tuple[set[str], set[str], bool]:
+    """Union the observed and predicted entities across an entry's trajectory.
+
+    The third value says whether the entry carried any Propose evidence at all,
+    so that a run predating these record fields reports "not measured" instead
+    of a misleading zero.
+    """
+    observed: set[str] = set()
+    predicted: set[str] = set()
+    has_evidence = False
+
+    for record in entry.get("records") or []:
+        for group in record.get("observed") or []:
+            observed |= _group_entities(group)
+            has_evidence = True
+        for group in record.get("predicted") or []:
+            predicted |= _group_entities(group)
+            has_evidence = True
+
+    return observed, predicted, has_evidence
+
+
 def evaluate_predictions(predictions: list[dict]) -> dict:
     total_hits_any = 0.0
     total_precision = 0.0
@@ -78,11 +112,35 @@ def evaluate_predictions(predictions: list[dict]) -> dict:
     total_hits_hard = 0.0
     num_missing_predictions = 0
 
+    # Evidence accounting: where the gold answer was surfaced during the
+    # trajectory, versus whether it survived into the final prediction.
+    num_with_evidence = 0
+    gold_via_observed = 0
+    gold_via_predicted = 0
+    gold_discarded = 0
+
     for entry in predictions:
         prediction, answers, hard_answer = _entry_sets(entry)
         ground_truth = answers.union(hard_answer)
         overlap = prediction.intersection(ground_truth)
 
+        # Keyed on hard_answer so the discard rate is directly comparable with
+        # Hits@Hard; datasets with no hard-answer column fall back to `answers`.
+        gold = hard_answer or answers
+        observed, predicted, has_evidence = _evidence_sets(entry)
+        if has_evidence:
+            num_with_evidence += 1
+            if gold & observed:
+                gold_via_observed += 1
+            if gold & predicted:
+                gold_via_predicted += 1
+                # The link predictor surfaced the answer and the agent still did
+                # not return it: recoverable headroom, not a retrieval failure.
+                if not gold & prediction:
+                    gold_discarded += 1
+
+        # Counted before the empty-prediction skip below: an entry that returned
+        # nothing at all still discarded whatever the predictor surfaced.
         if not prediction:
             num_missing_predictions += 1
             continue
@@ -124,6 +182,32 @@ def evaluate_predictions(predictions: list[dict]) -> dict:
     results["HHR"] = (
         results["Hits@Hard"] / results["Hits@Any"] if results["Hits@Any"] > 0 else 0.0
     )
+
+    # Reported as null rather than 0.0 for runs written before Propose records
+    # carried observed/predicted groups, so an unmeasured run cannot be mistaken
+    # for a run with nothing discarded.
+    if num_with_evidence == 0:
+        results.update({
+            "num_with_evidence": 0,
+            "GoldViaObserved": None,
+            "GoldViaPredicted": None,
+            "GoldDiscarded": None,
+            "Hits@HardCeiling": None,
+        })
+        return results
+
+    results.update({
+        "num_with_evidence": num_with_evidence,
+        "GoldViaObserved": gold_via_observed / num_with_evidence,
+        "GoldViaPredicted": gold_via_predicted / num_with_evidence,
+        "GoldDiscarded": gold_discarded / num_with_evidence,
+    })
+    # Hits@Hard attainable if every already-surfaced prediction were collected:
+    # an upper bound on what any agent-side fix can recover without a better GNN.
+    # Denominators differ on purpose -- the three rates above are over the
+    # entries that could be measured, while this one is over all entries so it
+    # stays directly comparable with Hits@Hard.
+    results["Hits@HardCeiling"] = results["Hits@Hard"] + gold_discarded / num_entries
     return results
 
 

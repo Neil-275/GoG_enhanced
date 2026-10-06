@@ -21,21 +21,28 @@ The final segment typically names the endpoint type — reason about whether E
 fills the role of subject or object of that full-path meaning.
 
 Examples:
-
+Input:
 Question: "What is the position of player E?"
 Relation: position
+Output:
 Pattern: (E, position, ?)     Direction: outgoing
 
+Input:
 Question: "Which player has position E?"
 Relation: position
+Output:
 Pattern: (?, position, E)     Direction: incoming
 
+Input
 Question: "Who is E uncle of ?"
 Relation: parent
+Output
 Pattern: (E, uncle_of, ?)       Direction: outgoing
 
+Input
 Question: "Who has E as parent?"
 Relation: parent
+Output:
 Pattern: (?, uncle_of, E)       Direction: incoming
 
 Output your answer as a JSON list. Each entry has the following keys:

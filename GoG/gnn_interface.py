@@ -207,7 +207,8 @@ class OneShotInterface:
         #     return tail_ids
 
         # Local scoring: use candidate-only scores from inference.
-        out = self.model.inference(q_sub, q_rel, subgraph_data, topk=None)
+        out = self.model.inference(q_sub, q_rel, subgraph_data)
+        # print("Shape: ", out.shape, "n_ent: ", self.args.n_ent)
         if isinstance(out, dict):
             node_scores = out['node_scores']
             abs_idxs = out['abs_idxs']
@@ -267,6 +268,7 @@ class OneShotInterface:
         if kk == 0:
             return []
         values, idx = torch.topk(cand_scores, k=kk)
+        # print("Top-%d scores: %s" % (kk, values.detach().cpu().tolist()))
         indices = cand_abs[idx]
         tail_ids = [self.id2entity[int(x)] for x in indices.detach().cpu().numpy()]
         return tail_ids
