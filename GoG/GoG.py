@@ -8,7 +8,9 @@ import os
 from pathlib import Path
 import random
 import re
+import shlex
 import time
+from datetime import datetime
 from tqdm import tqdm
 import json
 import argparse
@@ -60,6 +62,7 @@ def write_results(data, env: KGEnv, prediction, args, error: str = None):
                 "generate_call_count": env.generate_call_count,
                 "records": env.records,
                 "error": error,
+                "command": getattr(args, "command", None),
                 # Stamped per entry rather than into the filename: the output
                 # filename is a fixed 5-field pattern postprocess_predictions.py
                 # parses. Without this the two arms merge silently, the way
@@ -485,14 +488,21 @@ if __name__ == "__main__":
             / f"{args.sc_num}_{args.n_related_triples}_{args.max_n_expand}_{args.temperature}_{Path(args.dataset).stem + postfix}_predictions.jsonl"
         )
 
+    # Record the exact invocation, and give every non-test run its own
+    # timestamped files so reruns never overwrite or resume into each other.
+    args.command = shlex.join([sys.executable, *sys.argv])
+    log_name = f"{args.temperature}_{Path(args.dataset).stem}.log"
+    if not args.test:
+        run_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_file = output_file.with_name(f"{output_file.stem}_{run_ts}{output_file.suffix}")
+        log_name = f"{Path(log_name).stem}_{run_ts}.log"
+
     args.output_file = output_file
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
-    logger.add(
-        sink=output_file.parent / f"{args.temperature}_{Path(args.dataset).stem}.log",
-        mode="w",
-    )
+    logger.add(sink=output_file.parent / log_name, mode="w")
+    logger.info(f"Command: {args.command}")
 
     # print(output_file)
 
