@@ -160,6 +160,7 @@ class OneShotInterface:
         direction: str = ["incoming", "outgoing"],
         k: int = 10,
         known=True,
+        return_scores = False
     ):
         """Predict top-k tails for a single (head, relation) query.
 
@@ -271,4 +272,7 @@ class OneShotInterface:
         # print("Top-%d scores: %s" % (kk, values.detach().cpu().tolist()))
         indices = cand_abs[idx]
         tail_ids = [self.id2entity[int(x)] for x in indices.detach().cpu().numpy()]
-        return tail_ids
+        if return_scores:
+            return values.detach().cpu().tolist(), tail_ids
+        else:
+            return tail_ids

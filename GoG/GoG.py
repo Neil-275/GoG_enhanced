@@ -65,6 +65,8 @@ def write_results(data, env: KGEnv, prediction, args, error: str = None):
                 # parses. Without this the two arms merge silently, the way
                 # --ablate runs already do.
                 "type_check": getattr(args, "type_check", False),
+                "include_score": getattr(args, "include_score", False),
+                "representative_only": getattr(args, "representative_only", False),
             }
             if env.llm_output:
                 res["llm_output"] = env.llm_output
@@ -95,6 +97,8 @@ def find_answer(process_idx, idxes_to_process, args, datas, env: KGEnv):
         example_path /= "examples_no-collect"
     elif args.ablate:
         example_path /= "ablate_examples.txt"
+    elif getattr(args, "representative_only", False):
+        example_path /= "examples_representative"
     else:
         example_path /= "examples"
 
@@ -371,6 +375,23 @@ if __name__ == "__main__":
                              "verdicts land in records[*].predicted[*].type_check). Off by "
                              "default -- it cannot help single-type KGs like family, and it "
                              "multiplies LLM calls per Propose.")
+    parser.add_argument("--propose_mode", default="prob", choices=("llm", "prob"),
+                        help="'llm': relation selection + direction specification prompts. 'prob': LLM-free "
+                             "calibrated P(r,d) x P(e|r,d) (GoG/prob_propose.py); predicted entities are ranked "
+                             "and thresholded, observed ones added unranked.")
+    parser.add_argument("--include_score", action=argparse.BooleanOptionalAction, default=False,
+                        help="show prob-propose scores in the Propose Observation: p of each selected "
+                             "(relation, direction) and of each predicted entity. Off = the agent sees "
+                             "relations and entities only; scores still land in records[*].prob_propose.")
+    parser.add_argument("--representative_only", dest="representative_only",
+                        action="store_true",
+                        help="Propose Observation shows one row per selected relation: a single entity drawn "
+                             "uniformly from the merged observed + predicted pool, plus the pool size. Unshown "
+                             "entities stay drawable by a later Propose; records keep the full pool.")
+    parser.add_argument("--collect_predict", action=argparse.BooleanOptionalAction, default=False,
+                        help="Collect fan-out also follows GNN-predicted edges at every hop (top --predict_topk, "
+                             "calibrated P(e|r,d)); path score = product of edge confidences, merged by max, "
+                             "cut at the prob-propose theta. Off = replay over G_inc only.")
     parser.add_argument("--max_selected_relations", type=int, default=3,
                         help="cap on relations Propose may select per call; Predict runs once per relation.")
     parser.add_argument("--max_steps", type=int, default=6,
@@ -401,6 +422,10 @@ if __name__ == "__main__":
     # parser.add_argument("start_idx", type=int, default=0, help="the start index of the dataset to process.")
 
     args = parser.parse_args()
+    if args.representative_only:
+        for conflict in ("include_score", "ablate_collect", "ablate"):
+            if getattr(args, conflict):
+                parser.error(f"--representative_only cannot be combined with --{conflict}")
     # with open("sampled_args/sample_args_finetune_fb15k_237_2.pkl", "wb") as f: 
     #     pkl.dump(args, f)
 

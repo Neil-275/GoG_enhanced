@@ -54,6 +54,19 @@ def render_group(label, body):
     return f"  {label}:".ljust(GROUP_LABEL_WIDTH) + body
 
 
+def render_representative(start_entity, relation, direction, entity, n_options):
+    """Render the single unlabelled row of --representative_only.
+
+    `direction` is the representative's own, so the triple reads the right way
+    round even when the pool mixed both orientations.
+    """
+    if entity is None:
+        return "  No new edges retrieved"
+    noun = "option" if n_options == 1 else "options"
+    triple = format_triple_group(start_entity, relation, direction, [entity])
+    return f"  {triple}  ({n_options} {noun})"
+
+
 # ----------------------------------------------------------------------
 # Parsing of action arguments and LLM responses
 # ----------------------------------------------------------------------
@@ -159,25 +172,44 @@ def trace_path(provenance, topic_entity_set, entity):
     return path, current
 
 
-def replay_path(graph, root, path, max_hops=0, max_entities=0):
+def replay_path(graph, root, path, max_hops=0, max_entities=0, predict_fn=None, threshold=0.0):
     """Fan a relation-type path out from `root` across G_inc.
 
     Returns (frontier, log). `frontier` is None when the replay fails and the
     caller must fall back to a single-entity collect. Depends only on
     (root, path), so `collect_action` caches it: entities sharing a traced path
     replay once.
+
+    With `predict_fn(node, relation, direction) -> [(entity, p)]`, every hop
+    also follows predicted edges. Each frontier entity carries the product of
+    edge confidences along its best path (observed edge = 1, predicted edge =
+    p), merged by max; predicted arrivals below `threshold` are dropped. This
+    recovers answers behind a dropped edge at any hop, not only the ones on
+    the agent's own trajectory.
     """
     max_hops = max_hops or 0
     if max_hops > 0 and len(path) > max_hops:
         return None, {"reason": "path_longer_than_max_hops", "n_hops": len(path)}
 
     max_entities = max_entities or 0
-    frontier = {str(root)}
+    frontier = {str(root): 1.0}
+    predicted_scores = {}   # entity -> path score, for entities whose best path uses a predicted edge
     hop_sizes = []
     for relation, direction in path:
-        next_frontier = set()
-        for node in frontier:
-            next_frontier |= observed_neighbors(graph, node, relation, direction)
+        next_frontier, via_prediction = {}, {}
+        for node, score in frontier.items():
+            for other in observed_neighbors(graph, node, relation, direction):
+                if score > next_frontier.get(other, -1.0):
+                    next_frontier[other] = score
+                    via_prediction[other] = node in predicted_scores
+            if predict_fn is None:
+                continue
+            for other, p in predict_fn(node, relation, direction):
+                other_score = score * p
+                if other_score >= threshold and other_score > next_frontier.get(other, -1.0):
+                    next_frontier[other] = other_score
+                    via_prediction[other] = True
+        predicted_scores = {e: s for e, s in next_frontier.items() if via_prediction[e]}
         if not next_frontier:
             # No real edge realises this hop from anywhere in the frontier:
             # the signal that it was Predict-derived rather than observed.
@@ -199,4 +231,7 @@ def replay_path(graph, root, path, max_hops=0, max_entities=0):
             }
         frontier = next_frontier
         hop_sizes.append(len(frontier))
-    return frontier, {"hop_sizes": hop_sizes}
+    log = {"hop_sizes": hop_sizes}
+    if predict_fn is not None:
+        log["predicted_scores"] = predicted_scores
+    return set(frontier), log

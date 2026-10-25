@@ -1,0 +1,176 @@
+For every step, you must first generate a `Thought` that decomposes the current state of the question, followed immediately by exactly one `Action`.
+
+Your goal is to answer the question by providing the correct entity IDs from the KG.
+
+## Actions
+
+### Propose[Current entity | Query]
+
+Examines one entity in the KG. For each relation it judges relevant to your
+Query, it returns a `Selected:` heading followed by exactly one line:
+
+* One representative triple, followed by the number of options it was drawn
+  from, e.g. `[901], celebrity.dated, 410  (6 options)`.
+  * The options are every entity linked to the current entity by that relation
+    that you have not been shown yet. The representative is drawn from them at
+    random, so it is an example of the group, not its best member.
+  * `No new edges retrieved` means there is nothing new to show for that relation.
+
+  The representative is shown in brackets on the side of the triple it
+  occupies, so `262, son_of, [264]` means 264 is a son of 262, while
+  `[264], son_of, 262` means 262 is a son of 264. Read the bracket position to
+  know which side the entity is on.
+
+
+Rules:
+
+* The first action must be `Propose` on the topic entity.
+* Propose takes exactly one entity. Do not pass several entities at once.
+* The Query must clearly state what information you want about that entity.
+
+### Collect[Answer_1 | Answer_2 | ...]
+
+Collects entity IDs that are likely answers.
+
+Collecting an entity also records every other answer reachable from the topic
+entity by the same relation path. You therefore do not need to draw every
+option of a group: collecting one fitting representative covers its siblings.
+
+Rules:
+
+* Collect when a representative, or a path through representatives, matches the question.
+* After collecting, continue exploring other relevant branches if they may reveal more answers.
+
+### Finish
+
+Stops the search.
+
+Rule:
+
+* Finish only when useful evidence has been exhausted or no relevant direction remains.
+
+
+## Important Context
+
+* Each triple has the form `(subject, relation, object)`.
+* The relation is directed from subject to object. `X son_of Y` means X is the son of Y.
+* Entity labels are masked; reason from relations and graph structure only.
+* Do not try to identify real-world labels.
+* Do not repeat the same action with the same arguments.
+
+## Evidence Policy
+
+1. Direct evidence
+   If a representative triple directly matches the question, collect it.
+
+2. Indirect evidence
+   If representatives form a reasoning path to an answer, collect the answer.
+
+3. No supported answer yet
+   Continue only through entities whose relations may produce evidence relevant
+   to the question, or Propose again to draw another representative.
+
+## Example 1:
+
+Question: In which regions was the film 7731 released?
+Topic Entity: [7731]
+
+Thought 1: The question asks for the regions where 7731 was released. This is a property of 7731 itself, so I should look at 7731 directly.
+Action 1: Propose[7731 | In which regions was 7731 released]
+Observation 1:
+Selected: /film/film/release_date_s./film/film_regional_release_date/film_release_region (outgoing)
+  7731, /film/film/release_date_s./film/film_regional_release_date/film_release_region, [2290]  (7 options)
+
+Selected: /film/film/country (outgoing)
+  7731, /film/film/country, [5016]  (1 option)
+
+Selected: /film/film/release_date_s./film/film_regional_release_date/film_release_distribution_medium (outgoing)
+  7731, /film/film/release_date_s./film/film_regional_release_date/film_release_distribution_medium, [918]  (2 options)
+
+Thought 2: The first relation goes from the film 7731 through a release-date record and ends in film_release_region, so the entity on its far side is a release region, not the record. 2290 is therefore a region where 7731 was released. Entities are only IDs and no name will ever be shown, so 2290 is already the specific answer and there is nothing more to find out about it. Collecting it also records the other regions reachable by the same relation.
+Action 2: Collect[2290]
+Observation 2: Collected the answers: [2290]
+Also recorded 6 further answer(s) reachable from the topic entity by the same relation path.
+
+Thought 3: The release regions of 7731 are collected. /film/film/country gives where the film was produced, and the distribution medium is not a region, so neither answers the question. No relevant direction remains.
+Action 3: Finish
+
+## Example 2:
+
+Question: Who dated the performer who performed at 332?
+Topic Entity: [332]
+
+Thought 1: I need to find who performed at 332 first, then who dated those performers.
+Action 1: Propose[332 | Who performed at 332]
+Observation 1:
+Selected: event.performer (outgoing)
+  332, event.performer, [410]  (3 options)
+
+Selected: event.venue (outgoing)
+  332, event.venue, [77]  (1 option)
+
+Thought 2: 410 is one of 3 performers at 332. I should find who dated 410.
+Action 2: Propose[410 | Who dated 410]
+Observation 2:
+Selected: celebrity.dated (incoming)
+  [901], celebrity.dated, 410  (6 options)
+
+Selected: celebrity.dated (outgoing)
+  410, celebrity.dated, [215]  (1 option)
+
+Selected: person.spouse (outgoing)
+  No new edges retrieved
+
+Thought 3: 901 dated 410 and 410 dated 215, and 410 performed at 332. Both fit the question. Collecting them also records the other people reachable by the same path, so I do not need to draw the remaining options one by one.
+Action 3: Collect[901 | 215]
+Observation 3: Collected the answers: [901 | 215]
+Also recorded 5 further answer(s) reachable from the topic entity by the same relation path.
+
+Thought 4: The path 332 -> event.performer -> celebrity.dated has been collected, which covers the dates of all performers at 332. No other relation is relevant.
+Action 4: Finish
+
+## Example 3:
+
+Question: Which films were directed by someone who studied at 640?
+Topic Entity: [640]
+
+Thought 1: I need to find who studied at 640 first, then which films those people directed.
+Action 1: Propose[640 | Who studied at 640]
+Observation 1:
+Selected: person.education (incoming)
+  [1102], person.education, 640  (4 options)
+
+Selected: location.contains (incoming)
+  [12], location.contains, 640  (1 option)
+
+Thought 2: 1102 studied at 640. I should find the films 1102 directed.
+Action 2: Propose[1102 | Which films did 1102 direct]
+Observation 2:
+Selected: film.directed_by (incoming)
+  No new edges retrieved
+
+Selected: film.actor (outgoing)
+  1102, film.actor, [3310]  (2 options)
+
+Thought 3: 1102 directed no films, so 1102 is a dead end; acting in a film does not answer the question. person.education at 640 still has 3 options left, so I should Propose on 640 again to draw another person who studied there.
+Action 3: Propose[640 | Who else studied at 640]
+Observation 3:
+Selected: person.education (incoming)
+  [1187], person.education, 640  (3 options)
+
+Selected: location.contains (incoming)
+  No new edges retrieved
+
+Thought 4: 1187 studied at 640. I should find the films 1187 directed.
+Action 4: Propose[1187 | Which films did 1187 direct]
+Observation 4:
+Selected: film.directed_by (incoming)
+  [2741], film.directed_by, 1187  (2 options)
+
+Thought 5: 2741 was directed by 1187, who studied at 640. Collecting it also records the other films reachable by the same path, including those directed by the other people who studied at 640.
+Action 5: Collect[2741]
+Observation 5: Collected the answers: [2741]
+Also recorded 3 further answer(s) reachable from the topic entity by the same relation path.
+
+Thought 6: The path 640 -> person.education -> film.directed_by has been collected, which covers the films directed by everyone who studied at 640. No relevant direction remains.
+Action 6: Finish

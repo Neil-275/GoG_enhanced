@@ -6,6 +6,7 @@ import re
 # import spacy
 import traceback
 import asyncio
+from GoG.prob_propose import ProbabilisticPropose
 from loguru import logger
 from GoG.kg_interface import KGInterface
 from GoG.utils import (
@@ -24,6 +25,7 @@ from GoG.GoG_env_utils import (
     parse_json_list_responses,
     parse_propose_argument,
     render_group,
+    render_representative,
     replay_path,
     trace_path,
 )
@@ -76,6 +78,14 @@ class KGEnv:
         ## One-shot subgraph 
         self.gnn: OneShotInterface = OneShotInterface(self.dataset_name, self.kg.n_ent, self.kg.n_rel)
         self.gnn.assign_graph(self.kg)
+        # getattr: pickled args Namespaces predate this flag.
+        self.prob_propose = None
+        # if getattr(args, "propose_mode", "llm") == "prob":
+        #     from GoG.prob_propose import ProbabilisticPropose
+        self.prob_propose = ProbabilisticPropose(
+            self.kg, self.gnn, self.dataset_name,
+            max_slots=args.max_selected_relations, k_predict=args.predict_topk,
+        )
         print(f"Dataset Name: {self.dataset_name}")
         logger.info(f"Initialized KGInterface with dataset: {self.dataset_name}")
 
@@ -108,22 +118,8 @@ class KGEnv:
         self.topic_entities = None
         self.question = None
         self.crucial_rel = None
-    # def update_name_to_id(self, name_to_id):
-    #     name_to_id = {name.lower(): id for name, id in name_to_id.items()}
-    #     self.name_to_id.update(name_to_id)
-    #     self.id_to_name.update({id: label for label, id in name_to_id.items()})
-
-    # def update_id_to_name(self, id_to_name):
-    #     # id_to_name = {id: name.lower() for id, name in id_to_name.items()}
-    #     # self.id_to_name.update(id_to_name)
-    #     # self.name_to_id.update({label: id for id, label in id_to_name.items()})
-    #     id_to_name = {id:id for id in id_to_name}
-    #     self.id_to_name.update(id_to_name)
-    #     self.name_to_id.update({label: id for id, label in id_to_name.items()})
 
     def find_crucial_rel(self, data):
-        # print(data, data["q_entity"], data["hard_answer"])
-        # print(type(data["q_entity"]), type(data["hard_answer"]))
         q_entity = data["q_entity"][0]
         hard_answer = data["hard_answer"][0]
         self.ez_answers = [ans for ans in data["a_entity"] if ans != hard_answer]
@@ -143,6 +139,11 @@ class KGEnv:
         # Path tracing terminates at any topic entity: they are the roots and
         # carry no provenance record.
         self.topic_entity_set = {str(entity) for entity in self.topic_entities}
+        # --representative_only: draws per (entity, slot), so a repeat Propose
+        # reseeds instead of re-drawing from the same RNG state.
+        self.representative_draws = Counter()
+        # R_t mirror (agent-named + fan-out), kept out of representative pools.
+        self.collected = set()
 
         if self.args.hard_only:
             self.crucial_rel = self.find_crucial_rel(data)
@@ -562,6 +563,8 @@ class KGEnv:
         groups with explicit labels.
         """
         e_current, q_sub = parse_propose_argument(parameter)
+        if getattr(self.args, "propose_mode", "llm") == "prob":
+            return self.prob_propose_action(e_current, q_sub)
         return (self.propose(q_sub, e_current)) ## Uncomment this line for testing propose alone
         (
             selected_relations,
@@ -572,7 +575,7 @@ class KGEnv:
             incoming_context,
         ) = self.propose(q_sub, e_current)
 
-        # record = self.records[-1]
+        record = self.records[-1] if self.records else {}
         # record["e_current"] = str(start_entity)
         # record["q_sub"] = q_sub
         # record["local_context"] = {
@@ -591,6 +594,9 @@ class KGEnv:
         observed_log = []
         predicted_log = []
         cap = self.args.n_related_triples
+        # One merged pool per relation, across both observed directions and the
+        # predicted one; nothing but the drawn edge is marked explored.
+        representative_only = getattr(self.args, "representative_only", False)
 
         for item in parsed_generations:
             relation = item.get("relation")
@@ -653,8 +659,11 @@ class KGEnv:
                         suppressed_entry[obs_direction] += 1
                         continue
                     kept.append((other, triple))
-                    if len(kept) >= cap:
+                    if len(kept) >= cap and not representative_only:
                         break
+                if representative_only:
+                    observed_entry[obs_direction] = [str(other) for other, _ in kept]
+                    continue
                 for other, triple in kept:
                     self.explored_triples.append(triple)
                     self.explored_entities.add(str(other))
@@ -674,11 +683,13 @@ class KGEnv:
             observed_log.append(observed_entry)
 
             # Empty sub-groups are omitted; a single line stands in only when
-            # neither direction produced anything new.
-            if observed_rendered:
-                lines.extend(observed_rendered)
-            else:
-                lines.append(render_group("(observed)", "No edges retrieved"))
+            # neither direction produced anything new. --representative_only
+            # renders its single row after Predict instead.
+            if not representative_only:
+                if observed_rendered:
+                    lines.extend(observed_rendered)
+                else:
+                    lines.append(render_group("(observed)", "No edges retrieved"))
 
             # --- predicted: GNN candidates, existence-filtered ---
             candidates = self.predict(start_entity, relation, direction)
@@ -715,6 +726,7 @@ class KGEnv:
                 type_check_candidates, type_check_log = self.filter_type_consistent(
                     candidates, start_entity, relation, direction
                 )
+                candidates = type_check_candidates
                 return type_check_candidates
             return candidates ## Uncomment this line for testing type-checking
         
@@ -729,8 +741,10 @@ class KGEnv:
                 triple = format_triple(start_entity, relation, direction, candidate)
                 if triple in self.explored_triples:
                     continue
-                self.explored_triples.append(triple)
                 kept_predictions.append(candidate)
+                if representative_only:
+                    continue
+                self.explored_triples.append(triple)
                 self._record_provenance(candidate, start_entity, relation, direction)
             predicted_entry = {
                 "relation": relation,
@@ -744,7 +758,26 @@ class KGEnv:
                 predicted_entry["type_check"] = type_check_log
             predicted_log.append(predicted_entry)
 
-            if kept_predictions:
+            if representative_only:
+                # observed_entry / predicted_entry above hold the whole pool.
+                pool = [
+                    (other, obs_direction, "observed")
+                    for obs_direction in observed_directions
+                    for other in observed_entry[obs_direction]
+                ] + [(candidate, direction, "predicted") for candidate in kept_predictions]
+                pool, excluded = self._exclude_collected(pool)
+                selected_log[-1]["excluded_collected"] = excluded
+                drawn = self._draw_representative(start_entity, relation, "any", pool)
+                if drawn is None:
+                    lines.append(render_representative(start_entity, relation, direction, None, 0))
+                    selected_log[-1]["representative"] = None
+                else:
+                    entity, drawn_direction, _ = drawn
+                    lines.append(render_representative(
+                        start_entity, relation, drawn_direction, entity, len(pool)
+                    ))
+                    selected_log[-1]["representative"] = str(entity)
+            elif kept_predictions:
                 lines.append(render_group(
                     "(predicted, unverified)",
                     format_triple_group(
@@ -765,6 +798,154 @@ class KGEnv:
             lines.append("No relation was selected for this entity.")
 
         return "\n".join(lines)
+
+    def prob_propose_action(self, e_current, q_sub):
+        """`Propose` with the LLM-free ProbabilisticPropose (--propose_mode prob).
+
+        Same Observation layout as the LLM path. Per selected (r, d): up to
+        `n_related_triples` observed far ends, taken from a seeded shuffle after
+        suppressing already-shown triples; then the predicted entities that pass
+        theta, each under the slot contributing most to it, labelled with the
+        marginal P(e) summed over all selected slots.
+        """
+        start_entity = str(e_current)
+        # print(123)
+        if start_entity not in self.kg.entities:
+            return f"{start_entity} is not an entity of the graph."
+        result = self.prob_propose.propose(q_sub, start_entity)
+        cap = self.args.n_related_triples
+        kept_by_slot = {}
+        for entity, p, slot in result.kept:
+            kept_by_slot.setdefault(slot, []).append((entity, p))
+        # Scores reach the agent only with --include_score; slot_log keeps them either way.
+        include_score = getattr(self.args, "include_score", False)
+        representative_only = getattr(self.args, "representative_only", False)
+        predicted_cands = []
+        lines, slot_log = [], []
+        for proposal in result.slots:
+            relation, direction = proposal.relation, proposal.direction
+            lines.append("")
+            if include_score:
+                lines.append(f"Selected: {relation} ({direction}, p={proposal.p:.2f})")
+            else:
+                lines.append(f"Selected: {relation} ({direction})")
+
+            if representative_only:
+                # Uncapped: only one entity is shown, so the cap would merely
+                # shrink the pool. Nothing is marked explored except the draw.
+                def unshown(entity):
+                    triple = format_triple(start_entity, relation, direction, entity)
+                    return triple not in self.explored_triples
+                observed = [other for other in proposal.observed if unshown(other)]
+                observed_set = {str(other) for other in observed}
+                predicted = [(entity, p) for entity, p in kept_by_slot.get(proposal.slot, [])
+                             if unshown(entity) and str(entity) not in observed_set]
+                pool = ([(other, direction, "observed") for other in observed]
+                        + [(entity, direction, "predicted") for entity, _ in predicted])
+                pool, excluded = self._exclude_collected(pool)
+                drawn = self._draw_representative(start_entity, relation, direction, pool)
+                representative = drawn[0] if drawn else None
+                lines.append(render_representative(
+                    start_entity, relation, direction, representative, len(pool)
+                ))
+            else:
+                observed = []
+                for other in proposal.observed:
+                    triple = format_triple(start_entity, relation, direction, other)
+                    if triple in self.explored_triples:
+                        continue
+                    observed.append(other)
+                    self.explored_triples.append(triple)
+                    self.explored_entities.add(str(other))
+                    self._record_provenance(other, start_entity, relation, direction)
+                    if len(observed) >= cap:
+                        break
+                lines.append(render_group(
+                    f"(observed, {direction})",
+                    format_triple_group(start_entity, relation, direction, observed)
+                    if observed else "No edges retrieved",
+                ))
+
+                predicted = []
+
+                for entity, p in kept_by_slot.get(proposal.slot, []):
+                    triple = format_triple(start_entity, relation, direction, entity)
+                    if triple in self.explored_triples:
+                        continue
+                    predicted.append((entity, p))
+
+                    self.explored_triples.append(triple)
+                    self._record_provenance(entity, start_entity, relation, direction)
+                lines.append(render_group(
+                    "(predicted, ranked)",
+                    format_triple_group(start_entity, relation, direction,
+                                        [f"{entity} (p={p:.2f})" if include_score else entity
+                                         for entity, p in predicted])
+                    if predicted else "No new edges retrieved",
+                ))
+            predicted_cands.append((predicted, proposal))
+            slot_entry = {
+                "relation": relation, "direction": direction, "p": proposal.p,
+                "observed": [str(o) for o in observed],
+                "predicted": [{"entity": entity, "p": p} for entity, p in predicted],
+                "gnn_top": [{"entity": entity, "p_cond": p} for entity, p in proposal.predicted],
+            }
+            if representative_only:
+                # observed/predicted above hold the whole pool, not what was shown.
+                slot_entry["representative"] = (
+                    None if representative is None else str(representative)
+                )
+                slot_entry["excluded_collected"] = excluded
+            slot_log.append(slot_entry)
+
+        # return result.slots, predicted_cands ### Uncomment this line for testing prob_propose alone
+        if self.records:
+            self.records[-1]["e_current"] = start_entity
+            self.records[-1]["q_sub"] = q_sub
+            self.records[-1]["prob_propose"] = {
+                "candidates": result.candidates,
+                "slots": slot_log,
+                "ranked": [{"entity": entity, "p": p, "slot": self.prob_propose.space.name(slot)}
+                           for entity, p, slot in result.ranked],
+            }
+        if not result.slots:
+            lines.append("")
+            lines.append("No relation was selected for this entity.")
+        return "\n".join(lines)
+
+    def _exclude_collected(self, pool):
+        """Split off pool entries already in R_t, fan-out members included.
+
+        A collected entity is resolved, so drawing it wastes a Propose; and
+        fan-out members are deliberately never named to the agent. Returns
+        (remaining pool, sorted excluded entity ids).
+        """
+        collected = getattr(self, "collected", set())
+        remaining = [item for item in pool if str(item[0]) not in collected]
+        excluded = sorted({str(item[0]) for item in pool if str(item[0]) in collected},
+                          key=entity_sort_key)
+        return remaining, excluded
+
+    def _draw_representative(self, start_entity, relation, slot_direction, pool):
+        """Uniformly draw one `(entity, direction, source)` from `pool`, or None.
+
+        `slot_direction` names the slot in the seed: the prob slot's direction,
+        or "any" for an llm slot whose pool spans both. Seeded by (entity, slot,
+        draw count) so runs are reproducible. Only the drawn edge is marked
+        explored and given provenance; the rest of the pool stays drawable by a
+        later Propose on the same entity and slot.
+        """
+        if not pool:
+            return None
+        key = f"{start_entity}|{relation}|{slot_direction}"
+        n_draw = self.representative_draws[key]
+        self.representative_draws[key] += 1
+        entity, direction, source = random.Random(f"{key}|{n_draw}").choice(pool)
+        self.explored_triples.append(format_triple(start_entity, relation, direction, entity))
+        if source == "observed":
+            self.explored_entities.add(str(entity))
+        self._record_provenance(entity, start_entity, relation, direction)
+        return entity, direction, source
 
     # ------------------------------------------------------------------
     # Collect: relation-path fan-out
@@ -804,13 +985,29 @@ class KGEnv:
 
     def _replay_path(self, root, path):
         """Fan a relation-type path out from `root` -- see `GoG_env_utils.replay_path`."""
+        predict_fn, threshold = None, 0.0
+        if getattr(self.args, "collect_predict", False):
+            predict_fn, threshold = self._collect_predict, self.prob_propose.theta
         return replay_path(
             self.kg.incomplete_graph_nx,
             root,
             path,
             max_hops=getattr(self.args, "collect_fanout_max_hops", 0),
             max_entities=getattr(self.args, "collect_fanout_max_entities", 0),
+            predict_fn=predict_fn,
+            threshold=threshold,
         )
+
+    def _collect_predict(self, node, relation, direction):
+        """Calibrated GNN top-`predict_topk` for one replay hop: [(entity, P(e | r, d))].
+
+        No P(r, d) factor: the path is already fixed by what the agent collected.
+        """
+        if str(node) not in self.kg.entities:
+            return []
+        entities, probs = self.prob_propose.predict(str(node), self.prob_propose.space.slot(relation, direction))
+        k = self.args.predict_topk
+        return list(zip(entities[:k], probs[:k].tolist()))
 
     def _collect_one(self, entity, replay_cache=None):
         """Expand one collected entity into the full set to add to R_t.
@@ -881,6 +1078,7 @@ class KGEnv:
                 if collected_entity not in seen:
                     seen.add(collected_entity)
                     collected.append(collected_entity)
+        self.collected.update(str(entity) for entity in collected)
 
         if self.records:
             self.records[-1]["collect"] = logs
