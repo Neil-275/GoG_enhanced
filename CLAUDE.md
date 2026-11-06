@@ -133,7 +133,7 @@ python -m relation_inference.baseline.eval_prob_propose --dataset family        
 
 ## Data
 
-`brink_dataset/`, `data_for_LP/`, `results/`, `exp_run/`, and `docs/` (the specs linked above) are gitignored and local.
+`brink_dataset/`, `data_for_LP/`, `results/`, and `exp_run/` are gitignored and local.
 
 - **Two id spaces** must stay consistent. BRINK ids come from `brink_dataset/<name>/`, and GNN ids from
   `data_for_LP/id_processed/<name>/`. `OneShotInterface` builds its mapping from the assigned `KGInterface`, and
