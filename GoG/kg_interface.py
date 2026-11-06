@@ -40,10 +40,12 @@ class FamilyConfig:
 
 class Wikidata5mConfig:
     """Configuration for Wikidata5m dataset"""
-    incomplete_path = "brink_dataset/wikidata5m/wikidata5m/kg/incomplete_facts.tsv"
-    complete_path = "brink_dataset/wikidata5m/wikidata5m/kg/facts.tsv"
-    relations_path = "brink_dataset/wikidata5m/wikidata5m/kg/relations.txt"
-    entities_path = "brink_dataset/wikidata5m/wikidata5m/kg/entities.txt"
+    incomplete_path = "brink_dataset/wikidata5m/incomplete_facts.tsv"
+    complete_path = "brink_dataset/wikidata5m/facts.tsv"
+    rel_path = "brink_dataset/wikidata5m/relations.txt"
+    # Line-aligned with relations.txt: the first alias of each relation id (relations_alias.txt)
+    rel_label_path = "brink_dataset/wikidata5m/relation_labels.txt"
+    ent_path = "brink_dataset/wikidata5m/entities.txt"
 
 
 # ============================================================================
@@ -63,15 +65,25 @@ DATASET_CONFIG_MAP = {
 
 class KGInterface:
     
-    def __init__(self, dataset_name: str, base_path: Optional[str] = None):
+    def __init__(self, dataset_name: str, base_path: Optional[str] = None, args=None):
 
+        self.args = args
         self.dataset_name = dataset_name.lower()
         self.config = DATASET_CONFIG_MAP[self.dataset_name]
         self.base_path = Path(base_path) if base_path else Path(".")
         
         # Load datasets and build NetworkX graphs
         self._load_datasets()
-        self._build_nx_graphs()
+        # NetworkX graphs are built unless args.build_nx_graphs is False (args=None keeps the default).
+        # They are by far the largest cost on wikidata5m (~36 GB, ~70 min) and only the graph
+        # query methods (those going through _get_graph) need them.
+        # args may be a dict ({"build_nx_graphs": False}) or a Namespace.
+        if isinstance(self.args, dict):
+            self.has_nx_graphs = self.args.get("build_nx_graphs", True)
+        else:
+            self.has_nx_graphs = getattr(self.args, "build_nx_graphs", True)
+        if self.has_nx_graphs:
+            self._build_nx_graphs()
 
         # Build a PyG `Data` view of the KG for downstream GNN code.
         # By default we expose the incomplete KG (message passing context).
@@ -82,8 +94,11 @@ class KGInterface:
         logger.info(f"Incomplete graph: {len(self.incomplete_kg)} triples")
         logger.info(f"Relations: {len(self.relations)} (optional)")
         logger.info(f"Entities: {len(self.entities)} (optional)")
-        logger.info(f"NetworkX Complete Graph - Nodes: {self.complete_graph_nx.number_of_nodes()}, Edges: {self.complete_graph_nx.number_of_edges()}")
-        logger.info(f"NetworkX Incomplete Graph - Nodes: {self.incomplete_graph_nx.number_of_nodes()}, Edges: {self.incomplete_graph_nx.number_of_edges()}")
+        if self.has_nx_graphs:
+            logger.info(f"NetworkX Complete Graph - Nodes: {self.complete_graph_nx.number_of_nodes()}, Edges: {self.complete_graph_nx.number_of_edges()}")
+            logger.info(f"NetworkX Incomplete Graph - Nodes: {self.incomplete_graph_nx.number_of_nodes()}, Edges: {self.incomplete_graph_nx.number_of_edges()}")
+        else:
+            logger.info("NetworkX graphs not built (args.build_nx_graphs=False)")
 
     def _build_pyg_data(self, kg_type: str = "incomplete", add_inverse: bool = True) -> Data:
         """Build a `torch_geometric.data.Data` representation of the KG.
@@ -168,28 +183,45 @@ class KGInterface:
     def _get_graph(self, kg_type: str = 'incomplete') -> nx.MultiDiGraph:
         """Get the appropriate NetworkX graph based on kg_type."""
         kg_type = self._validate_kg_type(kg_type)
+        if not self.has_nx_graphs:
+            raise RuntimeError("NetworkX graphs were not built: create KGInterface without args.build_nx_graphs=False")
         return self.complete_graph_nx if kg_type == 'complete' else self.incomplete_graph_nx
     
     def _load_datasets(self):
         """Load KG dataframes and metadata from files."""
         # Load complete KG
         complete_path = self.base_path / self.config.complete_path
-        self.complete_kg = pd.read_csv(complete_path, sep='\t' if complete_path.suffix == '.tsv' else ',')
+        # The KG files have no header row; header=None keeps the first triple.
+        self.complete_kg = pd.read_csv(complete_path, sep='\t' if complete_path.suffix == '.tsv' else ',', header=None)
         self.complete_kg.columns = ['head', 'relation', 'tail']
         self.complete_kg = self.complete_kg.astype(str)
         
         # Load incomplete KG
         incomplete_path = self.base_path / self.config.incomplete_path
-        self.incomplete_kg = pd.read_csv(incomplete_path, sep='\t' if incomplete_path.suffix == '.tsv' else ',')
+        self.incomplete_kg = pd.read_csv(incomplete_path, sep='\t' if incomplete_path.suffix == '.tsv' else ',', header=None)
         self.incomplete_kg.columns = ['head', 'relation', 'tail']
         self.incomplete_kg = self.incomplete_kg.astype(str)
-        self.list_edges = list(zip(self.incomplete_kg['head'], self.incomplete_kg['relation'], self.incomplete_kg['tail']))
-        
+
         with open(self.base_path / self.config.rel_path, 'r') as f:
             self.relations = [line.strip() for line in f]
         if self.dataset_name == "family":
             # Handle Family dataset's relation label inconsistency.
             self.relations = [rel + "_of" for rel in self.relations]
+        rel_label_path = getattr(self.config, "rel_label_path", None)
+        if rel_label_path:
+            # Wikidata5m triples use relation ids (P159). Replace them with their labels
+            # ("headquarters location") so prompts, relation matching and rel_emb see readable
+            # names, as in the other KGs. rel2id keeps the line order of relations.txt.
+            with open(self.base_path / rel_label_path, 'r', encoding='utf-8') as f:
+                labels = [line.strip() for line in f]
+            assert len(labels) == len(self.relations) and len(set(labels)) == len(labels)
+            self.relation_ids = self.relations
+            id2label = dict(zip(self.relations, labels))
+            for kg in (self.complete_kg, self.incomplete_kg):
+                kg['relation'] = kg['relation'].map(id2label)
+                assert not kg['relation'].isna().any(), "a relation of the KG is missing from relations.txt"
+            self.relations = labels
+        self.list_edges = list(zip(self.incomplete_kg['head'], self.incomplete_kg['relation'], self.incomplete_kg['tail']))
         # if self.dataset_name == "fb15k_237":
         #     print("12344124152")
         #     self.relations = [shorten_relation(rel) for rel in self.relations]

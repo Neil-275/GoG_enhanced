@@ -6,11 +6,14 @@ from torch.utils.data import DataLoader
 from types import SimpleNamespace
 import torch
 from collections import defaultdict
+import numpy as np
+import scipy.sparse as sp
 
 # in_feature = 2 * n_rel (outgoing + incoming counts), set per dataset
 IN_FEATURE = {
     "family":     25,   # placeholder (family has 12 relations, so 24)
     "fb15k_237":  475,   # placeholder
+    "wikidata5m": 1644,  # 822 relations
 }
 
 def make_args(dataset: str , in_features: int) -> SimpleNamespace:
@@ -69,7 +72,39 @@ class RelationInferenceData(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         return self.X[idx], self.y[idx]
-    
+
+
+class SparseRelationInferenceData(torch.utils.data.Dataset):
+    """RelationInferenceData for the CSR files of wikidata5m: X (counts) and Y (multi-hot) stay
+    sparse and only one batch is made dense (DataLoader calls __getitems__ with the batch indices)."""
+    def __init__(self, X, Y):
+        self.X, self.Y = X.tocsr().astype(np.float32), Y.tocsr().astype(np.float32)
+
+    @classmethod
+    def from_questions(cls, d):
+        """Question file {"X", "slot", ...} (one row per question/dropped edge) -> one row per
+        distinct input with all its slots, like RelationInferenceData's grouping."""
+        X, slots, first = d["X"].tocsr(), defaultdict(set), {}
+        for i, s in enumerate(d["slot"]):
+            lo, hi = X.indptr[i], X.indptr[i + 1]
+            key = X.indices[lo:hi].tobytes() + X.data[lo:hi].tobytes()
+            first.setdefault(key, i)
+            slots[key].add(int(s))
+        r = [i for i, k in enumerate(first) for _ in slots[k]]
+        c = [s for k in first for s in slots[k]]
+        Y = sp.csr_matrix((np.ones(len(c), np.float32), (r, c)), shape=(len(first), X.shape[1]))
+        return cls(X[list(first.values())], Y)
+
+    def __len__(self):
+        return self.X.shape[0]
+
+    def __getitems__(self, idxs):
+        X, Y = torch.from_numpy(self.X[idxs].toarray()), torch.from_numpy(self.Y[idxs].toarray())
+        return list(zip(X, Y))
+
+    def __getitem__(self, idx):
+        return self.__getitems__([idx])[0]
+
 
 class RelationInferenceTrainer():
     def __init__(self, model: RelationInferenceModel, data: RelationInferenceData, args,
@@ -94,7 +129,10 @@ class RelationInferenceTrainer():
     def _filtered_ranks(pred, y):
         valid = y.bool()
         s_invalid = pred.masked_fill(valid, float("-inf"))
-        above = (s_invalid.unsqueeze(1) > pred.unsqueeze(2)).sum(dim=2)
+        # number of invalid scores strictly above each score; sort + searchsorted instead of a
+        # B x V x V comparison, which is ~1.4 GB per batch of 512 with wikidata5m's 1644 slots
+        s_sorted = s_invalid.sort(dim=1).values
+        above = pred.size(1) - torch.searchsorted(s_sorted, pred.contiguous(), right=True)
         ranks =  (above[valid] + 1)
         return ranks.float()
     
@@ -173,12 +211,14 @@ def finetune(pretrained_path, finetune_data, val_data, args, test_data=None):
     """
     model = RelationInferenceModel(args)
     model.load_state_dict(torch.load(pretrained_path, map_location="cpu"))
+    # a Dataset (e.g. SparseRelationInferenceData for wikidata5m) is used as is
+    as_data = lambda d: d if isinstance(d, torch.utils.data.Dataset) else RelationInferenceData(d, args)
     trainer = RelationInferenceTrainer(
         model,
-        RelationInferenceData(finetune_data, args),
+        as_data(finetune_data),
         args,
-        val_data=RelationInferenceData(val_data, args),
-        test_data=RelationInferenceData(test_data, args) if test_data is not None else None,
+        val_data=as_data(val_data),
+        test_data=as_data(test_data) if test_data is not None else None,
     )
     trainer.train(keep_baseline=True)
     return trainer.model, trainer

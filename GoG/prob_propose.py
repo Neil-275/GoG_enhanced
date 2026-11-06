@@ -28,12 +28,13 @@ from relation_inference.relation_inference_interface import RelationInferenceInt
 
 CALIBRATION_DIR = Path("results/calibration_results")
 PRIOR_PATHS = {
-    # "family": "relation_inference/model/family_finetune.pt",
-    "family": "relation_inference/model/family_pretrain.pt", 
-    # "fb15k_237": "relation_inference/model/fb15k_237_finetune.pt",
-    "fb15k_237": "relation_inference/model/fb15k_237_pretrain.pt",
+    "family": "relation_inference/model/family_finetune.pt",
+    # "family": "relation_inference/model/family_pretrain.pt", 
+    "fb15k_237": "relation_inference/model/fb15k_237_finetune.pt",
+    # "fb15k_237": "relation_inference/model/fb15k_237_pretrain.pt",
 }
 BASELINE_CFG = {"T": 0.02, "lam": 1, "gamma": 2, "k_b": 3, "k_p": 3}
+# BASELINE_CFG = {"T": 0.02, "lam": 0, "gamma": 2, "k_b": 3, "k_p": 0} ## Ablate prior
 PREDICT_POOL = 200
 MASS = 0.95    # tau: cumulative P(r, d) at which slot expansion stops
 THETA = 1   # P(e) threshold for keeping a predicted entity; the top one is always kept

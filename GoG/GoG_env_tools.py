@@ -354,11 +354,14 @@ class KGEnv:
             relation = item.get("relation")
             if not relation:
                 continue
-            for gd_relation in snap_targets:
-                # print("gd_relation:", gd_relation, "relation:", relation)
-                if relation in gd_relation:
-                    relation = gd_relation
-                    break
+            # An exact match wins over a substring one: "country" must not snap to
+            # "country of citizenship" when "country" is itself a target.
+            if relation not in snap_targets:
+                for gd_relation in snap_targets:
+                    # print("gd_relation:", gd_relation, "relation:", relation)
+                    if relation in gd_relation:
+                        relation = gd_relation
+                        break
             if relation and relation not in selected_relations:
                 selected_relations.append(relation)
                 updated_selected_relation_items.append({"relation": relation})
