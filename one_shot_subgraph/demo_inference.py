@@ -75,6 +75,13 @@ def main():
     parser.add_argument('--topk', type=float, default=0.1, help='Subgraph sampling ratio (topk * n_ent nodes)')
     parser.add_argument('--topm', type=float, default=-1, help='Edge sampling ratio (topm * |facts| edges); -1 disables')
     parser.add_argument('--add_manual_edges', action='store_true')
+    parser.add_argument('--local_ppr', action='store_true',
+                        help='Use compact local-push sampling and candidate-only top-k')
+    parser.add_argument('--max_nodes_per_query', type=int, default=1024)
+    parser.add_argument('--max_edges_per_query', type=int, default=10000)
+    parser.add_argument('--local_ppr_alpha', type=float, default=0.85)
+    parser.add_argument('--local_ppr_epsilon', type=float, default=1e-6)
+    parser.add_argument('--drop_graph', action='store_true')
 
     # Runtime
     parser.add_argument('--gpu', type=int, default=0)
@@ -86,6 +93,8 @@ def main():
     parser.add_argument('--fact_ratio', type=float, default=0.85)
     parser.add_argument('--remove_1hop_edges', default=True)
     parser.add_argument('--not_shuffle_train', default=True)
+    parser.add_argument('--brink', action='store_true')
+    parser.add_argument('--topic_ent_file', default=None)
 
     # Model architecture (MUST match the checkpoint)
     parser.add_argument('--hidden_dim', type=int, default=64)
@@ -126,8 +135,8 @@ def main():
     args.n_rel = loader.n_rel
 
     # Build inference sampler from the USER-PROVIDED graph (can take time if PPR cache is missing)
-    args.n_samp_ent = int(args.topk * loader.n_ent)
-    args.n_samp_edge = int(args.topm * len(loader.fact_data)) if args.topm > 0 else -1
+    args.n_samp_ent = args.max_nodes_per_query if args.local_ppr else int(args.topk * loader.n_ent)
+    args.n_samp_edge = args.max_edges_per_query if args.local_ppr else (int(args.topm * len(loader.fact_data)) if args.topm > 0 else -1)
     print(f"==> #sampled entities: {args.n_samp_ent}, #sampled edges: {args.n_samp_edge}")
 
     infer_triples = _read_triples_file(args.infer_graph_path, loader=loader)

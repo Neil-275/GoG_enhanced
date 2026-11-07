@@ -10,7 +10,6 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from collections import defaultdict
 import torch.nn.functional as F
-from torch_scatter import scatter
 import copy
 from torch.utils.data import Subset
 
@@ -25,8 +24,8 @@ class BaseModel(object):
         self.args.scoring_mode = self.scoring_mode
 
         self.loader = loader
-        self.model = GNN_auto(args)
-        self.model.cuda()
+        self.device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
+        self.model = GNN_auto(args).to(self.device)
         self.n_ent = loader.n_ent
         self.n_samp_ent = args.n_samp_ent
         self.n_rel = loader.n_rel
@@ -96,7 +95,7 @@ class BaseModel(object):
     def loadModel(self, filePath):
         print(f'Load weight from {filePath}')
         assert os.path.exists(filePath)
-        checkpoint = torch.load(filePath, map_location=torch.device(f'cuda:{self.args.gpu}'))
+        checkpoint = torch.load(filePath, map_location=self.device)
         self.model.load_state_dict(checkpoint['model_state_dict'])
         
         # Load optimizer state if available
@@ -110,12 +109,48 @@ class BaseModel(object):
         self.scheduler = ReduceLROnPlateau(self.optimizer, mode='max', factor=0.5, patience=2, min_lr=self.args.lr/20)
         
     def prepareData(self, batch_data):
-        subs, rels, objs, batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs, batch_sampled_edges = batch_data
-        subgraph_data = [batch_idxs, abs_idxs, query_sub_idxs, edge_batch_idxs.cuda(), batch_sampled_edges.cuda()]
-        subs = subs.cuda().flatten()
-        rels = rels.cuda().flatten()
-        objs = objs.cuda()
+        subs, rels, objs, *subgraph_data = batch_data
+        subgraph_data = [x.to(self.device) if isinstance(x, torch.Tensor) else x for x in subgraph_data]
+        subs = subs.to(self.device).flatten()
+        rels = rels.to(self.device).flatten()
+        if isinstance(objs, list):
+            objs = [x.to(self.device) for x in objs]
+        else:
+            objs = objs.to(self.device)
         return subs, rels, objs, subgraph_data
+
+    @staticmethod
+    def _segment(output, query_index):
+        start = int(output['node_ptr'][query_index].item())
+        end = int(output['node_ptr'][query_index + 1].item())
+        return output['node_scores'][start:end], output['abs_idxs'][start:end]
+
+    def compact_global_loss(self, output, targets):
+        losses, covered = [], []
+        for i, target in enumerate(targets.flatten().long()):
+            scores, ids = self._segment(output, i)
+            k = scores.numel()
+            if not 0 < k <= self.n_ent or torch.unique(ids).numel() != k:
+                raise ValueError('compact score segments require unique IDs and 0 < K <= N')
+            sampled_log_z = torch.logsumexp(scores, dim=0)
+            outside = scores.new_tensor(float('-inf')) if k == self.n_ent else scores.new_tensor(self.n_ent - k).log()
+            log_z = torch.logaddexp(sampled_log_z, outside)
+            match = torch.where(ids == target)[0]
+            covered.append(bool(match.numel()))
+            target_score = scores[match[0]] if match.numel() else scores.new_zeros(())
+            losses.append(log_z - target_score)
+        return torch.stack(losses).sum(), covered
+
+    def compact_filtered_rank(self, scores, ids, target, filter_ids):
+        valid_filter = {int(x) for x in filter_ids if 0 <= int(x) < self.n_ent}
+        sampled = {int(x): j for j, x in enumerate(ids.tolist())}
+        pos = sampled.get(int(target))
+        target_score = scores[pos] if pos is not None else scores.new_zeros(())
+        keep = torch.tensor([int(x) not in valid_filter for x in ids.tolist()], device=scores.device)
+        sampled_higher = int(((scores > target_score) & keep).sum().item())
+        outside_filtered = sum(x not in sampled for x in valid_filter)
+        outside_unfiltered = self.n_ent - len(sampled) - outside_filtered
+        return 1 + sampled_higher + (outside_unfiltered if float(target_score) < 0 else 0), pos is not None
 
     @torch.no_grad()
     def predict_topk(
@@ -168,10 +203,14 @@ class BaseModel(object):
             # forward
             self.model.zero_grad()
 
-            if self.scoring_mode != 'local':
+            if getattr(self.args, 'local_ppr', False):
+                output = self.model(subs, rels, subgraph_data)
+                loss, covered = self.compact_global_loss(output, objs)
+                reach_tails_list.extend([0 if x else 1 for x in covered])
+            elif self.scoring_mode != 'local':
                 scores = self.model(subs, rels, subgraph_data)
                 # global softmax loss (numerically stable)
-                pos_scores = scores[[torch.arange(len(scores)).cuda(), objs.flatten()]]
+                pos_scores = scores[torch.arange(len(scores), device=scores.device), objs.flatten()]
                 max_n = torch.max(scores, 1, keepdim=True)[0]
                 loss = torch.sum(- pos_scores + max_n + torch.log(torch.sum(torch.exp(scores - max_n),1)))
                 # cover tail entity or not
@@ -225,9 +264,6 @@ class BaseModel(object):
             #     X[flag] = np.random.random()
             #     p.data.copy_(X)
 
-            # cover tail entity or not
-            reach_tails = (pos_scores == 0).detach().int().reshape(-1).cpu().tolist()
-            reach_tails_list += reach_tails
             epoch_loss += loss.item()
         
         self.t_time += time.time() - t_time
@@ -248,6 +284,8 @@ class BaseModel(object):
     
     @torch.no_grad()
     def evaluate(self, eval_train=False, eval_val=True, eval_test=True, verbose=False, rank_CR=False, mean_rank=False):
+        if getattr(self.args, 'local_ppr', False):
+            return self._evaluate_compact(eval_train, eval_val, eval_test, mean_rank)
         self.model.eval()
         i_time = time.time()
         
@@ -462,3 +500,37 @@ class BaseModel(object):
         i_time = time.time() - i_time
         out_str = '[TRAIN] MRR:%.4f H@1:%.4f H@10:%.4f\t [VALID] MRR:%.4f H@1:%.4f H@10:%.4f\t [TEST] MRR:%.4f H@1:%.4f H@10:%.4f \t[TIME] train:%.4f inference:%.4f\n'%(tr_mrr, tr_h1, tr_h10, v_mrr, v_h1, v_h10, t_mrr, t_h1, t_h10, self.t_time, i_time)
         return v_mrr, out_str
+
+    @torch.no_grad()
+    def _evaluate_compact(self, eval_train=False, eval_val=True, eval_test=True, mean_rank=False):
+        self.model.eval()
+        started = time.time()
+        results = {}
+        specs = [('train', self.trainLoader, self.loader, eval_train),
+                 ('val', self.valLoader, self.valLoader.dataset, eval_val),
+                 ('test', self.testLoader, self.testLoader.dataset, eval_test)]
+        coverage_strings = []
+        for name, batches, dataset, enabled in specs:
+            if not enabled:
+                results[name] = (-1, -1, -1); continue
+            ranks, covered = [], []
+            for batch_data in tqdm(batches, ncols=50, leave=False):
+                subs, rels, objs, graph = self.prepareData(batch_data)
+                output = self.model(subs, rels, graph, mode=name)
+                answer_lists = [x.flatten() for x in objs] if isinstance(objs, list) else [x.view(1) for x in objs.flatten()]
+                for i, answers in enumerate(answer_lists):
+                    scores, ids = self._segment(output, i)
+                    filt = dataset.filters[(int(subs[i]), int(rels[i]))]
+                    for answer in answers:
+                        rank, present = self.compact_filtered_rank(scores, ids, int(answer), filt)
+                        ranks.append(rank); covered.append(present)
+            ranking = np.asarray(ranks)
+            results[name] = cal_performance(ranking) if len(ranking) else (-1, -1, -1)
+            coverage_strings.append(f'{name} coverage:{sum(covered)/len(covered):.4f}' if covered else f'{name} coverage:n/a')
+            if mean_rank:
+                self.mean_rank_dict[name] = ranks
+        tr, va, te = results['train'], results['val'], results['test']
+        out = ('[TRAIN] MRR:%.4f H@1:%.4f H@10:%.4f\t [VALID] MRR:%.4f H@1:%.4f H@10:%.4f\t '
+               '[TEST] MRR:%.4f H@1:%.4f H@10:%.4f \t[COVERAGE] %s \t[TIME] train:%.4f inference:%.4f\n') % (
+                   *tr, *va, *te, ' '.join(coverage_strings), self.t_time, time.time() - started)
+        return va[0], out

@@ -26,6 +26,11 @@ parser.add_argument('--remove_1hop_edges', default=True)
 parser.add_argument('--only_eval', action='store_true')
 parser.add_argument('--not_shuffle_train', default=True)
 parser.add_argument('--local_ppr', action='store_true', help='Use local PPR for sampling subgraphs')
+parser.add_argument('--max_nodes_per_query', type=int, default=1024)
+parser.add_argument('--max_edges_per_query', type=int, default=10000,
+                    help='Local-push edge cap; -1 disables it')
+parser.add_argument('--local_ppr_alpha', type=float, default=0.85)
+parser.add_argument('--local_ppr_epsilon', type=float, default=1e-6)
 parser.add_argument('--drop_graph', action='store_true', help='Drop NetworkX graph after building samplers')
 parser.add_argument('--brink', action='store_true', help='Use Brink dataset')
 parser.add_argument('--output_dir', type=str, default=None,
@@ -61,6 +66,12 @@ if __name__ == '__main__':
     torch.cuda.set_device(gpu)
     print('==> gpu:', gpu)
     opts.n_batch = opts.n_tbatch = int(args.batchsize)
+    if args.local_ppr:
+        if not args.not_shuffle_train:
+            parser.error('--local_ppr requires --not_shuffle_train=True (frozen fact graph)')
+        if args.max_nodes_per_query <= 0 or args.max_edges_per_query == 0 or args.max_edges_per_query < -1:
+            parser.error('invalid local-push node/edge budget')
+        print('==> local-push uses absolute node/edge budgets; --topk/--topm are ignored')
     with open(opts.perf_file, 'a+') as f:
         f.write(str(opts))
     
@@ -74,8 +85,8 @@ if __name__ == '__main__':
 
     # build ppr sampler here
     # number of sampled entities
-    args.n_samp_ent = int(args.topk * loader.n_ent)
-    args.n_samp_edge = int(args.topm * len(loader.fact_data)) if args.topm > 0  else -1
+    args.n_samp_ent = args.max_nodes_per_query if args.local_ppr else int(args.topk * loader.n_ent)
+    args.n_samp_edge = args.max_edges_per_query if args.local_ppr else (int(args.topm * len(loader.fact_data)) if args.topm > 0 else -1)
     if hasattr(loader, 'topic_entities') and loader.topic_entities is not None:
         args.topic_entities = loader.topic_entities
         print(f'==> using topic entities from {args.topic_ent_file}, #topic entities: {len(args.topic_entities)}')

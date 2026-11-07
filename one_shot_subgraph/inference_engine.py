@@ -138,17 +138,22 @@ class InferenceEngine:
             args.add_manual_edges = False
         if not hasattr(args, 'use_gpu_ppr'):
             args.use_gpu_ppr = True
+        args.local_ppr = bool(getattr(args, 'local_ppr', False))
+        args.max_nodes_per_query = int(getattr(args, 'max_nodes_per_query', 1024))
+        args.max_edges_per_query = int(getattr(args, 'max_edges_per_query', 10000))
+        args.local_ppr_alpha = float(getattr(args, 'local_ppr_alpha', 0.85))
+        args.local_ppr_epsilon = float(getattr(args, 'local_ppr_epsilon', 1e-6))
 
         # number of sampled nodes/edges (match training conventions)
         if hasattr(args, 'n_samp_ent') and args.n_samp_ent is not None:
             n_samp_ent = int(args.n_samp_ent)
         else:
             topk_ratio = float(getattr(args, 'topk', 0.1))
-            n_samp_ent = int(max(1, round(topk_ratio * self.n_ent)))
+            n_samp_ent = args.max_nodes_per_query if args.local_ppr else int(max(1, round(topk_ratio * self.n_ent)))
             args.n_samp_ent = n_samp_ent
 
         topm_ratio = float(getattr(args, 'topm', -1))
-        n_samp_edge = int(topm_ratio * edge_index.shape[0]) if topm_ratio > 0 else -1
+        n_samp_edge = args.max_edges_per_query if args.local_ppr else (int(topm_ratio * edge_index.shape[0]) if topm_ratio > 0 else -1)
 
         homo_edges = list(set([(int(h), int(t)) for (h, _, t) in edge_index]))
 
@@ -178,9 +183,9 @@ class InferenceEngine:
         params.concatHidden = bool(getattr(args, 'concatHidden', False))
         params.shortcut = bool(getattr(args, 'shortcut', False))
         params.readout = getattr(args, 'readout', 'linear')
+        params.local_ppr = args.local_ppr
 
-        loader_stub = types.SimpleNamespace(n_ent=self.n_ent)
-        self.model = GNN_auto(params, loader_stub)
+        self.model = GNN_auto(params)
 
         device = torch.device(f'cuda:{int(args.gpu)}' if torch.cuda.is_available() else 'cpu')
         self.model.to(device)
