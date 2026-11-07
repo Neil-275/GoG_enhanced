@@ -27,6 +27,7 @@ from relation_inference.relation_inference_interface import RelationInferenceInt
 DATASET_DIRS = {
     "family": "brink_dataset/family",
     "fb15k_237": "brink_dataset/fb15k_237/private_id",
+    "wikidata5m": "brink_dataset/wikidata5m",
 }
 DIRECTIONS = ("outgoing", "incoming")
 PRIOR_FLOOR = 1e-6
@@ -99,19 +100,19 @@ def prior_log_probs(ri: RelationInferenceInterface, entities: list[str]) -> np.n
 def build_questions(dataset: str, split: str, kg: KGInterface, ri: RelationInferenceInterface,
                     space: SlotSpace) -> list[Question]:
     df = _read_split(dataset, split)
+    rows = df.to_dict(orient="records")
+    entities = [row["q_entity"][0] for row in rows]
+    # Only question entities are looked up, and grouping all of wikidata5m does not fit in memory.
     inc = kg.incomplete_kg
-    out_index = inc.groupby(["head", "relation"])["tail"].apply(lambda s: sorted(set(s))).to_dict()
-    in_index = inc.groupby(["tail", "relation"])["head"].apply(lambda s: sorted(set(s))).to_dict()
-    inc_triples = set(zip(inc["head"], inc["relation"], inc["tail"]))
-    dropped = [t for t in zip(kg.complete_kg["head"], kg.complete_kg["relation"], kg.complete_kg["tail"])
-               if t not in inc_triples]
+    outgoing = inc[inc["head"].isin(entities)]
+    incoming = inc[inc["tail"].isin(entities)]
+    out_index = outgoing.groupby(["head", "relation"])["tail"].apply(lambda s: sorted(set(s))).to_dict()
+    in_index = incoming.groupby(["tail", "relation"])["head"].apply(lambda s: sorted(set(s))).to_dict()
     dropped_by_pair = defaultdict(set)
-    for h, r, t in dropped:
+    for h, r, t in zip(kg.drop_edges["head"], kg.drop_edges["relation"], kg.drop_edges["tail"]):
         dropped_by_pair[(h, t)].add(space.slot(r, "outgoing"))
         dropped_by_pair[(t, h)].add(space.slot(r, "incoming"))
 
-    rows = df.to_dict(orient="records")
-    entities = [row["q_entity"][0] for row in rows]
     cos = question_text_scores(kg, [row["question"] for row in rows])
     log_prior = prior_log_probs(ri, entities)
 

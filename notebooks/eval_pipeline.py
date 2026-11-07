@@ -139,6 +139,8 @@ def load_kg_env(dataset, questions_path):
     with open(args_path, "rb") as file:
         args = pickle.load(file)
     args.dataset = Path(questions_path).as_posix()
+    args.build_nx_graphs = False
+    args.return_raw_propose = True
     return KGEnv(args)
 
 
@@ -147,6 +149,11 @@ def main():
     parser.add_argument("--dataset", default="wikidata5m", choices=sorted(DEFAULT_QUESTIONS))
     parser.add_argument("--questions", help="question TSV; defaults to the dataset's smoke or val file")
     parser.add_argument("--stages", nargs="+", default=STAGES, choices=STAGES)
+    # Unset keeps the value in gnn_config.py; these apply to this run only.
+    parser.add_argument("--local_ppr", action=argparse.BooleanOptionalAction, default=None)
+    parser.add_argument("--local_ppr_epsilon", type=float)
+    parser.add_argument("--max_nodes_per_query", type=int)
+    parser.add_argument("--max_edges_per_query", type=int, help="-1 = no cap")
     args = parser.parse_args()
 
     questions_path = args.questions or DEFAULT_QUESTIONS[args.dataset]
@@ -164,6 +171,10 @@ def main():
     if missing:
         raise SystemExit(f"\nCannot run {env_stages} on {args.dataset}, missing:\n  " + "\n  ".join(missing))
 
+    sampler_args = ("local_ppr", "local_ppr_epsilon", "max_nodes_per_query", "max_edges_per_query")
+    overrides = {name: getattr(args, name) for name in sampler_args if getattr(args, name) is not None}
+    one_shot_subgraph_config[args.dataset]["args"].update(overrides)
+    print(f"sampler overrides: {overrides}")
     kg_env = load_kg_env(args.dataset, questions_path)
     drop_edges = kg_env.kg.drop_edges
     if "predict" in env_stages:

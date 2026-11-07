@@ -70,6 +70,7 @@ def write_results(data, env: KGEnv, prediction, args, error: str = None):
                 "type_check": getattr(args, "type_check", False),
                 "include_score": getattr(args, "include_score", False),
                 "representative_only": getattr(args, "representative_only", False),
+                "local_ppr": getattr(args, "local_ppr", None),
             }
             if env.llm_output:
                 res["llm_output"] = env.llm_output
@@ -395,6 +396,11 @@ if __name__ == "__main__":
                         help="Collect fan-out also follows GNN-predicted edges at every hop (top --predict_topk, "
                              "calibrated P(e|r,d)); path score = product of edge confidences, merged by max, "
                              "cut at the prob-propose theta. Off = replay over G_inc only.")
+    parser.add_argument("--local_ppr", "--local-ppr", dest="local_ppr",
+                        action=argparse.BooleanOptionalAction, default=None,
+                        help="use the local-push PPR sampler for the GNN. Unset = the dataset's value in "
+                             "gnn_config.py (on for wikidata5m, where the matrix sampler cannot run; off for "
+                             "family and fb15k_237, whose reported numbers use the matrix sampler).")
     parser.add_argument("--max_selected_relations", type=int, default=3,
                         help="cap on relations Propose may select per call; Predict runs once per relation.")
     parser.add_argument("--max_steps", type=int, default=6,

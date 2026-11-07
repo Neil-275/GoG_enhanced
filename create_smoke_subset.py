@@ -7,6 +7,7 @@ this writes `answer` (all answers) and `hard_answer` together. Easy answers are 
 Writes, next to the source files (the parent folder selects the KG in GoG.py):
     val.tsv, test.tsv  the full splits
     smoke_val.tsv      a subset of val only, so test stays unseen while experimenting
+    val_calibration.tsv  val minus smoke_val, for fitting calibration without touching smoke
 
 The subset is sampled systematically over val sorted by (target relation, rule, q direction,
 q degree), so every stratum gets a proportional share. Same arguments give the same file.
@@ -114,7 +115,9 @@ def main():
     val[OUTPUT_COLUMNS].to_csv(DATA_DIR / "val.tsv", sep="\t", index=False)
     test[OUTPUT_COLUMNS].to_csv(DATA_DIR / "test.tsv", sep="\t", index=False)
     subset[OUTPUT_COLUMNS].to_csv(DATA_DIR / "smoke_val.tsv", sep="\t", index=False)
-    print(f"\nWrote val.tsv, test.tsv and smoke_val.tsv to {DATA_DIR}")
+    calibration = val[~val["id"].isin(subset["id"])]
+    calibration[OUTPUT_COLUMNS].to_csv(DATA_DIR / "val_calibration.tsv", sep="\t", index=False)
+    print(f"\nWrote val.tsv, test.tsv, smoke_val.tsv and val_calibration.tsv ({len(calibration)}) to {DATA_DIR}")
 
 
 if __name__ == "__main__":

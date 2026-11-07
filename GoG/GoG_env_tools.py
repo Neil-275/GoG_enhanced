@@ -71,12 +71,17 @@ class KGEnv:
 
         # Initialize KGInterface
 
-        self.kg: KGInterface = KGInterface(self.dataset_name)
+        # Collect fan-out reads the NetworkX graphs; Propose-only evaluation does not.
+        self.kg: KGInterface = KGInterface(
+            self.dataset_name, args={"build_nx_graphs": getattr(args, "build_nx_graphs", True)}
+        )
         ## NBFNet ##
         # self.gnn: GNNInterface = GNNInterface(self.dataset_name)
         # self.gnn.assign_graph(self.kg.pyg_data)
         ## One-shot subgraph 
-        self.gnn: OneShotInterface = OneShotInterface(self.dataset_name, self.kg.n_ent, self.kg.n_rel)
+        self.gnn: OneShotInterface = OneShotInterface(
+            self.dataset_name, self.kg.n_ent, self.kg.n_rel, local_ppr=getattr(args, "local_ppr", None)
+        )
         self.gnn.assign_graph(self.kg)
         # getattr: pickled args Namespaces predate this flag.
         self.prob_propose = None
@@ -902,6 +907,8 @@ class KGEnv:
             slot_log.append(slot_entry)
 
         # return result.slots, predicted_cands ### Uncomment this line for testing prob_propose alone
+        if getattr(self.args, "return_raw_propose", False):
+            return result.slots, predicted_cands
         if self.records:
             self.records[-1]["e_current"] = start_entity
             self.records[-1]["q_sub"] = q_sub

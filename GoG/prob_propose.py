@@ -32,6 +32,8 @@ PRIOR_PATHS = {
     # "family": "relation_inference/model/family_pretrain.pt", 
     "fb15k_237": "relation_inference/model/fb15k_237_finetune.pt",
     # "fb15k_237": "relation_inference/model/fb15k_237_pretrain.pt",
+    "wikidata5m": "relation_inference/model/wikidata5m_finetune.pt",
+    # "wikidata5m": "relation_inference/model/wikidata5m_pretrain.pt",
 }
 BASELINE_CFG = {"T": 0.02, "lam": 1, "gamma": 2, "k_b": 3, "k_p": 3}
 # BASELINE_CFG = {"T": 0.02, "lam": 0, "gamma": 2, "k_b": 3, "k_p": 0} ## Ablate prior

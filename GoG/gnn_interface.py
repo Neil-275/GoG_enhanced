@@ -75,10 +75,12 @@ def _add_inverse_edges(edge_index: np.ndarray, n_rel: int) -> np.ndarray:
     return np.concatenate([edge_index, inv], axis=0)
 
 class OneShotInterface:
-    def __init__(self, dataset_name: str, n_ent: int, n_rel: int):
+    def __init__(self, dataset_name: str, n_ent: int, n_rel: int, local_ppr: bool = None):
         assert dataset_name in one_shot_subgraph_config, f"Dataset {dataset_name} not found in config"
         args = one_shot_subgraph_config[dataset_name]["args"]
         self.args = types.SimpleNamespace(**args)
+        if local_ppr is not None:  # None keeps the dataset's config value
+            self.args.local_ppr = local_ppr
         self.args.n_rel = n_rel
         self.args.n_ent = n_ent
         self.model = GNN_auto(
@@ -144,7 +146,9 @@ class OneShotInterface:
         n_samp_edge = self.args.max_edges_per_query if self.args.local_ppr else (int(self.topm_ratio * edge_index.shape[0]) if self.topm_ratio > 0 else -1)
         self.args.n_samp_ent = n_samp_ent
         self.args.n_samp_edge = n_samp_edge
-        homo_edges = list(set([(int(h), int(t)) for (h, _, t) in edge_index]))
+        # Local push dedups in its CSR, so skip the Python set (about 10 GB on wikidata5m).
+        homo_edges = (edge_index[:, [0, 2]] if self.args.local_ppr
+                      else list(set([(int(h), int(t)) for (h, _, t) in edge_index])))
         print("okay")
         self.sampler = pprSampler(
             self.n_ent,
