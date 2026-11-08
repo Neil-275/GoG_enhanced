@@ -1,18 +1,49 @@
 import torch
 
-nbfnet_config: dict = {
-    "family":{
-        "config": "NBFNet_PyG/config/transductive/local_family.yaml",
-        "checkpoint": "data_for_LP/id_processed/family/saveModel/topk_0.1_layer_8_ValMRR_0.462.pt",
-    },
+
+class FB15k_237_Config:
+    """Configuration for FB15k-237 dataset"""
+
+
+
+class FamilyConfig:
+    """Configuration for Family dataset"""
+    incomplete_path = "brink_dataset/family/knowledge_graph_incomplete.tsv"
+    complete_path = "brink_dataset/family/knowledge_graph_complete.tsv"
+    rel_path = "brink_dataset/family/relations.txt"
+    ent_path = "brink_dataset/family/entities.txt"
+
+
+class Wikidata5mConfig:
+    """Configuration for Wikidata5m dataset"""
+    incomplete_path = "brink_dataset/wikidata5m/incomplete_facts.tsv"
+    complete_path = "brink_dataset/wikidata5m/facts.tsv"
+    rel_path = "brink_dataset/wikidata5m/relations.txt"
+    # Line-aligned with relations.txt: the first alias of each relation id (relations_alias.txt)
+    rel_label_path = "brink_dataset/wikidata5m/relation_labels.txt"
+    ent_path = "brink_dataset/wikidata5m/entities.txt"
+
+
+data_config_map = {
     "fb15k_237": {
-        "config": "NBFNet_PyG/config/transductive/fb15k237_custom.yaml",
-        "checkpoint": "data_for_LP/id_processed/fb15k_237/finetuneModel/epoch_3_ValMRR_0.568.pt"
+            "incomplete_path": "brink_dataset/fb15k_237/private_id/knowledge_graph_incomplete.tsv",
+            "complete_path": "brink_dataset/fb15k_237/private_id/knowledge_graph_complete.tsv",
+            "rel_path": "brink_dataset/fb15k_237/private_id/relations.txt",  # For translation from BRINK ID to GNN ID
+            "ent_path": "brink_dataset/fb15k_237/private_id/entities.txt"
+        },
+    "family":{
+        "incomplete_path": "brink_dataset/family/knowledge_graph_incomplete.tsv",
+        "complete_path": "brink_dataset/family/knowledge_graph_complete.tsv",
+        "rel_path": "brink_dataset/family/relations.txt",
+        "ent_path": "brink_dataset/family/entities.txt"
     },
     "wikidata5m": {
-        "config": "config/wikidata5m.yaml",
-        "checkpoint": "checkpoints/wikidata5m/best.pt", 
-    },
+        "incomplete_path": "brink_dataset/wikidata5m/incomplete_facts.tsv",
+        "complete_path": "brink_dataset/wikidata5m/facts.tsv",
+        "rel_path": "brink_dataset/wikidata5m/relations.txt",
+        "rel_label_path": "brink_dataset/wikidata5m/relation_labels.txt",
+        "ent_path": "brink_dataset/wikidata5m/entities.txt"
+    }
 }
 
 one_shot_subgraph_config: dict = {

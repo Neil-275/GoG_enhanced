@@ -13,55 +13,12 @@ import torch
 from torch_geometric.data import Data
 from sentence_transformers import SentenceTransformer, util, models
 import numpy as np
-
+from gnn_config import data_config_map
 from GoG.utils import shorten_relation
 
 embed_model = SentenceTransformer('all-MiniLM-L6-v2')
 
-# ============================================================================
-# Dataset Configuration Classes
-# ============================================================================
 
-class FB15k_237_Config:
-    """Configuration for FB15k-237 dataset"""
-    incomplete_path = "brink_dataset/fb15k_237/private_id/knowledge_graph_incomplete.tsv"
-    complete_path = "brink_dataset/fb15k_237/private_id/knowledge_graph_complete.tsv"
-    rel_path = "brink_dataset/fb15k_237/private_id/relations.txt" # For translation from BRINK ID to GNN ID
-    ent_path = "brink_dataset/fb15k_237/private_id/entities.txt"
-
-
-class FamilyConfig:
-    """Configuration for Family dataset"""
-    incomplete_path = "brink_dataset/family/knowledge_graph_incomplete.tsv"
-    complete_path = "brink_dataset/family/knowledge_graph_complete.tsv"
-    rel_path = "brink_dataset/family/relations.txt"
-    ent_path = "brink_dataset/family/entities.txt"
-
-
-class Wikidata5mConfig:
-    """Configuration for Wikidata5m dataset"""
-    incomplete_path = "brink_dataset/wikidata5m/incomplete_facts.tsv"
-    complete_path = "brink_dataset/wikidata5m/facts.tsv"
-    rel_path = "brink_dataset/wikidata5m/relations.txt"
-    # Line-aligned with relations.txt: the first alias of each relation id (relations_alias.txt)
-    rel_label_path = "brink_dataset/wikidata5m/relation_labels.txt"
-    ent_path = "brink_dataset/wikidata5m/entities.txt"
-
-
-# ============================================================================
-# Dataset Registry
-# ============================================================================
-
-DATASET_CONFIG_MAP = {
-    "fb15k_237": FB15k_237_Config,
-    "family": FamilyConfig,
-    "wikidata5m": Wikidata5mConfig,
-}
-
-
-# ============================================================================
-# Knowledge Graph Interface
-# ============================================================================
 
 class KGInterface:
     
@@ -69,7 +26,7 @@ class KGInterface:
 
         self.args = args
         self.dataset_name = dataset_name.lower()
-        self.config = DATASET_CONFIG_MAP[self.dataset_name]
+        self.config = data_config_map[self.dataset_name]
         self.base_path = Path(base_path) if base_path else Path(".")
         
         # Load datasets and build NetworkX graphs
@@ -190,19 +147,19 @@ class KGInterface:
     def _load_datasets(self):
         """Load KG dataframes and metadata from files."""
         # Load complete KG
-        complete_path = self.base_path / self.config.complete_path
+        complete_path = self.base_path / self.config['complete_path']
         # The KG files have no header row; header=None keeps the first triple.
         self.complete_kg = pd.read_csv(complete_path, sep='\t' if complete_path.suffix == '.tsv' else ',', header=None)
         self.complete_kg.columns = ['head', 'relation', 'tail']
         self.complete_kg = self.complete_kg.astype(str)
         
         # Load incomplete KG
-        incomplete_path = self.base_path / self.config.incomplete_path
+        incomplete_path = self.base_path / self.config['incomplete_path']
         self.incomplete_kg = pd.read_csv(incomplete_path, sep='\t' if incomplete_path.suffix == '.tsv' else ',', header=None)
         self.incomplete_kg.columns = ['head', 'relation', 'tail']
         self.incomplete_kg = self.incomplete_kg.astype(str)
 
-        with open(self.base_path / self.config.rel_path, 'r') as f:
+        with open(self.base_path / self.config['rel_path'], 'r') as f:
             self.relations = [line.strip() for line in f]
         if self.dataset_name == "family":
             # Handle Family dataset's relation label inconsistency.
@@ -231,7 +188,7 @@ class KGInterface:
         self.rel2id = {v: k for k, v in enumerate(self.relations)}
         self.create_rel_emb()
 
-        with open(self.base_path / self.config.ent_path, 'r') as f:
+        with open(self.base_path / self.config['ent_path'], 'r') as f:
             self.entities = [line.strip() for line in f]
         self.entity2id = {v: k for k, v in enumerate(self.entities)}
         self.n_ent = len(self.entities)
