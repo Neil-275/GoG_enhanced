@@ -10,9 +10,16 @@
 Only predicted entities are ranked by P(e). Observed far ends of each slot in S are returned unranked, in a
 shuffle seeded by (e, slot), for the caller to add unconditionally.
 
-T_propose / T_predict were fitted (relation_inference/baseline/calibrate.ipynb) for one baseline config, one
-prior and one pool size; all three are stored next to them and checked on load. The fit only used questions
-whose gold slot is in C and whose gold entity is in the pool, so both probabilities are conditional on that.
+T_propose / T_predict were fitted (relation_inference/baseline/calibration.py) for one baseline config, one
+prior, one pool size and one GNN sampler; all four are stored next to them and checked on load. The fit only
+used questions whose gold slot is in C and whose gold entity is in the pool, so both probabilities are
+conditional on that.
+
+Prior variants: 'finetune' and 'pretrain' load relation_inference/model/{dataset}_{variant}.pt. 'noprior' sets
+lam = 0 and k_p = 0, so the prior neither scores nor adds slots; the finetune model is still loaded only
+because make_question computes its features, and the calibration stores prior_path = None.
+Calibration files: results/calibration_results/calibration_results_{dataset}_{variant}_{sampler}.pkl, with
+sampler 'localpush' or 'matrix' from the GNN's local_ppr.
 """
 import pickle
 import random
@@ -27,19 +34,74 @@ from relation_inference.baseline import pipeline as P
 from relation_inference.relation_inference_interface import RelationInferenceInterface
 
 CALIBRATION_DIR = Path("results/calibration_results")
-PRIOR_PATHS = {
-    "family": "relation_inference/model/family_finetune.pt",
-    # "family": "relation_inference/model/family_pretrain.pt", 
-    "fb15k_237": "relation_inference/model/fb15k_237_finetune.pt",
-    # "fb15k_237": "relation_inference/model/fb15k_237_pretrain.pt",
-    "wikidata5m": "relation_inference/model/wikidata5m_finetune.pt",
-    # "wikidata5m": "relation_inference/model/wikidata5m_pretrain.pt",
-}
+DATASETS = ("family", "fb15k_237", "wikidata5m")
+PRIOR_VARIANTS = ("finetune", "pretrain", "noprior")
+DEFAULT_PRIOR_VARIANT = "finetune"
 BASELINE_CFG = {"T": 0.02, "lam": 1, "gamma": 2, "k_b": 3, "k_p": 3}
-# BASELINE_CFG = {"T": 0.02, "lam": 0, "gamma": 2, "k_b": 3, "k_p": 0} ## Ablate prior
+NO_PRIOR_CFG = {**BASELINE_CFG, "lam": 0, "k_p": 0}  # ablate the prior
+
+
+def prior_model_path(dataset: str, variant: str) -> str:
+    """Relation-prior weights loaded for `variant`; 'noprior' loads finetune, whose output is unused."""
+    assert variant in PRIOR_VARIANTS, variant
+    return f"relation_inference/model/{dataset}_{'finetune' if variant == 'noprior' else variant}.pt"
+
+
+def baseline_cfg(variant: str) -> dict:
+    return NO_PRIOR_CFG if variant == "noprior" else BASELINE_CFG
+
+
+# Default variant per dataset, for callers that predate the variant argument.
+PRIOR_PATHS = {dataset: prior_model_path(dataset, DEFAULT_PRIOR_VARIANT) for dataset in DATASETS}
 PREDICT_POOL = 200
 MASS = 0.95    # tau: cumulative P(r, d) at which slot expansion stops
 THETA = 1   # P(e) threshold for keeping a predicted entity; the top one is always kept
+
+
+def sampler_signature(gnn_args) -> dict:
+    """GNN sampler settings that change the subgraph, hence the GNN scores T_predict was fitted on.
+
+    Local push: local_ppr, epsilon, node and edge caps, alpha. Matrix: local_ppr, topk, topm, the only
+    settings the matrix sampler reads.
+    """
+    a = gnn_args if isinstance(gnn_args, dict) else vars(gnn_args)
+    if a.get("local_ppr"):
+        return {"local_ppr": True,
+                "local_ppr_epsilon": float(a["local_ppr_epsilon"]),
+                "max_nodes_per_query": int(a["max_nodes_per_query"]),
+                "max_edges_per_query": int(a["max_edges_per_query"]),
+                "local_ppr_alpha": float(a["local_ppr_alpha"])}
+    return {"local_ppr": False, "topk": float(a["topk"]), "topm": float(a["topm"])}
+
+
+def sampler_name(signature: dict) -> str:
+    return "localpush" if signature["local_ppr"] else "matrix"
+
+
+def calibration_path(dataset: str, variant: str, gnn_args) -> Path:
+    name = sampler_name(sampler_signature(gnn_args))
+    return CALIBRATION_DIR / f"calibration_results_{dataset}_{variant}_{name}.pkl"
+
+
+def expected_calibration(dataset: str, variant: str, gnn_args) -> dict:
+    """What a calibration file must store to be valid for this setup; compared key by key on load."""
+    return {"cfg": baseline_cfg(variant),
+            "prior_path": None if variant == "noprior" else prior_model_path(dataset, variant),
+            "predict_pool": PREDICT_POOL,
+            "sampler": sampler_signature(gnn_args)}
+
+
+def load_calibration(dataset: str, variant: str, gnn_args) -> dict:
+    path = calibration_path(dataset, variant, gnn_args)
+    if not path.exists():
+        raise FileNotFoundError(f"no calibration {path}; fit it with relation_inference/baseline/calibration.py")
+    calib = pickle.loads(path.read_bytes())
+    stale = {k: (calib.get(k), v) for k, v in expected_calibration(dataset, variant, gnn_args).items()
+             if calib.get(k) != v}
+    if stale:
+        raise ValueError(f"{path} was fitted under a different setup (stored, expected): {stale}; "
+                         f"refit with relation_inference/baseline/calibration.py")
+    return calib
 
 
 @dataclass
@@ -67,24 +129,20 @@ class ProposeResult:
 
 class ProbabilisticPropose:
     def __init__(self, kg, gnn, dataset: str, max_slots: int, k_predict: int,
-                 mass: float = MASS, theta: float = THETA):
+                 mass: float = MASS, theta: float = THETA, prior_variant: str = DEFAULT_PRIOR_VARIANT):
         self.kg, self.gnn = kg, gnn
         self.max_slots, self.k_predict, self.mass, self.theta = max_slots, k_predict, mass, theta
-        mode = PRIOR_PATHS[dataset].split("/")[-1].split(".")[0].split("_")[-1]
-        calib = pickle.loads((CALIBRATION_DIR / f"calibration_results_{dataset}_{mode}.pkl").read_bytes())
-        expected = {"cfg": BASELINE_CFG, "prior_path": PRIOR_PATHS[dataset], "predict_pool": PREDICT_POOL}
-        # stale = {k: (calib.get(k), v) for k, v in expected.items() if calib.get(k) != v}
-        # if stale:
-        #     print(mode, "calibration:", calib)
-        #     raise ValueError(f"calibration for {dataset} was fitted under a different setup "
-        #                      f"(stored, expected): {stale}; refit calibrate.ipynb")
+        self.prior_variant = prior_variant
+        self.cfg = baseline_cfg(prior_variant)
+        calib = load_calibration(dataset, prior_variant, gnn.args)
         self.T_propose, self.T_predict = float(calib["T_propose"]), float(calib["T_predict"])
 
         self.space = P.SlotSpace(kg)
-        self.ri = RelationInferenceInterface(kg, model_path=PRIOR_PATHS[dataset])
+        model_path = prior_model_path(dataset, prior_variant)
+        self.ri = RelationInferenceInterface(kg, model_path=model_path)
         self.predict_cache = {}   # (e, slot) -> (entities, raw GNN scores) over the whole pool
-        ## print model path 
-        print("Initiate ProbabilisticPropose with model path:", PRIOR_PATHS[dataset]) 
+        print(f"Initiate ProbabilisticPropose: prior {prior_variant} ({model_path}), "
+              f"calibration {calibration_path(dataset, prior_variant, gnn.args)}")
 
     def propose(self, text: str, e: str) -> ProposeResult:
         return self.propose_question(P.make_question(self.kg, self.ri, self.space, text, str(e)))
@@ -117,7 +175,7 @@ class ProbabilisticPropose:
 
     def slot_probs(self, q: P.Question) -> tuple[np.ndarray, np.ndarray]:
         """C ordered best first, with P(r, d) = softmax of the baseline score over C."""
-        cfg = BASELINE_CFG
+        cfg = self.cfg
         sources = P.candidate_sources(q, self.space, cfg["k_b"], cfg["k_p"])
         ranked, scores = P.rank_candidates(q, self.space, np.array(sorted(sources), dtype=np.int64),
                                            cfg["T"], cfg["lam"], cfg["gamma"])

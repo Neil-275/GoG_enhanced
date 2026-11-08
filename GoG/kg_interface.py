@@ -164,7 +164,7 @@ class KGInterface:
         if self.dataset_name == "family":
             # Handle Family dataset's relation label inconsistency.
             self.relations = [rel + "_of" for rel in self.relations]
-        rel_label_path = getattr(self.config, "rel_label_path", None)
+        rel_label_path = self.config.get("rel_label_path")  # config is a dict since data_config_map
         if rel_label_path:
             # Wikidata5m triples use relation ids (P159). Replace them with their labels
             # ("headquarters location") so prompts, relation matching and rel_emb see readable

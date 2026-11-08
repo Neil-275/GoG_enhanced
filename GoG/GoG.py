@@ -383,6 +383,10 @@ if __name__ == "__main__":
                         help="'llm': relation selection + direction specification prompts. 'prob': LLM-free "
                              "calibrated P(r,d) x P(e|r,d) (GoG/prob_propose.py); predicted entities are ranked "
                              "and thresholded, observed ones added unranked.")
+    parser.add_argument("--prior_variant", default="finetune", choices=("finetune", "pretrain", "noprior"),
+                        help="relation prior used by --propose_mode prob: relation_inference/model/"
+                             "{dataset}_{finetune,pretrain}.pt, or 'noprior' (lam = 0, k_p = 0). Each variant "
+                             "loads its own calibration file.")
     parser.add_argument("--include_score", action=argparse.BooleanOptionalAction, default=False,
                         help="show prob-propose scores in the Propose Observation: p of each selected "
                              "(relation, direction) and of each predicted entity. Off = the agent sees "

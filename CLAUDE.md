@@ -70,21 +70,22 @@ requirement before `Collect`, or batched multi-entity Propose.
   `run_baseline.py`'s oracle differs: it unions dropped edges in both directions.
 - `evaluation.py` is the canonical evaluator (Hits@Any, Hits@Hard, Precision, Recall, F1, `HHR = Hits@Hard / Hits@Any`).
 
-### Status (2026-11-06)
+### Status (2026-11-08)
 
 - **Toggles.** The `return` lines commented `Uncomment this line for testing ...` in `KGEnv.prob_propose_action` and
   `KGEnv.propose_action` turn Propose into a test harness that returns a tuple. Both are live now, so `obs.replace` in
   `find_answer` raises, and each question is written with `prediction: None` plus an `error`, without stopping the run.
   Comment them out for agent runs and check the `error` field of results.
-- **Calibration guard.** The stale-calibration check in `ProbabilisticPropose.__init__` is commented out. After changing
-  `BASELINE_CFG`, `PRIOR_PATHS`, or `PREDICT_POOL`, refit `relation_inference/baseline/calibrate.ipynb` yourself.
+- **Calibration guard.** On since 2026-11-08: `load_calibration` in `GoG/prob_propose.py` checks `cfg`, `prior_path`,
+  `predict_pool` and the GNN sampler signature. Files are `calibration_results_{dataset}_{variant}_{sampler}.pkl`
+  (`variant` = `finetune`/`pretrain`/`noprior`, from `--prior_variant`; `sampler` = `localpush`/`matrix`, from
+  `local_ppr`). Refit with `relation_inference/baseline/calibration.py`. The `_matrix` files are the old notebook
+  fits with the sampler key backfilled (`sampler_backfilled: True`).
 - **Prior models.** `relation_inference` input data was re-split by profile on 2026-10-25; confirm the `family` and
   `fb15k_237` weights were retrained after that before comparing results.
-- **Extending to wikidata5m (uncommitted).** `KGInterface` and the sparse prior data are in place, and
-  `relation_inference/model/wikidata5m_*.pt` exist. `KGEnv` cannot start yet because it always builds
-  `ProbabilisticPropose`, even with `--propose_mode llm` (`KeyError: 'wikidata5m'`). Still missing: a `PRIOR_PATHS`
-  entry, a calibration pkl, `one_shot_subgraph_config["wikidata5m"]` and its checkpoint, and a `pipeline.DATASET_DIRS`
-  entry. `server_wd5m/` holds the copies used on the server.
+- **wikidata5m.** `KGEnv` needs `calibration_results_wikidata5m_*_localpush.pkl`, which only the vast.ai run fits
+  (`notebooks/run_eval_bundle.py`, steps in `vast/README.md`; plan in `docs/eval_plan_wikidata5m.md`). Local RAM
+  (16 GB) cannot load the graph. `server_wd5m/` holds the copies used on the server.
 
 ## Running
 

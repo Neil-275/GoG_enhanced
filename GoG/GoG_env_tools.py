@@ -63,7 +63,9 @@ logger.add(
 
 
 class KGEnv:
-    def __init__(self, args) -> None:
+    def __init__(self, args, kg: KGInterface = None, gnn: OneShotInterface = None) -> None:
+        """`kg` and `gnn` reuse graphs already loaded in this process (wikidata5m takes minutes);
+        `gnn` must have been assigned `kg`. Unset, both are built from `args`."""
         self.args = args
         # with open("sample_args_family.pkl", "wb") as f:
         #     pkl.dump(self.args, f)
@@ -72,17 +74,20 @@ class KGEnv:
         # Initialize KGInterface
 
         # Collect fan-out reads the NetworkX graphs; Propose-only evaluation does not.
-        self.kg: KGInterface = KGInterface(
+        self.kg: KGInterface = kg if kg is not None else KGInterface(
             self.dataset_name, args={"build_nx_graphs": getattr(args, "build_nx_graphs", True)}
         )
         ## NBFNet ##
         # self.gnn: GNNInterface = GNNInterface(self.dataset_name)
         # self.gnn.assign_graph(self.kg.pyg_data)
         ## One-shot subgraph 
-        self.gnn: OneShotInterface = OneShotInterface(
-            self.dataset_name, self.kg.n_ent, self.kg.n_rel, local_ppr=getattr(args, "local_ppr", None)
-        )
-        self.gnn.assign_graph(self.kg)
+        if gnn is not None:
+            self.gnn: OneShotInterface = gnn
+        else:
+            self.gnn = OneShotInterface(
+                self.dataset_name, self.kg.n_ent, self.kg.n_rel, local_ppr=getattr(args, "local_ppr", None)
+            )
+            self.gnn.assign_graph(self.kg)
         # getattr: pickled args Namespaces predate this flag.
         self.prob_propose = None
         # if getattr(args, "propose_mode", "llm") == "prob":
@@ -90,6 +95,7 @@ class KGEnv:
         self.prob_propose = ProbabilisticPropose(
             self.kg, self.gnn, self.dataset_name,
             max_slots=args.max_selected_relations, k_predict=args.predict_topk,
+            prior_variant=getattr(args, "prior_variant", "finetune"),
         )
         print(f"Dataset Name: {self.dataset_name}")
         logger.info(f"Initialized KGInterface with dataset: {self.dataset_name}")
